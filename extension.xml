@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root version='3.3' release='3'>
+	<!-- Please see the LICENSE.md file included with this distribution for attribution and copyright information. -->
+	<properties>
+		<name>Upgrade NPC Actions</name>
+		<version>1.0</version>
+		<author>bmos (Wil Thieme)</author>
+		<description>This extension replaces NPC spell effects and descriptions with those from the 'PFRPG - Spellbook' module.</description>
+		<ruleset>
+			<name>PFRPG</name>
+		</ruleset>
+		<ruleset>
+			<name>3.5E</name>
+		</ruleset>
+	</properties>
+
+	<announcement text='Upgrade NPC Actions v1.0:\nThis extension replaces NPC spell effects and descriptions with those from the "PFRPG - Spellbook" module.' font='emotefont' />
+
+	<base>
+		<!-- Scripts -->
+		<script name='UpgradeSpells' file='scripts/upgradespells.lua' />
+	</base>
+</root>
