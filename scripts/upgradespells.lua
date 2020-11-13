@@ -115,7 +115,7 @@ function addBattle_new(nodeBattle)
 										end
 
 										-- copy fully-formatted spell description for use with Spell Formatting extension
-										DB.copyNode(nodeReferenceSpellActions.getParent().getChild('description'), nodeSpell.createChild('description_full', 'formattedtext'))
+										--DB.copyNode(nodeReferenceSpellActions.getParent().getChild('description'), nodeSpell.createChild('description_full', 'formattedtext'))
 									end
 								end
 							end
