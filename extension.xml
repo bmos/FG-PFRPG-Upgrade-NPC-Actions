@@ -14,7 +14,7 @@
 		</ruleset>
 	</properties>
 
-	<announcement text='Upgrade NPC Actions v1.0:\nThis extension replaces NPC spell effects and descriptions with those from the "PFRPG - Spellbook" module.' font='emotefont' />
+	<announcement text='https://www.fantasygrounds.com/forums/showthread.php?63620-PFRPG-Upgrade-NPC-Actions-Extension\nUpgrade NPC Actions v1.0:\nThis extension replaces NPC spell effects and descriptions with those from the "PFRPG - Spellbook" module.' font='emotefont' />
 
 	<base>
 		<!-- Scripts -->
