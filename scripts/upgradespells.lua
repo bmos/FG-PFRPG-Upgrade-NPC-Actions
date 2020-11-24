@@ -99,7 +99,7 @@ function addBattle_new(nodeBattle)
 								local sSpellName = string.lower(DB.getValue(nodeSpell, 'name'))
 								if sSpellName then
 									local nodeReferenceSpellActions = getReferenceSpellActions(sSpellName)
-									local nodeSpellActions = nodeSpell.createChild('actions')
+									local nodeSpellActions = nodeSpell.getChild('actions')
 									if nodeReferenceSpellActions and nodeSpellActions then
 										for _,nodeAction in pairs(nodeSpellActions.getChildren()) do
 											local sType = string.lower(DB.getValue(nodeAction, 'type', '')) 
@@ -113,9 +113,8 @@ function addBattle_new(nodeBattle)
 												DB.copyNode(nodeReferenceAction, nodeSpellActions.createChild())
 											end
 										end
-
-										-- copy fully-formatted spell description for use with Spell Formatting extension
-										--DB.copyNode(nodeReferenceSpellActions.getParent().getChild('description'), nodeSpell.createChild('description_full', 'formattedtext'))
+									elseif nodeReferenceSpellActions then
+										DB.copyNode(nodeReferenceSpellActions, nodeSpell.createChild('actions'))
 									end
 								end
 							end
