@@ -103,13 +103,13 @@ function addBattle_new(nodeBattle)
 									if nodeReferenceSpellActions and nodeSpellActions then
 										for _,nodeAction in pairs(nodeSpellActions.getChildren()) do
 											local sType = string.lower(DB.getValue(nodeAction, 'type', '')) 
-											if sType == 'effect' then
+											if sType ~= 'cast' then
 												DB.deleteNode(nodeAction)
 											end
 										end
 										for _,nodeReferenceAction in pairs(nodeReferenceSpellActions.getChildren()) do
 											local sType = string.lower(DB.getValue(nodeReferenceAction, 'type', '')) 
-											if sType == 'effect' then
+											if sType ~= 'cast' then
 												DB.copyNode(nodeReferenceAction, nodeSpellActions.createChild())
 											end
 										end
