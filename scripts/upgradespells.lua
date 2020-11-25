@@ -98,6 +98,8 @@ function addBattle_new(nodeBattle)
 					-- bmos replacing spell effects
 					for _,nodeSpellset in pairs(nodeEntry.getChild('spellset').getChildren()) do
 						for _,nodeSpellLevel in pairs(nodeSpellset.getChild('levels').getChildren()) do
+							local sSpellLevel = nodeSpellLevel.getName():gsub('level', '')
+							local nSpellLevel = tonumber(sSpellLevel)
 							for _,nodeSpell in pairs(nodeSpellLevel.getChild('spells').getChildren()) do
 								local sSpellName = string.lower(DB.getValue(nodeSpell, 'name'))
 								if sSpellName then
@@ -117,7 +119,12 @@ function addBattle_new(nodeBattle)
 											end
 										end
 									elseif nodeReferenceSpellActions then
-										DB.copyNode(nodeReferenceSpellActions, nodeSpell.createChild('actions'))
+										local nPrepared = DB.getValue(nodeSpell, 'prepared', 0)
+										local sSpellName = DB.getValue(nodeSpell, 'name', '')
+										DB.deleteNode(nodeSpell)
+										local nodeSpell = SpellManager.addSpell(nodeReferenceSpellActions.getParent(), nodeSpellset, nSpellLevel)
+										DB.setValue(nodeSpell, 'prepared', 'number', nPrepared)
+										DB.setValue(nodeSpell, 'name', 'string', sSpellName)
 									end
 								end
 							end
