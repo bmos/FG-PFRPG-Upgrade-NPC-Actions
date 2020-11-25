@@ -16,8 +16,11 @@ end
 
 function getReferenceSpellActions(sSpellName)
 	local nEnd = string.find(sSpellName, '%(')
-	sSpellName = string.sub(sSpellName, 1, nEnd)
-	sSpellName = string.gsub(sSpellName, '%A+', '')
+	sSpellName = sSpellName:sub(1, nEnd)
+	sSpellName = sSpellName:gsub('.+:', '')
+	sSpellName = sSpellName:gsub(',.+', '')
+	sSpellName = sSpellName:gsub('%A+', '')
+	sSpellName = StringManager.trim(sSpellName)
 	
 	local nodeReferenceSpell = DB.findNode('spelldesc.' .. sSpellName .. '@PFRPG - Spellbook')
 	if nodeReferenceSpell then
