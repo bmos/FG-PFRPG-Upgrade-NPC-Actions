@@ -96,35 +96,37 @@ function addBattle_new(nodeBattle)
 				if nodeEntry then
 
 					-- bmos replacing spell effects
-					for _,nodeSpellset in pairs(nodeEntry.getChild('spellset').getChildren()) do
-						for _,nodeSpellLevel in pairs(nodeSpellset.getChild('levels').getChildren()) do
-							local sSpellLevel = nodeSpellLevel.getName():gsub('level', '')
-							local nSpellLevel = tonumber(sSpellLevel)
-							for _,nodeSpell in pairs(nodeSpellLevel.getChild('spells').getChildren()) do
-								local sSpellName = string.lower(DB.getValue(nodeSpell, 'name'))
-								if sSpellName then
-									local nodeReferenceSpellActions = getReferenceSpellActions(sSpellName)
-									local nodeSpellActions = nodeSpell.getChild('actions')
-									if nodeReferenceSpellActions and nodeSpellActions then
-										for _,nodeAction in pairs(nodeSpellActions.getChildren()) do
-											local sType = string.lower(DB.getValue(nodeAction, 'type', '')) 
-											if sType ~= 'cast' then
-												DB.deleteNode(nodeAction)
+					if nodeEntry.getChild('spellset') then
+						for _,nodeSpellset in pairs(nodeEntry.getChild('spellset').getChildren()) do
+							for _,nodeSpellLevel in pairs(nodeSpellset.getChild('levels').getChildren()) do
+								local sSpellLevel = nodeSpellLevel.getName():gsub('level', '')
+								local nSpellLevel = tonumber(sSpellLevel)
+								for _,nodeSpell in pairs(nodeSpellLevel.getChild('spells').getChildren()) do
+									local sSpellName = string.lower(DB.getValue(nodeSpell, 'name'))
+									if sSpellName then
+										local nodeReferenceSpellActions = getReferenceSpellActions(sSpellName)
+										local nodeSpellActions = nodeSpell.getChild('actions')
+										if nodeReferenceSpellActions and nodeSpellActions then
+											for _,nodeAction in pairs(nodeSpellActions.getChildren()) do
+												local sType = string.lower(DB.getValue(nodeAction, 'type', '')) 
+												if sType ~= 'cast' then
+													DB.deleteNode(nodeAction)
+												end
 											end
-										end
-										for _,nodeReferenceAction in pairs(nodeReferenceSpellActions.getChildren()) do
-											local sType = string.lower(DB.getValue(nodeReferenceAction, 'type', '')) 
-											if sType ~= 'cast' then
-												DB.copyNode(nodeReferenceAction, nodeSpellActions.createChild())
+											for _,nodeReferenceAction in pairs(nodeReferenceSpellActions.getChildren()) do
+												local sType = string.lower(DB.getValue(nodeReferenceAction, 'type', '')) 
+												if sType ~= 'cast' then
+													DB.copyNode(nodeReferenceAction, nodeSpellActions.createChild())
+												end
 											end
+										elseif nodeReferenceSpellActions then
+											local nPrepared = DB.getValue(nodeSpell, 'prepared', 0)
+											local sSpellName = DB.getValue(nodeSpell, 'name', '')
+											DB.deleteNode(nodeSpell)
+											local nodeSpell = SpellManager.addSpell(nodeReferenceSpellActions.getParent(), nodeSpellset, nSpellLevel)
+											DB.setValue(nodeSpell, 'prepared', 'number', nPrepared)
+											DB.setValue(nodeSpell, 'name', 'string', sSpellName)
 										end
-									elseif nodeReferenceSpellActions then
-										local nPrepared = DB.getValue(nodeSpell, 'prepared', 0)
-										local sSpellName = DB.getValue(nodeSpell, 'name', '')
-										DB.deleteNode(nodeSpell)
-										local nodeSpell = SpellManager.addSpell(nodeReferenceSpellActions.getParent(), nodeSpellset, nSpellLevel)
-										DB.setValue(nodeSpell, 'prepared', 'number', nPrepared)
-										DB.setValue(nodeSpell, 'name', 'string', sSpellName)
 									end
 								end
 							end
