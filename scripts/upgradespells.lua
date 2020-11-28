@@ -132,7 +132,28 @@ function addBattle_new(nodeBattle)
 							end
 						end
 					end
-					-- end of bmos code
+					-- bmos adding automatic disease addition for DiseaseTracker
+					if DiseaseTracker then
+						local sNPCName = DB.getValue(nodeEntry, 'name')
+						if sNPCName then
+							sNPCName = string.lower(sNPCName:gsub('%A', ''))
+							if DB.findNode('reference.diseases@PFRPG SRD Maladies') then
+								for _,nodeDisease in pairs(DB.findNode('reference.diseases@*').getChildren()) do
+									local sDiseaseCreature = DB.getValue(nodeDisease, 'npc')
+									if sDiseaseCreature then
+										sDiseaseCreature = string.lower(sDiseaseCreature:gsub('%A', ''))
+										if sDiseaseCreature == sNPCName then
+											local sDesc = DB.getValue(nodeEntry, 'text', '')
+											local sDiseaseName = DB.getValue(nodeDisease, 'name')
+											local sDescAdd = '<linklist><link class="referencedisease" recordname="' .. DB.getPath(nodeDisease) .. '"><b>Malady: </b>' .. sDiseaseName .. '</link></linklist>'
+											DB.setValue(nodeEntry, 'text', 'formattedtext', sDescAdd .. sDesc)										
+										end
+									end
+								end
+							end
+						end
+					end
+					-- end bmos additions
 
 					local sFaction = DB.getValue(vNPCItem, "faction", "");
 					if sFaction ~= "" then
