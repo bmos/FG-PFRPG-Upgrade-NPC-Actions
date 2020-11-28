@@ -15,5 +15,8 @@
 	<base>
 		<!-- Scripts -->
 		<script name='UpgradeSpells' file='scripts/upgradespells.lua' />
+		<script name='EffectLibraryDescriptions' file='scripts/effectdescriptions.lua' />
+		<!-- Utility -->
+		<includefile source="utility/utility_effects.xml" />
 	</base>
 </root>

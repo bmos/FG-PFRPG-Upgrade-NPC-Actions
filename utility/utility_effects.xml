@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!-- Please see the license.html file included with this distribution for attribution and copyright information. -->
+
+<root>
+	<windowclass name="effectlist" merge="join">
+		<script>
+			function onInit()
+				if DataCommon and DataCommon.conditions then
+					createControl("label_effects_conditions", "label_conditions");
+					createControl("anchor_effects_conditions", "buttonanchor");
+					createControl("label_effects_custom", "label_custom");
+					list.setAnchor("top", "contentanchor", "bottom", "relative", 35);
+					list.setAnchor("left", "contentanchor", "left", "absolute", 195);
+
+					if labelcolor then
+						label_conditions.setColor(labelcolor[1]);
+						label_custom.setColor(labelcolor[1]);
+					end
+					
+					local nHalf = math.ceil(#(DataCommon.conditions) / 2);
+					for i = 1, nHalf do
+						local sEffect1 = StringManager.capitalize(DataCommon.conditions[i]);
+						local sEffect1Tooltip = StringManager.capitalize(EffectLibraryDescriptions.conditionshelp[i]);
+						local c1 = createControl("button_effect", "condition_" .. i);
+						c1.setTooltipText(sEffect1Tooltip);
+						c1.setEffect(sEffect1);
+
+						if (nHalf + i &lt;= #(DataCommon.conditions)) then
+							local sEffect2 = StringManager.capitalize(DataCommon.conditions[nHalf + i]);
+							local sEffect2Tooltip = StringManager.capitalize(EffectLibraryDescriptions.conditionshelp[nHalf + i]);
+							local c2 = createControl("button_effectright", "condition_" .. (nHalf + i));
+							c2.setTooltipText(sEffect2Tooltip);
+							c2.setEffect(sEffect2);
+						end
+					end
+				end
+			end
+		</script>
+	</windowclass>
+</root>
