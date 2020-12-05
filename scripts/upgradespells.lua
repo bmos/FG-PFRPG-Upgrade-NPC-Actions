@@ -21,6 +21,7 @@ function getReferenceSpellActions(sSpellName)
 	sSpellName = sSpellName:gsub(',.+', '')
 	sSpellName = sSpellName:gsub('%A+', '')
 	sSpellName = StringManager.trim(sSpellName)
+	if string.find(sSpellName, 'greater') then sSpellName = sSpellName:gsub('greater', '') .. 'greater'	end
 	
 	local nodeReferenceSpell = DB.findNode('spelldesc.' .. sSpellName .. '@PFRPG - Spellbook')
 	if nodeReferenceSpell then
