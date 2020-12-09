@@ -51,11 +51,13 @@ local function addDiseaseLink(nodeDisease, nodeEntry, sNPCName)
 	local tDiseaseCreatures = fromSSV(DB.getValue(nodeDisease, 'npc')) or {};
 	if tDiseaseCreatures ~= {} then
 		for _,sDiseaseCreature in pairs(tDiseaseCreatures) do
+			local sDC = (sDiseaseCreature:match(' %(DC %d+%)')) or '';
+			local sDiseaseCreature = sDiseaseCreature:gsub(' %(DC %d+%)', '');
 			local sDiseaseCreature = string.lower(sDiseaseCreature:gsub('%A', ''));
 			if sDiseaseCreature == sNPCName then
 				local sDesc = DB.getValue(nodeEntry, 'text', '');
 				local sDiseaseName = DB.getValue(nodeDisease, 'name');
-				local sDescAdd = '<linklist><link class="referencedisease" recordname="' .. DB.getPath(nodeDisease) .. '"><b>Malady: </b>' .. sDiseaseName .. '</link></linklist>';
+				local sDescAdd = '<linklist><link class="referencedisease" recordname="' .. DB.getPath(nodeDisease) .. '"><b>Malady: </b>' .. sDiseaseName .. sDC .. '</link></linklist>';
 				DB.setValue(nodeEntry, 'text', 'formattedtext', sDescAdd .. sDesc);								
 			end
 		end
