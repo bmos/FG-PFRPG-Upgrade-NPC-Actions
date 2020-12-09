@@ -29,6 +29,39 @@ function getReferenceSpellActions(sSpellName)
 	end
 end
 
+---	This function converts a string of values separated by semicolons to a table of values
+--	@param s input, a string of values separated by semicolons
+--	@return t output, an indexed table of values
+local function fromSSV(s)
+	if not s or s=='' then return {}; end
+	
+	s = s .. ';'        -- ending semicolon
+	local t = {}        -- table to collect fields
+	local fieldstart = 1
+	repeat
+		local nexti = string.find(s, ';', fieldstart)
+		table.insert(t, string.sub(s, fieldstart, nexti-1))
+		fieldstart = nexti + 1
+	until fieldstart > string.len(s)
+
+	return t
+end
+
+local function addDiseaseLink(nodeDisease, nodeEntry, sNPCName)
+	local tDiseaseCreatures = fromSSV(DB.getValue(nodeDisease, 'npc')) or {};
+	if tDiseaseCreatures ~= {} then
+		for _,sDiseaseCreature in pairs(tDiseaseCreatures) do
+			local sDiseaseCreature = string.lower(sDiseaseCreature:gsub('%A', ''));
+			if sDiseaseCreature == sNPCName then
+				local sDesc = DB.getValue(nodeEntry, 'text', '');
+				local sDiseaseName = DB.getValue(nodeDisease, 'name');
+				local sDescAdd = '<linklist><link class="referencedisease" recordname="' .. DB.getPath(nodeDisease) .. '"><b>Malady: </b>' .. sDiseaseName .. '</link></linklist>';
+				DB.setValue(nodeEntry, 'text', 'formattedtext', sDescAdd .. sDesc);								
+			end
+		end
+	end
+end
+
 function addBattle_new(nodeBattle)
 	local aModulesToLoad = {};
 	local sTargetNPCList = LibraryData.getCustomData("battle", "npclist") or "npclist";
@@ -137,33 +170,15 @@ function addBattle_new(nodeBattle)
 					if DiseaseTracker then
 						local sNPCName = DB.getValue(nodeEntry, 'name')
 						if sNPCName then
-							sNPCName = string.lower(sNPCName:gsub('%A', ''))
+							sNPCName = string.lower(sNPCName:gsub('%A+', ''))
 							if DB.findNode('reference.diseases@*') then
 								for _,nodeDisease in pairs(DB.findNode('reference.diseases@*').getChildren()) do
-									local sDiseaseCreature = DB.getValue(nodeDisease, 'npc')
-									if sDiseaseCreature then
-										sDiseaseCreature = string.lower(sDiseaseCreature:gsub('%A', ''))
-										if sDiseaseCreature == sNPCName then
-											local sDesc = DB.getValue(nodeEntry, 'text', '')
-											local sDiseaseName = DB.getValue(nodeDisease, 'name')
-											local sDescAdd = '<linklist><link class="referencedisease" recordname="' .. DB.getPath(nodeDisease) .. '"><b>Malady: </b>' .. sDiseaseName .. '</link></linklist>'
-											DB.setValue(nodeEntry, 'text', 'formattedtext', sDescAdd .. sDesc)										
-										end
-									end
+									addDiseaseLink(nodeDisease, nodeEntry, sNPCName)
 								end
 							end
 							if DB.findNode('disease') then
 								for _,nodeDisease in pairs(DB.findNode('disease').getChildren()) do
-									local sDiseaseCreature = DB.getValue(nodeDisease, 'npc')
-									if sDiseaseCreature then
-										sDiseaseCreature = string.lower(sDiseaseCreature:gsub('%A', ''))
-										if sDiseaseCreature == sNPCName then
-											local sDesc = DB.getValue(nodeEntry, 'text', '')
-											local sDiseaseName = DB.getValue(nodeDisease, 'name')
-											local sDescAdd = '<linklist><link class="referencedisease" recordname="' .. DB.getPath(nodeDisease) .. '"><b>Malady: </b>' .. sDiseaseName .. '</link></linklist>'
-											DB.setValue(nodeEntry, 'text', 'formattedtext', sDescAdd .. sDesc)										
-										end
-									end
+									addDiseaseLink(nodeDisease, nodeEntry, sNPCName)
 								end
 							end
 						end
