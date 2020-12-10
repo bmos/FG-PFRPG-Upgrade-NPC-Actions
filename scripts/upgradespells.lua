@@ -2,58 +2,63 @@
 -- Please see the LICENSE.md file included with this distribution for attribution and copyright information.
 --
 
-local function trim_spell_name(sSpellName)
-	local nEnd = string.find(sSpellName, '%(')
-	sSpellName = sSpellName:sub(1, nEnd)
-	sSpellName = sSpellName:gsub('.+:', '')
-	sSpellName = sSpellName:gsub(',.+', '')
-	sSpellName = sSpellName:gsub('%A+', '')
-	sSpellName = StringManager.trim(sSpellName)
-	if string.find(sSpellName, 'greater') then sSpellName = sSpellName:gsub('greater', '') .. 'greater'	end
-	return sSpellName
+local function trim_spell_name(string_spell_name)
+	local number_name_end = string.find(string_spell_name, '%(')
+	string_spell_name = string_spell_name:sub(1, number_name_end)
+	string_spell_name = string_spell_name:gsub('.+:', '')
+	string_spell_name = string_spell_name:gsub(',.+', '')
+	string_spell_name = string_spell_name:gsub('%A+', '')
+	string_spell_name = StringManager.trim(string_spell_name)
+	if string.find(string_spell_name, 'greater') then
+			string_spell_name = string_spell_name:gsub('greater', '') .. 'greater'
+	end
+
+	return string_spell_name
 end
 
-local function get_reference_spell(sSpellName)
-		return DB.findNode('spelldesc.' .. trim_spell_name(sSpellName) .. '@PFRPG - Spellbook')
+local function get_reference_spell(string_spell_name)
+		return DB.findNode('spelldesc.' .. trim_spell_name(string_spell_name) .. '@PFRPG - Spellbook')
 end
 
 ---	This function converts a string of values separated by semicolons to a table
 --	@param s input, a string of values separated by semicolons
 --	@return t output, an indexed table of values
-local function string_to_table(s)
-	if (not s or s == '') then return {}; end
+local function string_to_table(string_input)
+	if (not string_input or string_input == '') then
+		return {}
+	end
 
-	s = s .. ';'        -- ending semicolon
-	local t = {}        -- table to collect fields
-	local fieldstart = 1
+	string_input = string_input .. ';'        -- ending semicolon
+	local table_output = {}        -- table to collect fields
+	local number_field_start = 1
 	repeat
-		local nexti = string.find(s, ';', fieldstart)
-		table.insert(t, string.sub(s, fieldstart, nexti-1))
-		fieldstart = nexti + 1
-	until fieldstart > string.len(s)
+		local number_nexti = string.find(string_input, ';', number_field_start)
+		table.insert(table_output, string.sub(string_input, number_field_start, number_nexti-1))
+		number_field_start = number_nexti + 1
+	until number_field_start > string.len(string_input)
 
-	return t
+	return table_output
 end
 
-local function add_malady_link(nodeDisease, nodeEntry, sNPCName)
-	local tDiseaseCreatures = string_to_table(DB.getValue(nodeDisease, 'npc')) or {}
-	if tDiseaseCreatures ~= {} then
-		for _,sDiseaseCreature in pairs(tDiseaseCreatures) do
-			local sDC = (sDiseaseCreature:match(' %(DC %d+%)')) or ''
-			sDiseaseCreature = sDiseaseCreature:gsub(' %(DC %d+%)', '')
-			sDiseaseCreature = string.lower(sDiseaseCreature:gsub('%A', ''))
-			if sDiseaseCreature == sNPCName then
-				local sDesc = DB.getValue(nodeEntry, 'text', '')
-				local sDiseaseName = DB.getValue(nodeDisease, 'name')
-				local sDescAdd = '<linklist><link class="referencedisease" recordname="' .. DB.getPath(nodeDisease) .. '"><b>Malady: </b>' .. sDiseaseName .. sDC .. '</link></linklist>'
-				DB.setValue(nodeEntry, 'text', 'formattedtext', sDescAdd .. sDesc)
+local function add_malady_link(node_malady, node_npc, string_npc_name)
+	local table_malady_npcs = string_to_table(DB.getValue(node_malady, 'npc')) or {}
+	if table_malady_npcs ~= {} then
+		for _,string_malady_linked_npc in pairs(table_malady_npcs) do
+			local sDC = (string_malady_linked_npc:match(' %(DC %d+%)')) or ''
+			string_malady_linked_npc = string_malady_linked_npc:gsub(' %(DC %d+%)', '')
+			string_malady_linked_npc = string.lower(string_malady_linked_npc:gsub('%A', ''))
+			if string_malady_linked_npc == string_npc_name then
+				local string_description = DB.getValue(node_npc, 'text', '')
+				local string_malady_name = DB.getValue(node_malady, 'name', '')
+				local string_malady_link = '<linklist><link class="referencedisease" recordname="' .. DB.getPath(node_malady) .. '"><b>Malady: </b>' .. string_malady_name .. sDC .. '</link></linklist>'
+				DB.setValue(node_npc, 'text', 'formattedtext', string_malady_link .. string_description)
 			end
 		end
 	end
 end
 
 local function replace_effect_nodes(node_spell, node_spellset, nSpellLevel)
-	local name_spell = string.lower(DB.getValue(nodeSpell, 'name') or '')
+	local name_spell = string.lower(DB.getValue(node_spell, 'name') or '')
 	local node_actions_reference_spell = get_reference_spell(name_spell).getChild('actions')
 	local node_actions_npc_spell = node_spell.getChild('actions')
 	if node_actions_reference_spell and node_actions_npc_spell then
@@ -70,8 +75,8 @@ local function replace_effect_nodes(node_spell, node_spellset, nSpellLevel)
 			end
 		end
 	elseif node_actions_reference_spell then
-		local prepared_count = DB.getValue(nodeSpell, 'prepared', 0)
-		DB.deleteNode(nodeSpell)
+		local prepared_count = DB.getValue(node_spell, 'prepared', 0)
+		DB.deleteNode(node_spell)
 		local spell_node_new = SpellManager.addSpell(node_actions_reference_spell.getParent(), node_spellset, nSpellLevel)
 		DB.setValue(spell_node_new, 'prepared', 'number', prepared_count)
 		DB.setValue(spell_node_new, 'name', 'string', name_spell)
@@ -91,19 +96,19 @@ local function replace_spell_effects(nodeEntry)
 	end
 end
 
-local function search_for_maladies(nodeEntry)
+local function search_for_maladies(node_npc)
 	if DiseaseTracker then
-		local sNPCName = DB.getValue(nodeEntry, 'name')
-		if sNPCName then
-			sNPCName = string.lower(sNPCName:gsub('%A+', ''))
+		local string_npc_name = DB.getValue(node_npc, 'name')
+		if string_npc_name then
+			string_npc_name = string.lower(string_npc_name:gsub('%A+', ''))
 			if DB.findNode('reference.diseases@*') then
-				for _,nodeMalady in pairs(DB.findNode('reference.diseases@*').getChildren()) do
-					add_malady_link(nodeMalady, nodeEntry, sNPCName)
+				for _,node_malady in pairs(DB.findNode('reference.diseases@*').getChildren()) do
+					add_malady_link(node_malady, node_npc, string_npc_name)
 				end
 			end
 			if DB.findNode('disease') then
-				for _,nodeMalady in pairs(DB.findNode('disease').getChildren()) do
-					add_malady_link(nodeMalady, nodeEntry, sNPCName)
+				for _,node_malady in pairs(DB.findNode('disease').getChildren()) do
+					add_malady_link(node_malady, node_npc, string_npc_name)
 				end
 			end
 		end
