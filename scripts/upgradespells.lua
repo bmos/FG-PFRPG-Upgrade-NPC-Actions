@@ -1,20 +1,8 @@
--- 
+--
 -- Please see the LICENSE.md file included with this distribution for attribution and copyright information.
 --
 
-local addBattle_old = nil
-
--- Function Overrides
-function onInit()
-	addBattle_old = CombatManager.addBattle;
-	CombatManager.addBattle = addBattle_new;
-end
-
-function onClose()
-	CombatManager.addBattle = addBattle_old;
-end
-
-function getReferenceSpellActions(sSpellName)
+local function trim_spell_name(sSpellName)
 	local nEnd = string.find(sSpellName, '%(')
 	sSpellName = sSpellName:sub(1, nEnd)
 	sSpellName = sSpellName:gsub('.+:', '')
@@ -22,19 +10,19 @@ function getReferenceSpellActions(sSpellName)
 	sSpellName = sSpellName:gsub('%A+', '')
 	sSpellName = StringManager.trim(sSpellName)
 	if string.find(sSpellName, 'greater') then sSpellName = sSpellName:gsub('greater', '') .. 'greater'	end
-	
-	local nodeReferenceSpell = DB.findNode('spelldesc.' .. sSpellName .. '@PFRPG - Spellbook')
-	if nodeReferenceSpell then
-		return nodeReferenceSpell.getChild('actions')
-	end
+	return sSpellName
 end
 
----	This function converts a string of values separated by semicolons to a table of values
+local function get_reference_spell(sSpellName)
+		return DB.findNode('spelldesc.' .. trim_spell_name(sSpellName) .. '@PFRPG - Spellbook')
+end
+
+---	This function converts a string of values separated by semicolons to a table
 --	@param s input, a string of values separated by semicolons
 --	@return t output, an indexed table of values
-local function fromSSV(s)
-	if not s or s=='' then return {}; end
-	
+local function string_to_table(s)
+	if (not s or s == '') then return {}; end
+
 	s = s .. ';'        -- ending semicolon
 	local t = {}        -- table to collect fields
 	local fieldstart = 1
@@ -47,24 +35,82 @@ local function fromSSV(s)
 	return t
 end
 
-local function addDiseaseLink(nodeDisease, nodeEntry, sNPCName)
-	local tDiseaseCreatures = fromSSV(DB.getValue(nodeDisease, 'npc')) or {};
+local function add_malady_link(nodeDisease, nodeEntry, sNPCName)
+	local tDiseaseCreatures = string_to_table(DB.getValue(nodeDisease, 'npc')) or {}
 	if tDiseaseCreatures ~= {} then
 		for _,sDiseaseCreature in pairs(tDiseaseCreatures) do
-			local sDC = (sDiseaseCreature:match(' %(DC %d+%)')) or '';
-			local sDiseaseCreature = sDiseaseCreature:gsub(' %(DC %d+%)', '');
-			local sDiseaseCreature = string.lower(sDiseaseCreature:gsub('%A', ''));
+			local sDC = (sDiseaseCreature:match(' %(DC %d+%)')) or ''
+			sDiseaseCreature = sDiseaseCreature:gsub(' %(DC %d+%)', '')
+			sDiseaseCreature = string.lower(sDiseaseCreature:gsub('%A', ''))
 			if sDiseaseCreature == sNPCName then
-				local sDesc = DB.getValue(nodeEntry, 'text', '');
-				local sDiseaseName = DB.getValue(nodeDisease, 'name');
-				local sDescAdd = '<linklist><link class="referencedisease" recordname="' .. DB.getPath(nodeDisease) .. '"><b>Malady: </b>' .. sDiseaseName .. sDC .. '</link></linklist>';
-				DB.setValue(nodeEntry, 'text', 'formattedtext', sDescAdd .. sDesc);								
+				local sDesc = DB.getValue(nodeEntry, 'text', '')
+				local sDiseaseName = DB.getValue(nodeDisease, 'name')
+				local sDescAdd = '<linklist><link class="referencedisease" recordname="' .. DB.getPath(nodeDisease) .. '"><b>Malady: </b>' .. sDiseaseName .. sDC .. '</link></linklist>'
+				DB.setValue(nodeEntry, 'text', 'formattedtext', sDescAdd .. sDesc)
 			end
 		end
 	end
 end
 
-function addBattle_new(nodeBattle)
+local function replace_effect_nodes(node_spell, node_spellset, nSpellLevel)
+	local name_spell = string.lower(DB.getValue(nodeSpell, 'name') or '')
+	local node_actions_reference_spell = get_reference_spell(name_spell).getChild('actions')
+	local node_actions_npc_spell = node_spell.getChild('actions')
+	if node_actions_reference_spell and node_actions_npc_spell then
+		for _,nodeAction in pairs(node_actions_npc_spell.getChildren()) do
+			local sType = string.lower(DB.getValue(nodeAction, 'type', ''))
+			if sType ~= 'cast' then
+				DB.deleteNode(nodeAction)
+			end
+		end
+		for _,node_action in pairs(node_actions_reference_spell.getChildren()) do
+			local sType = string.lower(DB.getValue(node_action, 'type', ''))
+			if sType ~= 'cast' then
+				DB.copyNode(node_action, node_actions_npc_spell.createChild())
+			end
+		end
+	elseif node_actions_reference_spell then
+		local prepared_count = DB.getValue(nodeSpell, 'prepared', 0)
+		DB.deleteNode(nodeSpell)
+		local spell_node_new = SpellManager.addSpell(node_actions_reference_spell.getParent(), node_spellset, nSpellLevel)
+		DB.setValue(spell_node_new, 'prepared', 'number', prepared_count)
+		DB.setValue(spell_node_new, 'name', 'string', name_spell)
+	end
+end
+
+local function replace_spell_effects(nodeEntry)
+	if nodeEntry.getChild('spellset') then
+		for _,nodeSpellset in pairs(nodeEntry.getChild('spellset').getChildren()) do
+			for _,nodeSpellLevel in pairs(nodeSpellset.getChild('levels').getChildren()) do
+				local nSpellLevel = tonumber(nodeSpellLevel.getName():gsub('level', '') or 0)
+				for _,nodeSpell in pairs(nodeSpellLevel.getChild('spells').getChildren()) do
+					replace_effect_nodes(nodeSpell, nodeSpellset, nSpellLevel)
+				end
+			end
+		end
+	end
+end
+
+local function search_for_maladies(nodeEntry)
+	if DiseaseTracker then
+		local sNPCName = DB.getValue(nodeEntry, 'name')
+		if sNPCName then
+			sNPCName = string.lower(sNPCName:gsub('%A+', ''))
+			if DB.findNode('reference.diseases@*') then
+				for _,nodeMalady in pairs(DB.findNode('reference.diseases@*').getChildren()) do
+					add_malady_link(nodeMalady, nodeEntry, sNPCName)
+				end
+			end
+			if DB.findNode('disease') then
+				for _,nodeMalady in pairs(DB.findNode('disease').getChildren()) do
+					add_malady_link(nodeMalady, nodeEntry, sNPCName)
+				end
+			end
+		end
+	end
+end
+
+local function addBattle_new(nodeBattle)
 	local aModulesToLoad = {};
 	local sTargetNPCList = LibraryData.getCustomData("battle", "npclist") or "npclist";
 	for _, vNPCItem in pairs(DB.getChildren(nodeBattle, sTargetNPCList)) do
@@ -97,14 +143,14 @@ function addBattle_new(nodeBattle)
 	end
 	if #aModulesToLoad > 0 then
 		local wSelect = Interface.openWindow("module_dialog_missinglink", "");
-		wSelect.initialize(aModulesToLoad, onBattleNPCLoadCallback, { nodeBattle = nodeBattle });
+		wSelect.initialize(aModulesToLoad, CombatManager.onBattleNPCLoadCallback, { nodeBattle = nodeBattle });
 		return;
 	end
-	
-	if fCustomAddBattle then
-		return fCustomAddBattle(nodeBattle);
+
+	if CombatManager.fCustomAddBattle then
+		return CombatManager.fCustomAddBattle(nodeBattle);
 	end
-	
+
 	-- Cycle through the NPC list, and add them to the tracker
 	for _, vNPCItem in pairs(DB.getChildren(nodeBattle, sTargetNPCList)) do
 		-- Get link database node
@@ -114,7 +160,7 @@ function addBattle_new(nodeBattle)
 			nodeNPC = DB.findNode(sRecord);
 		end
 		local sName = DB.getValue(vNPCItem, "name", "");
-		
+
 		if nodeNPC then
 			local aPlacement = {};
 			for _,vPlacement in pairs(DB.getChildren(vNPCItem, "maplink")) do
@@ -125,68 +171,13 @@ function addBattle_new(nodeBattle)
 				rPlacement.imagey = DB.getValue(vPlacement, "imagey", 0);
 				table.insert(aPlacement, rPlacement);
 			end
-			
+
 			local nCount = DB.getValue(vNPCItem, "count", 0);
 			for i = 1, nCount do
 				local nodeEntry = CombatManager.addNPC(sClass, nodeNPC, sName);
 				if nodeEntry then
-
-					-- bmos replacing spell effects
-					if nodeEntry.getChild('spellset') then
-						for _,nodeSpellset in pairs(nodeEntry.getChild('spellset').getChildren()) do
-							for _,nodeSpellLevel in pairs(nodeSpellset.getChild('levels').getChildren()) do
-								local sSpellLevel = nodeSpellLevel.getName():gsub('level', '')
-								local nSpellLevel = tonumber(sSpellLevel)
-								for _,nodeSpell in pairs(nodeSpellLevel.getChild('spells').getChildren()) do
-									local sSpellName = string.lower(DB.getValue(nodeSpell, 'name'))
-									if sSpellName then
-										local nodeReferenceSpellActions = getReferenceSpellActions(sSpellName)
-										local nodeSpellActions = nodeSpell.getChild('actions')
-										if nodeReferenceSpellActions and nodeSpellActions then
-											for _,nodeAction in pairs(nodeSpellActions.getChildren()) do
-												local sType = string.lower(DB.getValue(nodeAction, 'type', '')) 
-												if sType ~= 'cast' then
-													DB.deleteNode(nodeAction)
-												end
-											end
-											for _,nodeReferenceAction in pairs(nodeReferenceSpellActions.getChildren()) do
-												local sType = string.lower(DB.getValue(nodeReferenceAction, 'type', '')) 
-												if sType ~= 'cast' then
-													DB.copyNode(nodeReferenceAction, nodeSpellActions.createChild())
-												end
-											end
-										elseif nodeReferenceSpellActions then
-											local nPrepared = DB.getValue(nodeSpell, 'prepared', 0)
-											local sSpellName = DB.getValue(nodeSpell, 'name', '')
-											DB.deleteNode(nodeSpell)
-											local nodeSpell = SpellManager.addSpell(nodeReferenceSpellActions.getParent(), nodeSpellset, nSpellLevel)
-											DB.setValue(nodeSpell, 'prepared', 'number', nPrepared)
-											DB.setValue(nodeSpell, 'name', 'string', sSpellName)
-										end
-									end
-								end
-							end
-						end
-					end
-					-- bmos adding automatic disease addition for DiseaseTracker
-					if DiseaseTracker then
-						local sNPCName = DB.getValue(nodeEntry, 'name')
-						if sNPCName then
-							sNPCName = string.lower(sNPCName:gsub('%A+', ''))
-							if DB.findNode('reference.diseases@*') then
-								for _,nodeDisease in pairs(DB.findNode('reference.diseases@*').getChildren()) do
-									addDiseaseLink(nodeDisease, nodeEntry, sNPCName)
-								end
-							end
-							if DB.findNode('disease') then
-								for _,nodeDisease in pairs(DB.findNode('disease').getChildren()) do
-									addDiseaseLink(nodeDisease, nodeEntry, sNPCName)
-								end
-							end
-						end
-					end
-					-- end bmos additions
-
+					replace_spell_effects(nodeEntry)	-- bmos replacing spell effects
+					search_for_maladies(nodeEntry)		-- bmos adding automatic disease addition for DiseaseTracker
 					local sFaction = DB.getValue(vNPCItem, "faction", "");
 					if sFaction ~= "" then
 						DB.setValue(nodeEntry, "friendfoe", "string", sFaction);
@@ -202,7 +193,7 @@ function addBattle_new(nodeBattle)
 					end
 					if sToken ~= "" then
 						DB.setValue(nodeEntry, "token", "token", sToken);
-						
+
 						if aPlacement[i] and aPlacement[i].imagelink ~= "" then
 							TokenManager.setDragTokenUnits(DB.getValue(nodeEntry, "space"));
 							local tokenAdded = Token.addToken(aPlacement[i].imagelink, sToken, aPlacement[i].imagex, aPlacement[i].imagey);
@@ -212,7 +203,7 @@ function addBattle_new(nodeBattle)
 							end
 						end
 					end
-					
+
 					-- Set identification state from encounter record, and disable source link to prevent overriding ID for existing CT entries when identification state changes
 					local sSourceClass,sSourceRecord = DB.getValue(nodeEntry, "sourcelink", "", "");
 					DB.setValue(nodeEntry, "sourcelink", "windowreference", "", "");
@@ -226,6 +217,18 @@ function addBattle_new(nodeBattle)
 			ChatManager.SystemMessage(Interface.getString("ct_error_addnpcfail2") .. " (" .. sName .. ")");
 		end
 	end
-	
+
 	Interface.openWindow("combattracker_host", "combattracker");
+end
+
+local addBattle_old = nil
+
+-- Function Overrides
+function onInit()
+	addBattle_old = CombatManager.addBattle
+	CombatManager.addBattle = addBattle_new
+end
+
+function onClose()
+	CombatManager.addBattle = addBattle_old
 end
