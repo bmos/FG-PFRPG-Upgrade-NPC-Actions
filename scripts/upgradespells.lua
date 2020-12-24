@@ -59,7 +59,9 @@ end
 
 local function replace_effect_nodes(node_spell, node_spellset, nSpellLevel)
 	local name_spell = string.lower(DB.getValue(node_spell, 'name') or '')
-	local node_actions_reference_spell = get_reference_spell(name_spell).getChild('actions')
+	local node_reference_spell = get_reference_spell(name_spell)
+	if not node_reference_spell then return; end
+	local node_actions_reference_spell = node_reference_spell.getChild('actions')
 	local node_actions_npc_spell = node_spell.getChild('actions')
 	if node_actions_reference_spell and node_actions_npc_spell then
 		for _,nodeAction in pairs(node_actions_npc_spell.getChildren()) do
