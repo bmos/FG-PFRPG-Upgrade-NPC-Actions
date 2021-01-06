@@ -88,10 +88,12 @@ end
 local function replace_spell_effects(nodeEntry)
 	if nodeEntry.getChild('spellset') then
 		for _,nodeSpellset in pairs(nodeEntry.getChild('spellset').getChildren()) do
-			for _,nodeSpellLevel in pairs(nodeSpellset.getChild('levels').getChildren()) do
-				local nSpellLevel = tonumber(nodeSpellLevel.getName():gsub('level', '') or 0)
-				for _,nodeSpell in pairs(nodeSpellLevel.getChild('spells').getChildren()) do
-					replace_effect_nodes(nodeSpell, nodeSpellset, nSpellLevel)
+			if nodeSpellset.getChild('levels') then
+				for _,nodeSpellLevel in pairs(nodeSpellset.getChild('levels').getChildren()) do
+					local nSpellLevel = tonumber(nodeSpellLevel.getName():gsub('level', '')) or 0
+					for _,nodeSpell in pairs(nodeSpellLevel.getChild('spells').getChildren()) do
+						replace_effect_nodes(nodeSpell, nodeSpellset, nSpellLevel)
+					end
 				end
 			end
 		end
