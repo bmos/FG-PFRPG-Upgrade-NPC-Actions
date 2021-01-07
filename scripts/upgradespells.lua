@@ -79,9 +79,9 @@ local function replace_effect_nodes(node_spell, node_spellset, nSpellLevel)
 	elseif node_actions_reference_spell then
 		local prepared_count = DB.getValue(node_spell, 'prepared', 0)
 		DB.deleteNode(node_spell)
-		local spell_node_new = SpellManager.addSpell(node_actions_reference_spell.getParent(), node_spellset, nSpellLevel)
-		DB.setValue(spell_node_new, 'prepared', 'number', prepared_count)
-		DB.setValue(spell_node_new, 'name', 'string', name_spell)
+		local node_spell_new = SpellManager.addSpell(node_actions_reference_spell.getParent(), node_spellset, nSpellLevel)
+		DB.setValue(node_spell_new, 'prepared', 'number', prepared_count)
+		DB.setValue(node_spell_new, 'name', 'string', name_spell)
 	end
 end
 
