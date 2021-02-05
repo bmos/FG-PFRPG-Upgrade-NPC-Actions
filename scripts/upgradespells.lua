@@ -121,6 +121,9 @@ local function search_for_maladies(node_npc)
 	end
 end
 
+---	This function is called when adding an encounter to the combat tracker.
+--	This function is modified from the SmiteWorks original.
+--	Lines added or modified will have at least "--bmos" as a comment
 local function addBattle_new(nodeBattle)
 	local aModulesToLoad = {};
 	local sTargetNPCList = LibraryData.getCustomData("battle", "npclist") or "npclist";
