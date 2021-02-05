@@ -40,23 +40,6 @@ local function string_to_table(string_input)
 	return table_output
 end
 
-local function add_malady_link(node_malady, node_npc, string_npc_name)
-	local table_malady_npcs = string_to_table(DB.getValue(node_malady, 'npc')) or {}
-	if table_malady_npcs ~= {} then
-		for _,string_malady_linked_npc in pairs(table_malady_npcs) do
-			local sDC = (string_malady_linked_npc:match(' %(DC %d+%)')) or ''
-			string_malady_linked_npc = string_malady_linked_npc:gsub(' %(DC %d+%)', '')
-			string_malady_linked_npc = string.lower(string_malady_linked_npc:gsub('%A', ''))
-			if string_malady_linked_npc == string_npc_name then
-				local string_description = DB.getValue(node_npc, 'text', '')
-				local string_malady_name = DB.getValue(node_malady, 'name', '')
-				local string_malady_link = '<linklist><link class="referencedisease" recordname="' .. DB.getPath(node_malady) .. '"><b>Malady: </b>' .. string_malady_name .. sDC .. '</link></linklist>'
-				DB.setValue(node_npc, 'text', 'formattedtext', string_malady_link .. string_description)
-			end
-		end
-	end
-end
-
 local function replace_effect_nodes(node_spell, node_spellset, nSpellLevel)
 	local name_spell = string.lower(DB.getValue(node_spell, 'name') or '')
 	local node_reference_spell = get_reference_spell(name_spell)
@@ -97,6 +80,23 @@ local function replace_spell_effects(nodeEntry)
 						end
 					end
 				end
+			end
+		end
+	end
+end
+
+local function add_malady_link(node_malady, node_npc, string_npc_name)
+	local table_malady_npcs = string_to_table(DB.getValue(node_malady, 'npc')) or {}
+	if table_malady_npcs ~= {} then
+		for _,string_malady_linked_npc in pairs(table_malady_npcs) do
+			local sDC = (string_malady_linked_npc:match(' %(DC %d+%)')) or ''
+			string_malady_linked_npc = string_malady_linked_npc:gsub(' %(DC %d+%)', '')
+			string_malady_linked_npc = string.lower(string_malady_linked_npc:gsub('%A', ''))
+			if string_malady_linked_npc == string_npc_name then
+				local string_description = DB.getValue(node_npc, 'text', '')
+				local string_malady_name = DB.getValue(node_malady, 'name', '')
+				local string_malady_link = '<linklist><link class="referencedisease" recordname="' .. DB.getPath(node_malady) .. '"><b>Malady: </b>' .. string_malady_name .. sDC .. '</link></linklist>'
+				DB.setValue(node_npc, 'text', 'formattedtext', string_malady_link .. string_description)
 			end
 		end
 	end
