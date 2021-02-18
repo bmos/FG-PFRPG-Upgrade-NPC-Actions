@@ -215,7 +215,7 @@ local function add_spell_node(nodeSource, nodeSpellClass, nLevel)
 				for k, v in pairs(nodeAction) do
 					if DB.getValue(v, "type") == "cast" then
 						SpellManager.addTags(nodeNewSpell, v);
-						DB.setValue(v, 'usereset', 'string', 'consumable')	-- bmos setting spell as consumable (no reset on rest)
+						-- DB.setValue(v, 'usereset', 'string', 'consumable')	-- bmos setting spell as consumable (no reset on rest)
 					end
 				end
 			end
