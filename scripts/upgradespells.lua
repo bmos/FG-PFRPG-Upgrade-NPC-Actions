@@ -21,6 +21,20 @@ local function trim_spell_name(string_spell_name)
 	return string_spell_name
 end
 
+local function add_spell_descriptions(node_spell, node_spellset, nSpellLevel)
+	local name_spell = string.lower(DB.getValue(node_spell, 'name') or '')
+	local node_reference_spell = DB.findNode('spelldesc.' .. trim_spell_name(name_spell) .. '@PFRPG - Spellbook')
+	if node_reference_spell and node_spell then
+		if DB.getValue(node_spell, 'description', '') == '' then
+			DB.deleteNode(node_spell.getChild('description'))
+			local string_full_description = DB.getValue(node_reference_spell, 'description', '<p></p>')
+			DB.setValue(node_spell, 'description_full', 'formattedtext', string_full_description)
+			DB.setValue(node_spell, 'description', 'formattedtext', string_full_description)
+			SpellManager.convertSpellDescToString(node_spell)
+		end
+	end
+end
+
 local function replace_effect_nodes(node_spell, node_spellset, nSpellLevel)
 	local name_spell = string.lower(DB.getValue(node_spell, 'name') or '')
 	local node_reference_spell = DB.findNode('spelldesc.' .. trim_spell_name(name_spell) .. '@PFRPG - Spellbook')
@@ -58,6 +72,7 @@ local function replace_spell_effects(nodeEntry)
 					if nodeSpellLevel.getChild('spells') and nSpellLevel then
 						for _,nodeSpell in pairs(nodeSpellLevel.getChild('spells').getChildren()) do
 							replace_effect_nodes(nodeSpell, nodeSpellset, nSpellLevel)
+							add_spell_descriptions(nodeSpell, nodeSpellset, nSpellLevel)
 						end
 					end
 				end
