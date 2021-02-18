@@ -2,6 +2,10 @@
 -- Please see the LICENSE.md file included with this distribution for attribution and copyright information.
 --
 
+--
+--	SPELL ACTION REPLACEMENT FUNCTIONS
+--
+
 local function trim_spell_name(string_spell_name)
 	local number_name_end = string.find(string_spell_name, '%(')
 	string_spell_name = string_spell_name:sub(1, number_name_end)
@@ -61,6 +65,10 @@ local function replace_spell_effects(nodeEntry)
 		end
 	end
 end
+
+--
+--	MALADY LINKING FUNCTIONS
+--
 
 ---	This function converts a string of values separated by semicolons to a table
 --	@param s input, a string of values separated by semicolons
@@ -202,8 +210,11 @@ local function add_spell_node(nodeSource, nodeSpellClass, nLevel)
 	return nodeNewSpell;
 end
 
+--
+--	ACTION AUTOMATION FUNCTIONS
+--
 
-function add_ability_automation(node_pc, string_ability_name, table_ability_information)
+local function add_ability_automation(node_pc, string_ability_name, table_ability_information)
 	if (
 		not node_pc
 		or string_ability_name == ""
@@ -228,40 +239,40 @@ function add_ability_automation(node_pc, string_ability_name, table_ability_info
 	return node_spell, node_spellclass
 end
 
-local array_abilities = {
-	['power attack'] = {
-		['string_ability_type'] = 'feat',
-		['level'] = 0,
-		['daily_uses'] = 1,
-		['effect-1'] = 'Power Attack-1H; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee',
-		['effect-2'] = 'Power Attack-2H; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee'
-		},
-	['deadly aim'] = {
-		['string_ability_type'] = 'feat',
-		['level'] = 0,
-		['daily_uses'] = 1,
-		['effect-1'] = 'Deadly Aim; ATK: -1 [-QBAB] ,ranged; DMG: 1 [QBAB] ,ranged; DMG: 1 [QBAB] ,ranged'
-		},
-	['combat expertise'] = {
-		['string_ability_type'] = 'feat',
-		['level'] = 0,
-		['daily_uses'] = 1,
-		['effect-1'] = 'Combat Expertise; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; AC: 1 [QBAB] dodge'
-		},
-	['bleed'] = {
-		['string_ability_type'] = 'special ability',
-		['level'] = 0,
-		['daily_uses'] = 1,
-		['search_dice'] = true,
-		['number_substitution'] = true,
-		['effect-1'] = 'Bleed; DMGO: %n bleed'
-		}
-}
-
 ---	This function breaks down a table of abilities and searches for them in an NPC sheet.
 --	The search result is provided by the hasSpecialAbility function.
 --	If a match is found, it triggers the function hasSpecialAbility.
 local function search_for_abilities(node_npc)
+	local array_abilities = {
+		['power attack'] = {
+			['string_ability_type'] = 'feat',
+			['level'] = 0,
+			['daily_uses'] = 1,
+			['effect-1'] = 'Power Attack-1H; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee',
+			['effect-2'] = 'Power Attack-2H; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee'
+			},
+		['deadly aim'] = {
+			['string_ability_type'] = 'feat',
+			['level'] = 0,
+			['daily_uses'] = 1,
+			['effect-1'] = 'Deadly Aim; ATK: -1 [-QBAB] ,ranged; DMG: 1 [QBAB] ,ranged; DMG: 1 [QBAB] ,ranged'
+			},
+		['combat expertise'] = {
+			['string_ability_type'] = 'feat',
+			['level'] = 0,
+			['daily_uses'] = 1,
+			['effect-1'] = 'Combat Expertise; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; AC: 1 [QBAB] dodge'
+			},
+		['bleed'] = {
+			['string_ability_type'] = 'special ability',
+			['level'] = 0,
+			['daily_uses'] = 1,
+			['search_dice'] = true,
+			['number_substitution'] = true,
+			['effect-1'] = 'Bleed; DMGO: %n bleed'
+			}
+	}
+	
 	for string_ability_name, table_ability_information in pairs(array_abilities) do
 		local is_feat, is_trait, is_special_ability = false, false, false
 		if table_ability_information['string_ability_type'] == 'feat' then
@@ -280,11 +291,14 @@ local function search_for_abilities(node_npc)
 	end
 end
 
-local addNPC_old = nil -- placeholder for original addNPC function
+--
+--	UTILITY FUNCTIONS
+--
 
 ---	This function is called when adding an NPC to the combat tracker.
 --	It passes the call to the original addNPC function.
 --	Once it receives the node, it performs replacement of actions.
+local addNPC_old = nil -- placeholder for original addNPC function
 local function addNPC_new(sClass, nodeNPC, sName)
 	local nodeEntry = addNPC_old(sClass, nodeNPC, sName)
 	if nodeEntry then
