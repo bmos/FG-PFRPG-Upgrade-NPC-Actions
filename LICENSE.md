@@ -1,7 +1,5 @@
 Upgrade Spellsis distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY.
 
-SmiteWorks owns rights to code sections copied from their rulesets. These code sections are used and modified by permission for FG community development.
-
 "Fantasy Grounds" is a trademark of SmiteWorks USA, LLC.
 
 "Fantasy Grounds" is Copyright 2004-2021 SmiteWorks USA LLC.
