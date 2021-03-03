@@ -67,17 +67,15 @@ end
 
 local function add_spell_information(node_spell, node_spellset, nSpellLevel)
 	local string_name_spell = trim_spell_name(DB.getValue(node_spell, 'name')) or ''
-	if string_name_spell == 'arcanemark' then
-		local node_reference_spell = DB.findNode('spelldesc.' .. string_name_spell .. '@PFRPG - Spellbook')
-		if node_reference_spell and node_spell then
-			for _,node_reference_spell_subnode in pairs(node_reference_spell.getChildren()) do
-				local string_node_name = node_reference_spell_subnode.getName()
-				if string_node_name ~= 'description' and string_node_name ~= 'name' then
-					if not node_spell.getChild(string_node_name) then
-						local string_node_type = node_reference_spell_subnode.getType()
-						local node_spell_subnode = node_spell.createChild(string_node_name, string_node_type)
-						DB.copyNode(node_reference_spell_subnode, node_spell_subnode)
-					end
+	local node_reference_spell = DB.findNode('spelldesc.' .. string_name_spell .. '@PFRPG - Spellbook')
+	if node_reference_spell and node_spell then
+		for _,node_reference_spell_subnode in pairs(node_reference_spell.getChildren()) do
+			local string_node_name = node_reference_spell_subnode.getName()
+			if string_node_name ~= 'description' and string_node_name ~= 'name' then
+				if not node_spell.getChild(string_node_name) then
+					local string_node_type = node_reference_spell_subnode.getType()
+					local node_spell_subnode = node_spell.createChild(string_node_name, string_node_type)
+					DB.copyNode(node_reference_spell_subnode, node_spell_subnode)
 				end
 			end
 		end
