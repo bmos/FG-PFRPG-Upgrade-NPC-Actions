@@ -8,12 +8,15 @@
 
 local function trim_spell_name(string_spell_name)
 	local number_name_end = string.find(string_spell_name, '%(')
-	string_spell_name = string.lower(string_spell_name:sub(1, number_name_end))
+	string_spell_name = string_spell_name:sub(1, number_name_end)
+	string_spell_name = string_spell_name:gsub('APG', '')
+	string_spell_name = string_spell_name:gsub('ARG', '')
+	string_spell_name = string_spell_name:gsub('UM', '')
 	string_spell_name = string_spell_name:gsub('.+:', '')
 	string_spell_name = string_spell_name:gsub(',.+', '')
 	string_spell_name = string_spell_name:gsub('%[%a%]', '')
 	string_spell_name = string_spell_name:gsub('%A+', '')
-	string_spell_name = StringManager.trim(string_spell_name)
+	string_spell_name = string.lower(StringManager.trim(string_spell_name))
 	if string.find(string_spell_name, 'greater') then
 			string_spell_name = string_spell_name:gsub('greater', '') .. 'greater'
 	end
