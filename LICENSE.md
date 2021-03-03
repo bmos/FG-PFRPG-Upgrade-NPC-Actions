@@ -1,4 +1,4 @@
-Upgrade Spellsis distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY.
+Upgrade Spells is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY.
 
 "Fantasy Grounds" is a trademark of SmiteWorks USA, LLC.
 
