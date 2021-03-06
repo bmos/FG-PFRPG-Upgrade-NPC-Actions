@@ -50,6 +50,8 @@ local function replace_effect_nodes(node_spell, node_spellset, nSpellLevel)
 			local node_spell_new = SpellManager.addSpell(node_actions_reference_spell.getParent(), node_spellset, nSpellLevel)
 			DB.setValue(node_spell_new, 'prepared', 'number', prepared_count)
 			DB.setValue(node_spell_new, 'name', 'string', name_spell)
+			
+			return node_spell_new
 		end
 	end
 end
@@ -93,7 +95,8 @@ local function replace_spell_effects(nodeEntry)
 					local nSpellLevel = tonumber(nodeSpellLevel.getName():gsub('level', '') or 0)
 					if nodeSpellLevel.getChild('spells') and nSpellLevel then
 						for _,nodeSpell in pairs(nodeSpellLevel.getChild('spells').getChildren()) do
-							replace_effect_nodes(nodeSpell, nodeSpellset, nSpellLevel)
+							local nodeNewSpell = replace_effect_nodes(nodeSpell, nodeSpellset, nSpellLevel)
+							if nodeNewSpell then nodeSpell = nodeNewSpell end
 							add_spell_description(nodeSpell, nodeSpellset, nSpellLevel)
 							add_spell_information(nodeSpell, nodeSpellset, nSpellLevel)
 						end
