@@ -28,16 +28,13 @@ local function trim_spell_name(string_spell_name)
 	string_spell_name = string_spell_name:gsub('%A+', '')
 	string_spell_name = string.lower(StringManager.trim(string_spell_name))
 	if string.find(string_spell_name, 'greater') then
-			string_spell_name = string_spell_name:gsub('greater', '') .. 'greater'
+		string_spell_name = string_spell_name:gsub('greater', '') .. 'greater'
 	end
 
 	return string_spell_name
 end
 
-local function replace_effect_nodes(node_spell, node_spellset, nSpellLevel)
-	local name_spell = DB.getValue(node_spell, 'name') or ''
-	local string_name_spell = trim_spell_name(name_spell:lower())
-	local node_reference_spell = DB.findNode('spelldesc.' .. string_name_spell .. '@PFRPG - Spellbook')
+local function replace_effect_nodes(node_spell, node_spellset, number_spell_level, string_name_spell, node_reference_spell)
 	if node_reference_spell then
 		local node_actions_reference_spell = node_reference_spell.getChild('actions')
 		local node_actions_npc_spell = node_spell.getChild('actions')
@@ -57,7 +54,7 @@ local function replace_effect_nodes(node_spell, node_spellset, nSpellLevel)
 		elseif node_actions_reference_spell then
 			local prepared_count = DB.getValue(node_spell, 'prepared', 0)
 			DB.deleteNode(node_spell)
-			local node_spell_new = SpellManager.addSpell(node_actions_reference_spell.getParent(), node_spellset, nSpellLevel)
+			local node_spell_new = SpellManager.addSpell(node_actions_reference_spell.getParent(), node_spellset, number_spell_level)
 			DB.setValue(node_spell_new, 'prepared', 'number', prepared_count)
 			DB.setValue(node_spell_new, 'name', 'string', name_spell)
 			
@@ -66,9 +63,7 @@ local function replace_effect_nodes(node_spell, node_spellset, nSpellLevel)
 	end
 end
 
-local function add_spell_description(node_spell, node_spellset, nSpellLevel)
-	local string_name_spell = trim_spell_name(DB.getValue(node_spell, 'name')) or ''
-	local node_reference_spell = DB.findNode('spelldesc.' .. string_name_spell .. '@PFRPG - Spellbook')
+local function add_spell_description(node_spell, string_name_spell, node_reference_spell)
 	if node_reference_spell and node_spell then
 		if DB.getValue(node_spell, 'description', '') == '' or DB.getValue(node_spell, 'description', '') == '<p></p>' then
 			DB.deleteNode(node_spell.getChild('description'))
@@ -80,9 +75,7 @@ local function add_spell_description(node_spell, node_spellset, nSpellLevel)
 	end
 end
 
-local function add_spell_information(node_spell, node_spellset, nSpellLevel)
-	local string_name_spell = trim_spell_name(DB.getValue(node_spell, 'name')) or ''
-	local node_reference_spell = DB.findNode('spelldesc.' .. string_name_spell .. '@PFRPG - Spellbook')
+local function add_spell_information(node_spell, string_name_spell, node_reference_spell)
 	if node_reference_spell and node_spell then
 		for _,node_reference_spell_subnode in pairs(node_reference_spell.getChildren()) do
 			local string_node_name = node_reference_spell_subnode.getName()
@@ -102,13 +95,15 @@ local function replace_spell_effects(nodeEntry)
 		for _,nodeSpellset in pairs(nodeEntry.getChild('spellset').getChildren()) do
 			if nodeSpellset.getChild('levels') then
 				for _,nodeSpellLevel in pairs(nodeSpellset.getChild('levels').getChildren()) do
-					local nSpellLevel = tonumber(nodeSpellLevel.getName():gsub('level', '') or 0)
-					if nodeSpellLevel.getChild('spells') and nSpellLevel then
+					local number_spell_level = tonumber(nodeSpellLevel.getName():gsub('level', '') or 0)
+					if nodeSpellLevel.getChild('spells') and number_spell_level then
 						for _,nodeSpell in pairs(nodeSpellLevel.getChild('spells').getChildren()) do
-							local nodeNewSpell = replace_effect_nodes(nodeSpell, nodeSpellset, nSpellLevel)
+							local string_name_spell = trim_spell_name(DB.getValue(nodeSpell, 'name')) or ''
+							local node_reference_spell = DB.findNode('spelldesc.' .. string_name_spell .. '@PFRPG - Spellbook')
+							local nodeNewSpell = replace_effect_nodes(nodeSpell, node_spellset, number_spell_level, string_name_spell, node_reference_spell)
 							if nodeNewSpell then nodeSpell = nodeNewSpell end
-							add_spell_description(nodeSpell, nodeSpellset, nSpellLevel)
-							add_spell_information(nodeSpell, nodeSpellset, nSpellLevel)
+							add_spell_description(nodeSpell, string_name_spell, node_reference_spell)
+							add_spell_information(nodeSpell, string_name_spell, node_reference_spell)
 						end
 					end
 				end
