@@ -264,66 +264,35 @@ end
 --	If a match is found, it triggers the function hasSpecialAbility.
 local function search_for_abilities(node_npc)
 	local array_abilities = {
-		['Mobility'] = {
+		['Ancestral Enmity'] = {
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
 			['effects'] = {
 				['zeffect-1'] = {
-					['label'] = { ['type'] = 'string', ['value'] = 'Mobility; AC: 4 ,opportunity; IF: CUSTOM(Flat-footed); AC: -4 ,opportunity' },
-					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+					['label'] = { ['type'] = 'string', ['value'] = ('Ancestral Enmity; IFT: TYPE(gnome); ATK: %d'), ['tiermultiplier'] = 2 },
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
-				},
-			},
-		},
-		['Furious Focus'] = {
-			['string_ability_type'] = 'Feats',
-			['level'] = 0,
-			['effects'] = {
-				['zeffect-1'] = {
-					['label'] = { ['type'] = 'string', ['value'] = 'Furious Focus; IF: CUSTOM(Power Attack 2-H); ATK: 1 [QBAB] ,melee; CMB: 1 [QBAB] ,melee' },
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-					['apply'] = { ['type'] = 'string', ['value'] = 'roll' },
-					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
-				},
-			},
-		},
-		['Power Attack'] = {
-			['string_ability_type'] = 'Feats',
-			['level'] = 0,
-			['effects'] = {
-				['zeffect-1'] = {
-					['label'] = { ['type'] = 'string', ['value'] = 'Power Attack 1-H; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee' },
-					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 				},
 				['zeffect-2'] = {
-					['label'] = { ['type'] = 'string', ['value'] = 'Power Attack 2-H; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee' },
-					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+					['label'] = { ['type'] = 'string', ['value'] = 'Ancestral Enmity; IFT: TYPE(dwarf); ATK: %d', ['tiermultiplier'] = 2 },
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 				},
 			},
 		},
-		['Deadly Aim'] = {
+		['Arcane Strike'] = {
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
 			['effects'] = {
 				['zeffect-1'] = {
-					['label'] = { ['type'] = 'string', ['value'] = 'Deadly Aim; ATK: -1 [-QBAB] ,ranged; DMG: 1 [QBAB] ,ranged; DMG: 1 [QBAB] ,ranged' },
-					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+					['dmaxstat'] = { ['type'] = 'number', ['value'] = 4 },
+					['durmod'] = { ['type'] = 'number', ['value'] = 1 },
+					['durmult'] = { ['type'] = 'number', ['value'] = .25 },
+					['durstat'] = { ['type'] = 'string', ['value'] = 'cl' },
 					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+					['label'] = { ['type'] = 'string', ['value'] = ('Arcane Strike; DMG: 1; DMGTYPE: magic') },
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
-				},
-			},
-		},
-		['Combat Expertise'] = {
-			['string_ability_type'] = 'Feats',
-			['level'] = 0,
-			['effects'] = {
-				['zeffect-1'] = {
-					['label'] = { ['type'] = 'string', ['value'] = 'Combat Expertise; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; AC: 1 [QBAB] dodge' },
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
-					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 				},
 			},
 		},
@@ -338,9 +307,72 @@ local function search_for_abilities(node_npc)
 			['number_substitution'] = true,
 			['effects'] = {
 				['zeffect-1'] = {
+					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
 					['label'] = { ['type'] = 'string', ['value'] = 'Bleed; DMGO: %n bleed' },
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+				},
+			},
+		},
+		['Combat Expertise'] = {
+			['string_ability_type'] = 'Feats',
+			['level'] = 0,
+			['effects'] = {
+				['zeffect-1'] = {
 					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+					['label'] = { ['type'] = 'string', ['value'] = 'Combat Expertise; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; AC: 1 [QBAB] dodge' },
+					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+				},
+			},
+		},
+		['Deadly Aim'] = {
+			['string_ability_type'] = 'Feats',
+			['level'] = 0,
+			['effects'] = {
+				['zeffect-1'] = {
+					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+					['label'] = { ['type'] = 'string', ['value'] = 'Deadly Aim; ATK: -1 [-QBAB] ,ranged; DMG: 1 [QBAB] ,ranged; DMG: 1 [QBAB] ,ranged' },
+					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+				},
+			},
+		},
+		['Furious Focus'] = {
+			['string_ability_type'] = 'Feats',
+			['level'] = 0,
+			['effects'] = {
+				['zeffect-1'] = {
+					['apply'] = { ['type'] = 'string', ['value'] = 'roll' },
+					['label'] = { ['type'] = 'string', ['value'] = 'Furious Focus; IF: CUSTOM(Power Attack 2-H); ATK: 1 [QBAB] ,melee; CMB: 1 [QBAB] ,melee' },
+					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+				},
+			},
+		},
+		['Mobility'] = {
+			['string_ability_type'] = 'Feats',
+			['level'] = 0,
+			['effects'] = {
+				['zeffect-1'] = {
+					['label'] = { ['type'] = 'string', ['value'] = 'Mobility; AC: 4 ,opportunity; IF: CUSTOM(Flat-footed); AC: -4 ,opportunity' },
+					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+				},
+			},
+		},
+		['Power Attack'] = {
+			['string_ability_type'] = 'Feats',
+			['level'] = 0,
+			['effects'] = {
+				['zeffect-1'] = {
+					['label'] = { ['type'] = 'string', ['value'] = 'Power Attack 1-H; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee' },
+					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+				},
+				['zeffect-2'] = {
+					['label'] = { ['type'] = 'string', ['value'] = 'Power Attack 2-H; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee' },
+					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 				},
 			},
 		},
