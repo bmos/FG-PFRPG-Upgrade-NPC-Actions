@@ -226,7 +226,7 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 	end
 
 	local node_spellset = node_npc.createChild('spellset')
-	local node_spellclass = node_spellset.createChild()
+	local node_spellclass = node_spellset.createChild(table_ability_information['string_ability_type'] or 'Abilities')
 
 	DB.setValue(node_spellclass, 'label', 'string', table_ability_information['string_ability_type'])
 	DB.setValue(node_spellclass, 'castertype', 'string', 'spontaneous')
@@ -260,15 +260,15 @@ local function search_for_abilities(node_npc)
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
 			['effects'] = {
-				['zeffect-1'] = { -- kk
-					['label'] = { ['type'] = 'string', ['value'] = 'Power Attack-1H; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee' },
+				['zeffect-1'] = {
+					['label'] = { ['type'] = 'string', ['value'] = 'Power Attack 1-H; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee' },
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 				},
 				['zeffect-2'] = {
-					['label'] = { ['type'] = 'string', ['value'] = 'Power Attack-2H; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee' },
+					['label'] = { ['type'] = 'string', ['value'] = 'Power Attack 2-H; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee' },
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 				},
 			},
 		},
@@ -280,6 +280,7 @@ local function search_for_abilities(node_npc)
 					['label'] = { ['type'] = 'string', ['value'] = 'Deadly Aim; ATK: -1 [-QBAB] ,ranged; DMG: 1 [QBAB] ,ranged; DMG: 1 [QBAB] ,ranged' },
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 				},
 			},
 		},
@@ -291,6 +292,7 @@ local function search_for_abilities(node_npc)
 					['label'] = { ['type'] = 'string', ['value'] = 'Combat Expertise; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; AC: 1 [QBAB] dodge' },
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 				},
 			},
 		},
