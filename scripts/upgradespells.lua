@@ -208,59 +208,6 @@ local function hasSpecialAbility(nodeActor, sSearchString, bFeat, bTrait, bSpeci
 	return false
 end
 
-local function add_ability_node(nodeSource, nodeSpellClass, nLevel)
-	-- Validate
-	if not nodeSource or not nodeSpellClass or not nLevel then
-		return nil;
-	end
-	
-	-- Create the new spell entry
-	local nodeTargetLevelSpells = nodeSpellClass.createChild("levels.level" .. nLevel .. ".spells");
-	if not nodeTargetLevelSpells then
-		return nil;
-	end
-	local nodeNewSpell = nodeTargetLevelSpells.createChild();
-	if not nodeNewSpell then
-		return nil;
-	end
-	
-	-- Copy the spell details over
-	DB.copyNode(nodeSource, nodeNewSpell);
-	
-	-- Convert the description field from module data
-	SpellManager.convertSpellDescToString(nodeNewSpell);
-
-	local nodeParent = nodeTargetLevelSpells.getParent();
-	if nodeParent then
-		-- If spell level not visible, then make it so.
-		local sAvailablePath = "....available" .. nodeParent.getName();
-		local nAvailable = DB.getValue(nodeTargetLevelSpells, sAvailablePath, 1);
-		if nAvailable <= 0 then
-			DB.setValue(nodeTargetLevelSpells, sAvailablePath, "number", 1);
-		end
-	end
-	
-	-- Parse spell details to create actions
-	if DB.getChildCount(nodeNewSpell, "actions") == 0 then
-		SpellManager.parseSpell(nodeNewSpell);
-	elseif usingKelrugemExt() then											-- bmos adding Kel's tag parsing
-		local nodeActions = nodeNewSpell.createChild("actions");
-		if nodeActions then
-			local nodeAction = nodeActions.getChildren();
-			if nodeAction then
-				for k, v in pairs(nodeAction) do
-					if DB.getValue(v, "type") == "cast" then
-						SpellManager.addTags(nodeNewSpell, v);
-						-- DB.setValue(v, 'usereset', 'string', 'consumable')	-- bmos setting spell as consumable (no reset on rest)
-					end
-				end
-			end
-		end
-	end
-		
-	return nodeNewSpell;
-end
-
 --
 --	ACTION AUTOMATION FUNCTIONS
 --
@@ -277,19 +224,31 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 		) then
 			return
 	end
-	Debug.chat('add_ability_automation:string_ability_name', string_ability_name)
-	local node_spellset = node_npc.createChild("spellset")
+
+	local node_spellset = node_npc.createChild('spellset')
 	local node_spellclass = node_spellset.createChild()
-	Debug.chat('add_ability_automation:node_spellclass', node_spellclass)
 
-	DB.setValue(node_spellclass, "label", "string", string_ability_name)
-	DB.setValue(node_spellclass, "castertype", "string", "spontaneous")
-	DB.setValue(node_spellclass, "availablelevel" .. table_ability_information['level'], "number", table_ability_information['daily_uses'])
-	DB.setValue(node_spellclass, "cl", "number", 0)
-	DB.setValue(node_npc, "spellmode", "string", "standard")
-	local node_spell = add_ability_node(node_spellclass, table_ability_information['level'])
-
-	return node_spell, node_spellclass
+	DB.setValue(node_spellclass, 'label', 'string', table_ability_information['string_ability_type'])
+	DB.setValue(node_spellclass, 'castertype', 'string', 'spontaneous')
+	DB.setValue(node_spellclass, 'availablelevel' .. table_ability_information['level'], 'number', table_ability_information['daily_uses'] or 1)
+	DB.setValue(node_spellclass, 'cl', 'number', 0)
+	local node_spelllevel = node_spellclass.createChild('levels').createChild('level' .. table_ability_information['level'])
+	DB.setValue(node_spelllevel, 'level', 'number', table_ability_information['level'])
+	for k,v in pairs(table_ability_information) do
+		if k == 'effects' then
+			local node_ability = node_spelllevel.createChild('spells').createChild()
+			DB.setValue(node_ability, 'name', 'string', string_ability_name)
+			local node_actions = node_ability.createChild('actions')
+			for kk,vv in pairs(v) do
+				local node_ability_kk = node_actions.createChild(kk)
+				for kkk,vvv in pairs(vv) do
+					if not vvv['type'] and vvv['value'] then break; end
+					DB.setValue(node_ability_kk, kkk, vvv['type'], vvv['value'])
+				end
+			end
+		end
+	end
+	DB.setValue(node_npc, 'spellmode', 'string', 'standard')
 end
 
 ---	This function breaks down a table of abilities and searches for them in an NPC sheet.
@@ -366,7 +325,7 @@ local function search_for_abilities(node_npc)
 		
 		local is_match, string_parenthetical = hasSpecialAbility(node_npc, string_ability_name, is_feat, is_trait, is_special_ability) or false
 		if is_match then
-			local node_spell, node_spellclass = add_ability_automation(node_npc, string_ability_name, table_ability_information)
+			add_ability_automation(node_npc, string_ability_name, table_ability_information)
 		end
 	end
 end
@@ -384,7 +343,7 @@ local function addNPC_new(sClass, nodeNPC, sName)
 	if nodeEntry then
 		replace_spell_effects(nodeEntry)
 		search_for_maladies(nodeEntry)
-		-- search_for_abilities(nodeEntry)
+		search_for_abilities(nodeEntry)
 	end
 
 	return nodeEntry
