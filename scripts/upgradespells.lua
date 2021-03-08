@@ -208,7 +208,7 @@ local function hasSpecialAbility(nodeActor, sSearchString, bFeat, bTrait, bSpeci
 	return false
 end
 
-local function add_spell_node(nodeSource, nodeSpellClass, nLevel)
+local function add_ability_node(nodeSource, nodeSpellClass, nLevel)
 	-- Validate
 	if not nodeSource or not nodeSpellClass or not nLevel then
 		return nil;
@@ -265,10 +265,10 @@ end
 --	ACTION AUTOMATION FUNCTIONS
 --
 
-local function add_ability_automation(node_pc, string_ability_name, table_ability_information)
+local function add_ability_automation(node_npc, string_ability_name, table_ability_information)
 	if (
-		not node_pc
-		or string_ability_name == ""
+		not node_npc
+		or string_ability_name == ''
 		or not table_ability_information
 		or table_ability_information == {}
 		or table_ability_information['daily_uses'] < 0
@@ -277,15 +277,17 @@ local function add_ability_automation(node_pc, string_ability_name, table_abilit
 		) then
 			return
 	end
-	local node_spellset = node_pc.createChild("spellset")
+	Debug.chat('add_ability_automation:string_ability_name', string_ability_name)
+	local node_spellset = node_npc.createChild("spellset")
 	local node_spellclass = node_spellset.createChild()
+	Debug.chat('add_ability_automation:node_spellclass', node_spellclass)
 
 	DB.setValue(node_spellclass, "label", "string", string_ability_name)
 	DB.setValue(node_spellclass, "castertype", "string", "spontaneous")
 	DB.setValue(node_spellclass, "availablelevel" .. table_ability_information['level'], "number", table_ability_information['daily_uses'])
 	DB.setValue(node_spellclass, "cl", "number", 0)
-	DB.setValue(node_pc, "spellmode", "string", "standard")
-	local node_spell = add_spell_node(node_spellclass, table_ability_information['level'])
+	DB.setValue(node_npc, "spellmode", "string", "standard")
+	local node_spell = add_ability_node(node_spellclass, table_ability_information['level'])
 
 	return node_spell, node_spellclass
 end
@@ -298,26 +300,31 @@ local function search_for_abilities(node_npc)
 		['power attack'] = {
 			['string_ability_type'] = 'feat',
 			['level'] = 0,
-			['daily_uses'] = 1,
+			['daily_uses'] = 0,
 			['effect-1'] = 'Power Attack-1H; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee',
 			['effect-2'] = 'Power Attack-2H; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee'
 			},
 		['deadly aim'] = {
 			['string_ability_type'] = 'feat',
 			['level'] = 0,
-			['daily_uses'] = 1,
+			['daily_uses'] = 0,
 			['effect-1'] = 'Deadly Aim; ATK: -1 [-QBAB] ,ranged; DMG: 1 [QBAB] ,ranged; DMG: 1 [QBAB] ,ranged'
 			},
 		['combat expertise'] = {
 			['string_ability_type'] = 'feat',
 			['level'] = 0,
-			['daily_uses'] = 1,
+			['daily_uses'] = 0,
 			['effect-1'] = 'Combat Expertise; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; AC: 1 [QBAB] dodge'
+			},
+		['breath weapon'] = {
+			['string_ability_type'] = 'special ability',
+			['level'] = 0,
+			['daily_uses'] = 0,
 			},
 		['bleed'] = {
 			['string_ability_type'] = 'special ability',
 			['level'] = 0,
-			['daily_uses'] = 1,
+			['daily_uses'] = 0,
 			['search_dice'] = true,
 			['number_substitution'] = true,
 			['effect-1'] = 'Bleed; DMGO: %n bleed'
@@ -325,7 +332,7 @@ local function search_for_abilities(node_npc)
 	}
 	
 	for string_ability_name, table_ability_information in pairs(array_abilities) do
-		local is_feat, is_trait, is_special_ability = false, false, false
+		local is_feat, is_trait, is_special_ability
 		if table_ability_information['string_ability_type'] == 'feat' then
 			is_feat = true
 		elseif table_ability_information['string_ability_type'] == 'trait' then
@@ -336,8 +343,7 @@ local function search_for_abilities(node_npc)
 		
 		local is_match, string_parenthetical = hasSpecialAbility(node_npc, string_ability_name, is_feat, is_trait, is_special_ability) or false
 		if is_match then
-			local node_spell, node_spellclass = add_ability_automation(node_pc, string_ability_name, table_ability_information)
-			Debug.chat('search_for_abilities', node_spell, node_spellclass)
+			local node_spell, node_spellclass = add_ability_automation(node_npc, string_ability_name, table_ability_information)
 		end
 	end
 end
