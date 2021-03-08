@@ -388,7 +388,7 @@ local function search_for_abilities(node_npc)
 			is_special_ability = true
 		end
 		
-		local is_match, string_parenthetical = hasSpecialAbility(node_npc, string_ability_name, is_feat, is_trait, is_special_ability) or false
+		local is_match, number_rank, string_parenthetical = hasSpecialAbility(node_npc, string_ability_name, is_feat, is_trait, is_special_ability)
 		if is_match then
 			add_ability_automation(node_npc, string_ability_name, table_ability_information, string_parenthetical)
 		end
