@@ -187,7 +187,7 @@ end
 --	ACTION AUTOMATION FUNCTIONS
 --
 
-local function add_ability_automation(node_npc, string_ability_name, table_ability_information, number_rank)
+local function add_ability_automation(node_npc, string_ability_name, table_ability_information, number_rank, string_parenthetical)
 	if (
 		not node_npc
 		or string_ability_name == ''
