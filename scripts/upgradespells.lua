@@ -242,11 +242,11 @@ local function hasSpecialAbility(nodeActor, sSearchString, bFeat, bTrait, bSpeci
 
 	if bFeat and sFeats:match(sLowerSpecAbil, 1) then
 		local nRank = tonumber(sFeats:match(sLowerSpecAbil .. ' (%d+)', 1))
-		local sParenthetical = sSpecAtks:match(sLowerSpecAbil .. ' (%(.+%))', 1) or sFeats:match(sLowerSpecAbil .. ' (%(.+%))', 1)
+		local sParenthetical = sSpecAtks:match(sLowerSpecAbil .. ' %((.+)%)', 1) or sFeats:match(sLowerSpecAbil .. ' %((.+)%)', 1)
 		return true, (nRank or 1), sParenthetical
 	elseif bSpecialAbility and (sSpecAtks:match(sLowerSpecAbil, 1) or sSpecialQualities:match(sLowerSpecAbil, 1)) then
-		local nRank = tonumber(sSpecAtks:match(sLowerSpecAbil .. ' (%d+)', 1) or sSpecAtks:match(sLowerSpecAbil .. ' (%d+)', 1))
-		local sParenthetical = sSpecAtks:match(sLowerSpecAbil .. ' (%(.+%))', 1) or sSpecAtks:match(sLowerSpecAbil .. ' (%(.+%))', 1)
+		local nRank = tonumber(sSpecAtks:match(sLowerSpecAbil .. ' (%d+)', 1) or sSpecialQualities:match(sLowerSpecAbil .. ' (%d+)', 1))
+		local sParenthetical = sSpecAtks:match(sLowerSpecAbil .. ' %((.+)%)', 1) or sSpecialQualities:match(sLowerSpecAbil .. ' %((.+)%)', 1)
 		return true, (nRank or 1), sParenthetical
 	end
 end
