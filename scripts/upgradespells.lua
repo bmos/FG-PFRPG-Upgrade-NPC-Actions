@@ -226,7 +226,6 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 			end
 		end
 	end
-	DB.setValue(node_npc, 'spellmode', 'string', 'standard')
 end
 
 ---	This function checks NPCs for feats, traits, and/or special abilities.
