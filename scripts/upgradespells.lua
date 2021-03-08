@@ -201,17 +201,20 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 			return
 	end
 
+	-- create spellset and intermediate subnodes
 	local node_spellset = node_npc.createChild('spellset')
 	local node_spellclass = node_spellset.createChild(table_ability_information['string_ability_type'] or 'Abilities')
 	local node_spelllevel = node_spellclass.createChild('levels').createChild('level' .. table_ability_information['level'])
 	local node_ability = node_spelllevel.createChild('spells').createChild()
 
+	-- set up spellset and intermediate subnodes
 	DB.setValue(node_spellclass, 'label', 'string', table_ability_information['string_ability_type'])
 	DB.setValue(node_spellclass, 'castertype', 'string', 'spontaneous')
 	DB.setValue(node_spellclass, 'availablelevel' .. table_ability_information['level'], 'number', table_ability_information['daily_uses'] or 1)
 	DB.setValue(node_spellclass, 'cl', 'number', 0)
 	DB.setValue(node_spelllevel, 'level', 'number', table_ability_information['level'])
 
+	-- create actions
 	DB.setValue(node_ability, 'name', 'string', string_ability_name)
 	local node_actions = node_ability.createChild('actions')
 	for string_name_action,table_action_information in pairs(table_ability_information['actions']) do
