@@ -271,7 +271,7 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 		or string_ability_name == ''
 		or not table_ability_information
 		or table_ability_information == {}
-		or table_ability_information['daily_uses'] < 0
+		or (table_ability_information['daily_uses'] and table_ability_information['daily_uses'] < 0)
 		or table_ability_information['level'] < 0
 		or table_ability_information['level'] > 9
 		) then
@@ -297,47 +297,70 @@ end
 --	If a match is found, it triggers the function hasSpecialAbility.
 local function search_for_abilities(node_npc)
 	local array_abilities = {
-		['power attack'] = {
-			['string_ability_type'] = 'feat',
+		['Power Attack'] = {
+			['string_ability_type'] = 'Feats',
 			['level'] = 0,
-			['daily_uses'] = 0,
-			['effect-1'] = 'Power Attack-1H; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee',
-			['effect-2'] = 'Power Attack-2H; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee'
+			['effects'] = {
+				['zeffect-1'] = { -- kk
+					['label'] = { ['type'] = 'string', ['value'] = 'Power Attack-1H; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+				},
+				['zeffect-2'] = {
+					['label'] = { ['type'] = 'string', ['value'] = 'Power Attack-2H; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+				},
 			},
-		['deadly aim'] = {
-			['string_ability_type'] = 'feat',
+		},
+		['Deadly Aim'] = {
+			['string_ability_type'] = 'Feats',
 			['level'] = 0,
-			['daily_uses'] = 0,
-			['effect-1'] = 'Deadly Aim; ATK: -1 [-QBAB] ,ranged; DMG: 1 [QBAB] ,ranged; DMG: 1 [QBAB] ,ranged'
+			['effects'] = {
+				['zeffect-1'] = {
+					['label'] = { ['type'] = 'string', ['value'] = 'Deadly Aim; ATK: -1 [-QBAB] ,ranged; DMG: 1 [QBAB] ,ranged; DMG: 1 [QBAB] ,ranged' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+				},
 			},
-		['combat expertise'] = {
-			['string_ability_type'] = 'feat',
+		},
+		['Combat Expertise'] = {
+			['string_ability_type'] = 'Feats',
 			['level'] = 0,
-			['daily_uses'] = 0,
-			['effect-1'] = 'Combat Expertise; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; AC: 1 [QBAB] dodge'
+			['effects'] = {
+				['zeffect-1'] = {
+					['label'] = { ['type'] = 'string', ['value'] = 'Combat Expertise; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; AC: 1 [QBAB] dodge' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+				},
 			},
-		['breath weapon'] = {
-			['string_ability_type'] = 'special ability',
+		},
+		['Breath Weapon'] = {
+			['string_ability_type'] = 'Special Abilities',
 			['level'] = 0,
-			['daily_uses'] = 0,
-			},
-		['bleed'] = {
-			['string_ability_type'] = 'special ability',
+		},
+		['Bleed'] = {
+			['string_ability_type'] = 'Special Abilities',
 			['level'] = 0,
-			['daily_uses'] = 0,
 			['search_dice'] = true,
 			['number_substitution'] = true,
-			['effect-1'] = 'Bleed; DMGO: %n bleed'
-			}
+			['effects'] = {
+				['zeffect-1'] = {
+					['label'] = { ['type'] = 'string', ['value'] = 'Bleed; DMGO: %n bleed' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+				},
+			},
+		},
 	}
 	
 	for string_ability_name, table_ability_information in pairs(array_abilities) do
 		local is_feat, is_trait, is_special_ability
-		if table_ability_information['string_ability_type'] == 'feat' then
+		if table_ability_information['string_ability_type'] == 'Feats' then
 			is_feat = true
-		elseif table_ability_information['string_ability_type'] == 'trait' then
+		elseif table_ability_information['string_ability_type'] == 'Traits' then
 			is_trait = true
-		elseif table_ability_information['string_ability_type'] == 'special ability' then
+		elseif table_ability_information['string_ability_type'] == 'Special Abilities' then
 			is_special_ability = true
 		end
 		
