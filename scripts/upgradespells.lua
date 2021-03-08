@@ -310,7 +310,7 @@ local function search_for_abilities(node_npc)
 					['type'] = { ['type'] = 'string', ['value'] = 'damage' },
 				},
 				['zeffect-1'] = {
-					['durdice'] = { ['dice'] = 'number', ['value'] = '1d4' },
+					['durdice'] = { ['type'] = 'dice', ['value'] = 'd4' },
 					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
 					['label'] = { ['type'] = 'string', ['value'] = ('Breath Weapon Recharge') },
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
