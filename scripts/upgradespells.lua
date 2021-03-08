@@ -183,34 +183,6 @@ local function search_for_maladies(node_npc)
 	end
 end
 
----	This function checks NPCs for feats, traits, and/or special abilities.
-local function hasSpecialAbility(nodeActor, sSearchString, bFeat, bTrait, bSpecialAbility, bDice)
-	if not nodeActor then
-		return false;
-	end
-
-	local sLowerSpecAbil = string.lower(sSearchString);
-	local sSpecialQualities = string.lower(DB.getValue(nodeActor, '.specialqualities', ''));
-	local sSpecAtks = string.lower(DB.getValue(nodeActor, '.specialattacks', ''));
-	local sFeats = string.lower(DB.getValue(nodeActor, '.feats', ''));
-
-	if bFeat and sFeats:match(sLowerSpecAbil, 1) then
-		local nRank = tonumber(sFeats:match(sLowerSpecAbil .. ' (%d+)', 1))
-		local sParenthetical = sSpecAtks:match(sLowerSpecAbil .. ' (%(.+%))', 1) or sFeats:match(sLowerSpecAbil .. ' (%(.+%))', 1)
-		return true, (nRank or 1), sParenthetical
-	elseif bDice and bSpecialAbility and (sSpecAtks:match(sLowerSpecAbil, 1) or sSpecialQualities:match(sLowerSpecAbil, 1)) then
-		local nRank = tonumber(sSpecAtks:match(sLowerSpecAbil .. ' (%d+)', 1) or sSpecialQualities:match(sLowerSpecAbil .. ' (%d+)', 1))
-		local sParenthetical = sSpecAtks:match(sLowerSpecAbil .. ' (%(.+%))', 1) or sSpecialQualities:match(sLowerSpecAbil .. ' (%(.+%))', 1)
-		return true, (nRank or 1), sParenthetical
-	elseif bSpecialAbility and (sSpecAtks:match(sLowerSpecAbil, 1) or sSpecialQualities:match(sLowerSpecAbil, 1)) then
-		local nRank = tonumber(sSpecAtks:match(sLowerSpecAbil .. ' (%d+)', 1) or sSpecAtks:match(sLowerSpecAbil .. ' (%d+)', 1))
-		local sParenthetical = sSpecAtks:match(sLowerSpecAbil .. ' (%(.+%))', 1) or sSpecAtks:match(sLowerSpecAbil .. ' (%(.+%))', 1)
-		return true, (nRank or 1), sParenthetical
-	end
-
-	return false
-end
-
 --
 --	ACTION AUTOMATION FUNCTIONS
 --
@@ -257,6 +229,28 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 		end
 	end
 	DB.setValue(node_npc, 'spellmode', 'string', 'standard')
+end
+
+---	This function checks NPCs for feats, traits, and/or special abilities.
+local function hasSpecialAbility(nodeActor, sSearchString, bFeat, bTrait, bSpecialAbility, bDice)
+	if not nodeActor or not sSearchString or (not bFeat and not bTrait and not bSpecialAbility) then
+		return false;
+	end
+
+	local sLowerSpecAbil = string.lower(sSearchString);
+	local sSpecialQualities = string.lower(DB.getValue(nodeActor, '.specialqualities', ''));
+	local sSpecAtks = string.lower(DB.getValue(nodeActor, '.specialattacks', ''));
+	local sFeats = string.lower(DB.getValue(nodeActor, '.feats', ''));
+
+	if bFeat and sFeats:match(sLowerSpecAbil, 1) then
+		local nRank = tonumber(sFeats:match(sLowerSpecAbil .. ' (%d+)', 1))
+		local sParenthetical = sSpecAtks:match(sLowerSpecAbil .. ' (%(.+%))', 1) or sFeats:match(sLowerSpecAbil .. ' (%(.+%))', 1)
+		return true, (nRank or 1), sParenthetical
+	elseif bSpecialAbility and (sSpecAtks:match(sLowerSpecAbil, 1) or sSpecialQualities:match(sLowerSpecAbil, 1)) then
+		local nRank = tonumber(sSpecAtks:match(sLowerSpecAbil .. ' (%d+)', 1) or sSpecAtks:match(sLowerSpecAbil .. ' (%d+)', 1))
+		local sParenthetical = sSpecAtks:match(sLowerSpecAbil .. ' (%(.+%))', 1) or sSpecAtks:match(sLowerSpecAbil .. ' (%(.+%))', 1)
+		return true, (nRank or 1), sParenthetical
+	end
 end
 
 ---	This function breaks down a table of abilities and searches for them in an NPC sheet.
