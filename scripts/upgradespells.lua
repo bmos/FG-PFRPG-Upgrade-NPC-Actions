@@ -203,25 +203,47 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 
 	local node_spellset = node_npc.createChild('spellset')
 	local node_spellclass = node_spellset.createChild(table_ability_information['string_ability_type'] or 'Abilities')
+	local node_spelllevel = node_spellclass.createChild('levels').createChild('level' .. table_ability_information['level'])
+	local node_ability = node_spelllevel.createChild('spells').createChild()
 
 	DB.setValue(node_spellclass, 'label', 'string', table_ability_information['string_ability_type'])
 	DB.setValue(node_spellclass, 'castertype', 'string', 'spontaneous')
 	DB.setValue(node_spellclass, 'availablelevel' .. table_ability_information['level'], 'number', table_ability_information['daily_uses'] or 1)
 	DB.setValue(node_spellclass, 'cl', 'number', 0)
-	local node_spelllevel = node_spellclass.createChild('levels').createChild('level' .. table_ability_information['level'])
 	DB.setValue(node_spelllevel, 'level', 'number', table_ability_information['level'])
 
-	local node_ability = node_spelllevel.createChild('spells').createChild()
 	DB.setValue(node_ability, 'name', 'string', string_ability_name)
 	local node_actions = node_ability.createChild('actions')
-	for k,v in pairs(table_ability_information['actions']) do
-		local node_ability_k = node_actions.createChild(k)
-		for kk,vv in pairs(v) do
-			if vv['type'] and vv['value'] then
-				if vv['tiermultiplier'] then
-					DB.setValue(node_ability_k, kk, vv['type'], string.format(vv['value'], (vv['tiermultiplier'] * (number_rank or 1))))
-				else
-					DB.setValue(node_ability_k, kk, vv['type'], vv['value'])
+	for string_name_action,table_action_information in pairs(table_ability_information['actions']) do
+		local node_action = node_actions.createChild(string_name_action)
+		for string_node_name,table_node_info in pairs(table_action_information) do
+			if string_node_name == 'damagelist' or string_node_name == 'heallist' then
+				for string_damage_name,table_damage_information in pairs(table_node_info) do
+					local node_damage = node_action.createChild(string_node_name).createChild(string_damage_name)
+					for string_damagenode_name,table_damagenode_info in pairs(table_damage_information) do
+						if table_damagenode_info['type'] and table_damagenode_info['value'] then
+							if table_damagenode_info['tiermultiplier'] then
+								if table_damagenode_info['type'] == 'string' then
+									local string_result = string.format(table_damagenode_info['value'], (table_damagenode_info['tiermultiplier'] * (number_rank or 1)))
+									DB.setValue(node_damage, string_damagenode_name, table_damagenode_info['type'], string_result)
+								elseif table_damagenode_info['type'] == 'number' then
+									local number_result = table_damagenode_info['value'] * (table_damagenode_info['tiermultiplier'] * (number_rank or 1))
+									DB.setValue(node_damage, string_damagenode_name, table_damagenode_info['type'], number_result)
+								end
+							else
+								DB.setValue(node_damage, string_damagenode_name, table_damagenode_info['type'], table_damagenode_info['value'])
+							end
+						end
+					end
+				end
+			else
+				if table_node_info['type'] and table_node_info['value'] then
+					if table_node_info['tiermultiplier'] then
+						local result = string.format(table_node_info['value'], (table_node_info['tiermultiplier'] * (number_rank or 1)))
+						DB.setValue(node_action, string_node_name, table_node_info['type'], result)
+					else
+						DB.setValue(node_action, string_node_name, table_node_info['type'], table_node_info['value'])
+					end
 				end
 			end
 		end
