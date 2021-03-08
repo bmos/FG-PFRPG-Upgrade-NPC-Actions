@@ -216,6 +216,7 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 
 	-- create actions
 	DB.setValue(node_ability, 'name', 'string', string_ability_name)
+	DB.setValue(node_ability, 'description', 'string', string_parenthetical)
 	local node_actions = node_ability.createChild('actions')
 	for string_name_action,table_action_information in pairs(table_ability_information['actions']) do
 		local node_action = node_actions.createChild(string_name_action)
