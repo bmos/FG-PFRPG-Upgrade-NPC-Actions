@@ -294,7 +294,7 @@ local function search_for_abilities(node_npc)
 			['actions'] = {
 				['zcast-1'] = {
 					['onmissdamage'] = { ['type'] = 'string', ['value'] = 'half' },
-					['savedcmod'] = { ['type'] = 'number', ['value'] = 10 },
+					['savedcmod'] = { ['type'] = 'number', ['value'] = 20 },
 					['savedctype'] = { ['type'] = 'string', ['value'] = 'fixed' },
 					['savetype'] = { ['type'] = 'string', ['value'] = 'reflex' },
 					['type'] = { ['type'] = 'string', ['value'] = 'cast' },
@@ -302,12 +302,19 @@ local function search_for_abilities(node_npc)
 				['zdamage-1'] = {
 					['damagelist'] = {
 						['damage-001'] = {
-							['dice'] = { ['type'] = 'dice', ['value'] = '4d6' },
+							['dice'] = { ['type'] = 'dice', ['value'] = '8d6' },
 							['type'] = { ['type'] = 'string', ['value'] = 'fire' },
 						},
 					},
 					['dmgnotspell'] = { ['type'] = 'number', ['value'] = 1 },
 					['type'] = { ['type'] = 'string', ['value'] = 'damage' },
+				},
+				['zeffect-1'] = {
+					['durdice'] = { ['dice'] = 'number', ['value'] = '1d4' },
+					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+					['label'] = { ['type'] = 'string', ['value'] = ('Breath Weapon Recharge') },
+					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 				},
 			},
 		},
