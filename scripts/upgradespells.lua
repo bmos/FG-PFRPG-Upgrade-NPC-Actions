@@ -301,9 +301,9 @@ local function search_for_abilities(node_npc)
 				},
 				['zdamage-1'] = {
 					['damagelist'] = {
-						['damage-001'] = [
-							['dice'] = ['type'] = 'dice', ['value'] = '4d6' },
-							['type'] = ['type'] = 'string', ['value'] = 'fire' },
+						['damage-001'] = {
+							['dice'] = { ['type'] = 'dice', ['value'] = '4d6' },
+							['type'] = { ['type'] = 'string', ['value'] = 'fire' },
 						},
 					},
 					['dmgnotspell'] = { ['type'] = 'number', ['value'] = 1 },
