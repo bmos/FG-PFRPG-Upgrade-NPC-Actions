@@ -200,6 +200,13 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 		) then
 			return
 	end
+	
+	local dice_damage, string_damage_type, string_save_type, number_save_dc, string_save_half, dice_recharge
+	if string_parenthetical then
+		local string_parenthetical = string.lower(', ' .. string_parenthetical .. ',')
+		dice_damage, string_damage_type = string_parenthetical:match(', ([%d+]?d%d+) (%l+) damage,')
+		--Debug.chat(string_parenthetical, dice_damage, string_damage_type)
+	end
 
 	-- create spellset and intermediate subnodes
 	local node_spellset = node_npc.createChild('spellset')
