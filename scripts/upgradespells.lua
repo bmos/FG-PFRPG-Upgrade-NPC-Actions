@@ -256,6 +256,29 @@ end
 --	If a match is found, it triggers the function hasSpecialAbility.
 local function search_for_abilities(node_npc)
 	local array_abilities = {
+		['Mobility'] = {
+			['string_ability_type'] = 'Feats',
+			['level'] = 0,
+			['effects'] = {
+				['zeffect-1'] = {
+					['label'] = { ['type'] = 'string', ['value'] = 'Mobility; AC: 4 ,opportunity; IF: CUSTOM(Flat-footed); AC: -4 ,opportunity' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+				},
+			},
+		},
+		['Furious Focus'] = {
+			['string_ability_type'] = 'Feats',
+			['level'] = 0,
+			['effects'] = {
+				['zeffect-1'] = {
+					['label'] = { ['type'] = 'string', ['value'] = 'Furious Focus; IF: CUSTOM(Power Attack 2-H); ATK: 1 [QBAB] ,melee; CMB: 1 [QBAB] ,melee' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+					['apply'] = { ['type'] = 'string', ['value'] = 'roll' },
+					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+				},
+			},
+		},
 		['Power Attack'] = {
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
