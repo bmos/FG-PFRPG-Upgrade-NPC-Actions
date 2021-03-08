@@ -196,7 +196,7 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 		or (table_ability_information['daily_uses'] and table_ability_information['daily_uses'] < 0)
 		or table_ability_information['level'] < 0
 		or table_ability_information['level'] > 9
-		or table_ability_information['actions']
+		or not table_ability_information['actions']
 		) then
 			return
 	end
@@ -214,14 +214,14 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 	local node_ability = node_spelllevel.createChild('spells').createChild()
 	DB.setValue(node_ability, 'name', 'string', string_ability_name)
 	local node_actions = node_ability.createChild('actions')
-	for kk,vv in pairs(table_ability_information['actions']) do
-		local node_ability_kk = node_actions.createChild(kk)
-		for kkk,vvv in pairs(vv) do
-			if vvv['type'] and vvv['value'] then
-				if vvv['tiermultiplier'] then
-					DB.setValue(node_ability_kk, kkk, vvv['type'], string.format(vvv['value'], (vvv['tiermultiplier'] * (number_rank or 1))))
+	for k,v in pairs(table_ability_information['actions']) do
+		local node_ability_k = node_actions.createChild(k)
+		for kk,vv in pairs(v) do
+			if vv['type'] and vv['value'] then
+				if vv['tiermultiplier'] then
+					DB.setValue(node_ability_k, kk, vv['type'], string.format(vv['value'], (vv['tiermultiplier'] * (number_rank or 1))))
 				else
-					DB.setValue(node_ability_kk, kkk, vvv['type'], vvv['value'])
+					DB.setValue(node_ability_k, kk, vv['type'], vv['value'])
 				end
 			end
 		end
@@ -291,6 +291,25 @@ local function search_for_abilities(node_npc)
 		['Breath Weapon'] = {
 			['string_ability_type'] = 'Special Abilities',
 			['level'] = 0,
+			['actions'] = {
+				['zcast-1'] = {
+					['onmissdamage'] = { ['type'] = 'string', ['value'] = 'half' },
+					['savedcmod'] = { ['type'] = 'number', ['value'] = 10 },
+					['savedctype'] = { ['type'] = 'string', ['value'] = 'fixed' },
+					['savetype'] = { ['type'] = 'string', ['value'] = 'reflex' },
+					['type'] = { ['type'] = 'string', ['value'] = 'cast' },
+				},
+				['zdamage-1'] = {
+					['damagelist'] = {
+						['damage-001'] = [
+							['dice'] = ['type'] = 'dice', ['value'] = '4d6' },
+							['type'] = ['type'] = 'string', ['value'] = 'fire' },
+						},
+					},
+					['dmgnotspell'] = { ['type'] = 'number', ['value'] = 1 },
+					['type'] = { ['type'] = 'string', ['value'] = 'damage' },
+				},
+			},
 		},
 		['Bleed'] = {
 			['string_ability_type'] = 'Special Abilities',
