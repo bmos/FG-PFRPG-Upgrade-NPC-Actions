@@ -196,6 +196,7 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 		or (table_ability_information['daily_uses'] and table_ability_information['daily_uses'] < 0)
 		or table_ability_information['level'] < 0
 		or table_ability_information['level'] > 9
+		or table_ability_information['actions']
 		) then
 			return
 	end
@@ -209,21 +210,18 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 	DB.setValue(node_spellclass, 'cl', 'number', 0)
 	local node_spelllevel = node_spellclass.createChild('levels').createChild('level' .. table_ability_information['level'])
 	DB.setValue(node_spelllevel, 'level', 'number', table_ability_information['level'])
-	for k,v in pairs(table_ability_information) do
-		if k == 'effects' then
-			local node_ability = node_spelllevel.createChild('spells').createChild()
-			DB.setValue(node_ability, 'name', 'string', string_ability_name)
-			local node_actions = node_ability.createChild('actions')
-			for kk,vv in pairs(v) do
-				local node_ability_kk = node_actions.createChild(kk)
-				for kkk,vvv in pairs(vv) do
-					if vvv['type'] and vvv['value'] then
-						if vvv['tiermultiplier'] then
-							DB.setValue(node_ability_kk, kkk, vvv['type'], string.format(vvv['value'], (vvv['tiermultiplier'] * (number_rank or 1))))
-						else
-							DB.setValue(node_ability_kk, kkk, vvv['type'], vvv['value'])
-						end
-					end
+
+	local node_ability = node_spelllevel.createChild('spells').createChild()
+	DB.setValue(node_ability, 'name', 'string', string_ability_name)
+	local node_actions = node_ability.createChild('actions')
+	for kk,vv in pairs(table_ability_information['actions']) do
+		local node_ability_kk = node_actions.createChild(kk)
+		for kkk,vvv in pairs(vv) do
+			if vvv['type'] and vvv['value'] then
+				if vvv['tiermultiplier'] then
+					DB.setValue(node_ability_kk, kkk, vvv['type'], string.format(vvv['value'], (vvv['tiermultiplier'] * (number_rank or 1))))
+				else
+					DB.setValue(node_ability_kk, kkk, vvv['type'], vvv['value'])
 				end
 			end
 		end
@@ -261,7 +259,7 @@ local function search_for_abilities(node_npc)
 		['Ancestral Enmity'] = {
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
-			['effects'] = {
+			['actions'] = {
 				['zeffect-1'] = {
 					['label'] = { ['type'] = 'string', ['value'] = ('Ancestral Enmity; IFT: TYPE(gnome); ATK: %d'), ['tiermultiplier'] = 2 },
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
@@ -277,7 +275,7 @@ local function search_for_abilities(node_npc)
 		['Arcane Strike'] = {
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
-			['effects'] = {
+			['actions'] = {
 				['zeffect-1'] = {
 					['dmaxstat'] = { ['type'] = 'number', ['value'] = 4 },
 					['durmod'] = { ['type'] = 'number', ['value'] = 1 },
@@ -299,7 +297,7 @@ local function search_for_abilities(node_npc)
 			['level'] = 0,
 			['search_dice'] = true,
 			['number_substitution'] = true,
-			['effects'] = {
+			['actions'] = {
 				['zeffect-1'] = {
 					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
 					['label'] = { ['type'] = 'string', ['value'] = 'Bleed; DMGO: %n bleed' },
@@ -310,7 +308,7 @@ local function search_for_abilities(node_npc)
 		['Combat Expertise'] = {
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
-			['effects'] = {
+			['actions'] = {
 				['zeffect-1'] = {
 					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
 					['label'] = { ['type'] = 'string', ['value'] = 'Combat Expertise; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; AC: 1 [QBAB] dodge' },
@@ -322,7 +320,7 @@ local function search_for_abilities(node_npc)
 		['Deadly Aim'] = {
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
-			['effects'] = {
+			['actions'] = {
 				['zeffect-1'] = {
 					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
 					['label'] = { ['type'] = 'string', ['value'] = 'Deadly Aim; ATK: -1 [-QBAB] ,ranged; DMG: 1 [QBAB] ,ranged; DMG: 1 [QBAB] ,ranged' },
@@ -334,7 +332,7 @@ local function search_for_abilities(node_npc)
 		['Furious Focus'] = {
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
-			['effects'] = {
+			['actions'] = {
 				['zeffect-1'] = {
 					['apply'] = { ['type'] = 'string', ['value'] = 'roll' },
 					['label'] = { ['type'] = 'string', ['value'] = 'Furious Focus; IF: CUSTOM(Power Attack 2-H); ATK: 1 [QBAB] ,melee; CMB: 1 [QBAB] ,melee' },
@@ -346,7 +344,7 @@ local function search_for_abilities(node_npc)
 		['Mobility'] = {
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
-			['effects'] = {
+			['actions'] = {
 				['zeffect-1'] = {
 					['label'] = { ['type'] = 'string', ['value'] = 'Mobility; AC: 4 ,opportunity; IF: CUSTOM(Flat-footed); AC: -4 ,opportunity' },
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
@@ -357,7 +355,7 @@ local function search_for_abilities(node_npc)
 		['Power Attack'] = {
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
-			['effects'] = {
+			['actions'] = {
 				['zeffect-1'] = {
 					['label'] = { ['type'] = 'string', ['value'] = 'Power Attack 1-H; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee' },
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
