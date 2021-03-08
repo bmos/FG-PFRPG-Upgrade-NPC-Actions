@@ -337,7 +337,7 @@ local function search_for_abilities(node_npc)
 			['actions'] = {
 				['zeffect-1'] = {
 					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
-					['label'] = { ['type'] = 'string', ['value'] = 'Combat Expertise; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; AC: 1 [QBAB] dodge' },
+					['label'] = { ['type'] = 'string', ['value'] = 'Combat Expertise; ATK: -1 [-QBAB] ,melee; AC: 1 [QBAB] dodge' },
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 				},
@@ -361,7 +361,7 @@ local function search_for_abilities(node_npc)
 			['actions'] = {
 				['zeffect-1'] = {
 					['apply'] = { ['type'] = 'string', ['value'] = 'roll' },
-					['label'] = { ['type'] = 'string', ['value'] = 'Furious Focus; IF: CUSTOM(Power Attack 2-H); ATK: 1 [QBAB] ,melee; CMB: 1 [QBAB] ,melee' },
+					['label'] = { ['type'] = 'string', ['value'] = 'Furious Focus; IF: CUSTOM(Power Attack 2-H); ATK: 1 [QBAB] ,melee' },
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 				},
@@ -383,12 +383,12 @@ local function search_for_abilities(node_npc)
 			['level'] = 0,
 			['actions'] = {
 				['zeffect-1'] = {
-					['label'] = { ['type'] = 'string', ['value'] = 'Power Attack 1-H; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee' },
+					['label'] = { ['type'] = 'string', ['value'] = 'Power Attack 1-H; ATK: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee' },
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 				},
 				['zeffect-2'] = {
-					['label'] = { ['type'] = 'string', ['value'] = 'Power Attack 2-H; ATK: -1 [-QBAB] ,melee; CMB: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee' },
+					['label'] = { ['type'] = 'string', ['value'] = 'Power Attack 2-H; ATK: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee' },
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 				},
