@@ -215,7 +215,7 @@ end
 --	ACTION AUTOMATION FUNCTIONS
 --
 
-local function add_ability_automation(node_npc, string_ability_name, table_ability_information, string_parenthetical)
+local function add_ability_automation(node_npc, string_ability_name, table_ability_information, number_rank)
 	if (
 		not node_npc
 		or string_ability_name == ''
@@ -247,7 +247,7 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 				for kkk,vvv in pairs(vv) do
 					if vvv['type'] and vvv['value'] then
 						if vvv['tiermultiplier'] then
-							DB.setValue(node_ability_kk, kkk, vvv['type'], string.format(vvv['value'], vvv['tiermultiplier'] * (string_parenthetical or 1)))
+							DB.setValue(node_ability_kk, kkk, vvv['type'], string.format(vvv['value'], (vvv['tiermultiplier'] * (number_rank or 1))))
 						else
 							DB.setValue(node_ability_kk, kkk, vvv['type'], vvv['value'])
 						end
@@ -390,7 +390,7 @@ local function search_for_abilities(node_npc)
 		
 		local is_match, number_rank, string_parenthetical = hasSpecialAbility(node_npc, string_ability_name, is_feat, is_trait, is_special_ability)
 		if is_match then
-			add_ability_automation(node_npc, string_ability_name, table_ability_information, string_parenthetical)
+			add_ability_automation(node_npc, string_ability_name, table_ability_information, number_rank, string_parenthetical)
 		end
 	end
 end
