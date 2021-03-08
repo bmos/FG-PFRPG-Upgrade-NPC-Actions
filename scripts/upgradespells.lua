@@ -196,13 +196,16 @@ local function hasSpecialAbility(nodeActor, sSearchString, bFeat, bTrait, bSpeci
 
 	if bFeat and sFeats:match(sLowerSpecAbil, 1) then
 		local nRank = tonumber(sFeats:match(sLowerSpecAbil .. ' (%d+)', 1))
-		return true, (nRank or 1)
+		local sParenthetical = sSpecAtks:match(sLowerSpecAbil .. ' (%(.+%))', 1) or sFeats:match(sLowerSpecAbil .. ' (%(.+%))', 1)
+		return true, (nRank or 1), sParenthetical
 	elseif bDice and bSpecialAbility and (sSpecAtks:match(sLowerSpecAbil, 1) or sSpecialQualities:match(sLowerSpecAbil, 1)) then
-		local sDice = sSpecAtks:match(sLowerSpecAbil .. ' (%(.+%))', 1) or sSpecialQualities:match(sLowerSpecAbil .. ' (%(.+%))', 1)
-		return true, (sParenthetical or 1), sDice
-	elseif bSpecialAbility and (sSpecAtks:match(sLowerSpecAbil, 1) or sSpecialQualities:match(sLowerSpecAbil, 1)) then
 		local nRank = tonumber(sSpecAtks:match(sLowerSpecAbil .. ' (%d+)', 1) or sSpecialQualities:match(sLowerSpecAbil .. ' (%d+)', 1))
-		return true, (nRank or 1)
+		local sParenthetical = sSpecAtks:match(sLowerSpecAbil .. ' (%(.+%))', 1) or sSpecialQualities:match(sLowerSpecAbil .. ' (%(.+%))', 1)
+		return true, (nRank or 1), sParenthetical
+	elseif bSpecialAbility and (sSpecAtks:match(sLowerSpecAbil, 1) or sSpecialQualities:match(sLowerSpecAbil, 1)) then
+		local nRank = tonumber(sSpecAtks:match(sLowerSpecAbil .. ' (%d+)', 1) or sSpecAtks:match(sLowerSpecAbil .. ' (%d+)', 1))
+		local sParenthetical = sSpecAtks:match(sLowerSpecAbil .. ' (%(.+%))', 1) or sSpecAtks:match(sLowerSpecAbil .. ' (%(.+%))', 1)
+		return true, (nRank or 1), sParenthetical
 	end
 
 	return false
@@ -212,7 +215,7 @@ end
 --	ACTION AUTOMATION FUNCTIONS
 --
 
-local function add_ability_automation(node_npc, string_ability_name, table_ability_information)
+local function add_ability_automation(node_npc, string_ability_name, table_ability_information, string_parenthetical)
 	if (
 		not node_npc
 		or string_ability_name == ''
@@ -242,8 +245,13 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 			for kk,vv in pairs(v) do
 				local node_ability_kk = node_actions.createChild(kk)
 				for kkk,vvv in pairs(vv) do
-					if not vvv['type'] and vvv['value'] then break; end
-					DB.setValue(node_ability_kk, kkk, vvv['type'], vvv['value'])
+					if vvv['type'] and vvv['value'] then
+						if vvv['tiermultiplier'] then
+							DB.setValue(node_ability_kk, kkk, vvv['type'], string.format(vvv['value'], vvv['tiermultiplier'] * (string_parenthetical or 1)))
+						else
+							DB.setValue(node_ability_kk, kkk, vvv['type'], vvv['value'])
+						end
+					end
 				end
 			end
 		end
@@ -350,7 +358,7 @@ local function search_for_abilities(node_npc)
 		
 		local is_match, string_parenthetical = hasSpecialAbility(node_npc, string_ability_name, is_feat, is_trait, is_special_ability) or false
 		if is_match then
-			add_ability_automation(node_npc, string_ability_name, table_ability_information)
+			add_ability_automation(node_npc, string_ability_name, table_ability_information, string_parenthetical)
 		end
 	end
 end
