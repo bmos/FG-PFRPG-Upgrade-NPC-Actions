@@ -201,13 +201,6 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 			return
 	end
 	
-	local dice_damage, string_damage_type, string_save_type, number_save_dc, string_save_half, dice_recharge
-	if string_parenthetical then
-		local string_parenthetical = string.lower(', ' .. string_parenthetical .. ',')
-		dice_damage, string_damage_type = string_parenthetical:match(', ([%d+]?d%d+) (%l+) damage,')
-		--Debug.chat(string_parenthetical, dice_damage, string_damage_type)
-	end
-
 	-- create spellset and intermediate subnodes
 	local node_spellset = node_npc.createChild('spellset')
 	local node_spellclass = node_spellset.createChild(table_ability_information['string_ability_type'] or 'Abilities')
@@ -283,6 +276,24 @@ local function hasSpecialAbility(nodeActor, sSearchString, bFeat, bTrait, bSpeci
 	end
 end
 
+local function parse_breath_weapon(string_parenthetical, table_ability_information)
+	local string_parenthetical = string.lower(', ' .. string_parenthetical .. ',')
+	local dice_damage, string_damage_type = string_parenthetical:match(',%s([%d+]?d%d+)%s*(%l+)%s*damage[.+]?')
+	-- Debug.chat(string_parenthetical, dice_damage, string_damage_type)
+	local string_save_type, number_save_dc, string_save_half = string_parenthetical:match(',%s(%l+)%s*dc%s*(%d+)%s*f*o*r*%s*(h*a*l*f*)[.+]?')
+	-- Debug.chat(string_parenthetical, string_save_type, number_save_dc, string_save_half)
+	local dice_recharge = string_parenthetical:match(',%susable%s*every%s*([%d+]?d%d+)%s*rounds[.+]?')
+	-- Debug.chat(string_parenthetical, dice_recharge)
+	
+	
+	if dice_damage then table_ability_information['actions']['breathweapondmg']['damagelist']['primarydamage']['dice']['value'] = dice_damage end
+	if string_damage_type then table_ability_information['actions']['breathweapondmg']['damagelist']['primarydamage']['type']['value'] = string_damage_type end
+	if string_save_type then table_ability_information['actions']['breathweaponsave']['savetype']['value'] = string_save_type end
+	if number_save_dc then table_ability_information['actions']['breathweaponsave']['savedcmod']['value'] = number_save_dc end
+	if string_save_half then table_ability_information['actions']['breathweaponsave']['onmissdamage']['value'] = string_save_half end
+	if dice_recharge then table_ability_information['actions']['breathweaponrecharge']['durdice']['value'] = dice_recharge end
+end
+
 ---	This function breaks down a table of abilities and searches for them in an NPC sheet.
 --	The search result is provided by the hasSpecialAbility function.
 --	If a match is found, it triggers the function hasSpecialAbility.
@@ -324,25 +335,25 @@ local function search_for_abilities(node_npc)
 			['string_ability_type'] = 'Special Abilities',
 			['level'] = 0,
 			['actions'] = {
-				['zcast-1'] = {
-					['onmissdamage'] = { ['type'] = 'string', ['value'] = 'half' },
-					['savedcmod'] = { ['type'] = 'number', ['value'] = 20 },
+				['breathweaponsave'] = {
+					['onmissdamage'] = { ['type'] = 'string', ['value'] = '' },
+					['savedcmod'] = { ['type'] = 'number', ['value'] = 0 },
 					['savedctype'] = { ['type'] = 'string', ['value'] = 'fixed' },
 					['savetype'] = { ['type'] = 'string', ['value'] = 'reflex' },
 					['type'] = { ['type'] = 'string', ['value'] = 'cast' },
 				},
-				['zdamage-1'] = {
+				['breathweapondmg'] = {
 					['damagelist'] = {
-						['damage-001'] = {
-							['dice'] = { ['type'] = 'dice', ['value'] = '8d6' },
+						['primarydamage'] = {
+							['dice'] = { ['type'] = 'dice', ['value'] = '' },
 							['type'] = { ['type'] = 'string', ['value'] = 'fire' },
 						},
 					},
 					['dmgnotspell'] = { ['type'] = 'number', ['value'] = 1 },
 					['type'] = { ['type'] = 'string', ['value'] = 'damage' },
 				},
-				['zeffect-1'] = {
-					['durdice'] = { ['type'] = 'dice', ['value'] = 'd4' },
+				['breathweaponrecharge'] = {
+					['durdice'] = { ['type'] = 'dice', ['value'] = '' },
 					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
 					['label'] = { ['type'] = 'string', ['value'] = ('Breath Weapon Recharge') },
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
@@ -440,6 +451,10 @@ local function search_for_abilities(node_npc)
 		
 		local is_match, number_rank, string_parenthetical = hasSpecialAbility(node_npc, string_ability_name, is_feat, is_trait, is_special_ability)
 		if is_match then
+			if string_parenthetical and string_ability_name == 'Breath Weapon' then
+				parse_breath_weapon(string_parenthetical, table_ability_information)
+			end
+
 			add_ability_automation(node_npc, string_ability_name, table_ability_information, number_rank, string_parenthetical)
 		end
 	end
