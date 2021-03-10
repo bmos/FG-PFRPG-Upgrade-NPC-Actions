@@ -278,20 +278,26 @@ end
 
 local function parse_breath_weapon(string_parenthetical, table_ability_information)
 	local string_parenthetical = string.lower(', ' .. string_parenthetical .. ',')
-	local dice_damage, string_damage_type = string_parenthetical:match(',%s([%d+]?d%d+)%s*(%l+)%s*damage[.+]?')
+	local dice_damage, string_damage_type = string_parenthetical:match(',%s(%d%d*d*d%d+)%s*(%l+)[.+]?')
 	-- Debug.chat(string_parenthetical, dice_damage, string_damage_type)
-	local string_save_type, number_save_dc, string_save_half = string_parenthetical:match(',%s(%l+)%s*dc%s*(%d+)%s*f*o*r*%s*(h*a*l*f*)[.+]?')
+	local string_save_type, number_save_dc, string_save_half = string_parenthetical:match(',%s(%l*%l*%l*%l*%l*%l*%l*%l*)%s*dc%s*(%d+)%s*f*o*r*%s*(h*a*l*f*)[.+]?')
+	if string_save_type == 'fort' then string_save_type = 'fortitude' end
 	-- Debug.chat(string_parenthetical, string_save_type, number_save_dc, string_save_half)
-	local dice_recharge = string_parenthetical:match(',%susable%s*every%s*([%d+]?d%d+)%s*rounds[.+]?')
+	local dice_recharge = string_parenthetical:match(',%susable%severy%s(%d%d*d*d%d+)%srounds[.+]?')
 	-- Debug.chat(string_parenthetical, dice_recharge)
 	
 	
-	if dice_damage then table_ability_information['actions']['breathweapondmg']['damagelist']['primarydamage']['dice']['value'] = dice_damage end
-	if string_damage_type then table_ability_information['actions']['breathweapondmg']['damagelist']['primarydamage']['type']['value'] = string_damage_type end
-	if string_save_type then table_ability_information['actions']['breathweaponsave']['savetype']['value'] = string_save_type end
-	if number_save_dc then table_ability_information['actions']['breathweaponsave']['savedcmod']['value'] = number_save_dc end
-	if string_save_half then table_ability_information['actions']['breathweaponsave']['onmissdamage']['value'] = string_save_half end
-	if dice_recharge then table_ability_information['actions']['breathweaponrecharge']['durdice']['value'] = dice_recharge end
+	table_ability_information['actions']['breathweapondmg']['damagelist']['primarydamage']['dice']['value'] = dice_damage
+	table_ability_information['actions']['breathweapondmg']['damagelist']['primarydamage']['type']['value'] = string_damage_type
+	if string_save_type and string_save_type ~= '' then
+		table_ability_information['actions']['breathweaponsave']['savetype']['value'] = string_save_type
+	end
+	table_ability_information['actions']['breathweaponsave']['savedcmod']['value'] = number_save_dc
+	table_ability_information['actions']['breathweaponsave']['onmissdamage']['value'] = string_save_half
+	if dice_recharge and dice_recharge ~= '' then
+		if dice_recharge:sub(1, 2) == '1d' then dice_recharge = dice_recharge:gsub('1d', 'd') end
+		table_ability_information['actions']['breathweaponrecharge']['durdice']['value'] = dice_recharge
+	end
 end
 
 ---	This function breaks down a table of abilities and searches for them in an NPC sheet.
@@ -336,8 +342,8 @@ local function search_for_abilities(node_npc)
 			['level'] = 0,
 			['actions'] = {
 				['breathweaponsave'] = {
-					['onmissdamage'] = { ['type'] = 'string', ['value'] = '' },
-					['savedcmod'] = { ['type'] = 'number', ['value'] = 0 },
+					['onmissdamage'] = { ['type'] = 'string', ['value'] = nil },
+					['savedcmod'] = { ['type'] = 'number', ['value'] = nil },
 					['savedctype'] = { ['type'] = 'string', ['value'] = 'fixed' },
 					['savetype'] = { ['type'] = 'string', ['value'] = 'reflex' },
 					['type'] = { ['type'] = 'string', ['value'] = 'cast' },
@@ -345,15 +351,15 @@ local function search_for_abilities(node_npc)
 				['breathweapondmg'] = {
 					['damagelist'] = {
 						['primarydamage'] = {
-							['dice'] = { ['type'] = 'dice', ['value'] = '' },
-							['type'] = { ['type'] = 'string', ['value'] = 'fire' },
+							['dice'] = { ['type'] = 'dice', ['value'] = nil },
+							['type'] = { ['type'] = 'string', ['value'] = nil },
 						},
 					},
 					['dmgnotspell'] = { ['type'] = 'number', ['value'] = 1 },
 					['type'] = { ['type'] = 'string', ['value'] = 'damage' },
 				},
 				['breathweaponrecharge'] = {
-					['durdice'] = { ['type'] = 'dice', ['value'] = '' },
+					['durdice'] = { ['type'] = 'dice', ['value'] = 'd4' },
 					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
 					['label'] = { ['type'] = 'string', ['value'] = ('Breath Weapon Recharge') },
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
