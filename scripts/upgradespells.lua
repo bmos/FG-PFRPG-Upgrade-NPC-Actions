@@ -421,7 +421,7 @@ local function search_for_abilities(node_npc)
 			['level'] = 0,
 			['actions'] = {
 				['zeffect-1'] = {
-					['label'] = { ['type'] = 'string', ['value'] = 'Mobility; AC: 4 ,opportunity; IF: CUSTOM(Flat-footed); AC: -4 ,opportunity' },
+					['label'] = { ['type'] = 'string', ['value'] = 'Mobility; AC: 4 dodge,opportunity' },
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 				},
