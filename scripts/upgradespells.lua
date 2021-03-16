@@ -40,9 +40,9 @@ local function trim_spell_name(string_spell_name)
 end
 
 local function replace_effect_nodes(node_spell, node_spellset, number_spell_level, string_name_spell, node_reference_spell)
+	local node_actions_npc_spell = node_spell.createChild('actions')
 	if node_reference_spell then
-		local node_actions_reference_spell = node_reference_spell.getChild('actions')
-		local node_actions_npc_spell = node_spell.getChild('actions')
+		local node_actions_reference_spell = node_reference_spell.createChild('actions')
 		if node_actions_reference_spell and node_actions_npc_spell then
 			for _,nodeAction in pairs(node_actions_npc_spell.getChildren()) do
 				local sType = string.lower(DB.getValue(nodeAction, 'type', ''))
@@ -71,7 +71,7 @@ end
 local function add_spell_description(node_spell, string_name_spell, node_reference_spell)
 	if node_reference_spell and node_spell then
 		if DB.getValue(node_spell, 'description', '') == '' or DB.getValue(node_spell, 'description', '') == '<p></p>' then
-			DB.deleteNode(node_spell.getChild('description'))
+			DB.deleteNode(node_spell.createChild('description'))
 			local string_full_description = DB.getValue(node_reference_spell, 'description', '<p></p>')
 			DB.setValue(node_spell, 'description_full', 'formattedtext', string_full_description)
 			DB.setValue(node_spell, 'description', 'formattedtext', string_full_description)
@@ -96,23 +96,17 @@ local function add_spell_information(node_spell, string_name_spell, node_referen
 end
 
 local function replace_spell_effects(nodeEntry)
-	if nodeEntry.getChild('spellset') then
-		for _,nodeSpellset in pairs(nodeEntry.getChild('spellset').getChildren()) do
-			if nodeSpellset.getChild('levels') then
-				for _,nodeSpellLevel in pairs(nodeSpellset.getChild('levels').getChildren()) do
-					local number_spell_level = tonumber(nodeSpellLevel.getName():gsub('level', '') or 0)
-					if nodeSpellLevel.getChild('spells') and number_spell_level then
-						for _,nodeSpell in pairs(nodeSpellLevel.getChild('spells').getChildren()) do
-							local string_name_spell = trim_spell_name(DB.getValue(nodeSpell, 'name')) or ''
-							local node_reference_spell = DB.findNode('spelldesc.' .. string_name_spell .. '@PFRPG - Spellbook')
-							if number_spell_level and string_name_spell and node_reference_spell then
-								local nodeNewSpell = replace_effect_nodes(nodeSpell, nodeSpellset, number_spell_level, string_name_spell, node_reference_spell)
-								if nodeNewSpell then nodeSpell = nodeNewSpell end
-								add_spell_description(nodeSpell, string_name_spell, node_reference_spell)
-								add_spell_information(nodeSpell, string_name_spell, node_reference_spell)
-							end
-						end
-					end
+	for _,nodeSpellset in pairs(nodeEntry.createChild('spellset').getChildren()) do
+		for _,nodeSpellLevel in pairs(nodeSpellset.createChild('levels').getChildren()) do
+			local number_spell_level = tonumber(nodeSpellLevel.getName():gsub('level', '') or 0)
+			for _,nodeSpell in pairs(nodeSpellLevel.createChild('spells').getChildren()) do
+				local string_name_spell = trim_spell_name(DB.getValue(nodeSpell, 'name')) or ''
+				local node_reference_spell = DB.findNode('spelldesc.' .. string_name_spell .. '@PFRPG - Spellbook')
+				if number_spell_level and string_name_spell and node_reference_spell then
+					local nodeNewSpell = replace_effect_nodes(nodeSpell, nodeSpellset, number_spell_level, string_name_spell, node_reference_spell)
+					if nodeNewSpell then nodeSpell = nodeNewSpell end
+					add_spell_description(nodeSpell, string_name_spell, node_reference_spell)
+					add_spell_information(nodeSpell, string_name_spell, node_reference_spell)
 				end
 			end
 		end
