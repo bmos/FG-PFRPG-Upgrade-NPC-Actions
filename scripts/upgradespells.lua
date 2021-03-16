@@ -40,6 +40,8 @@ local function trim_spell_name(string_spell_name)
 end
 
 local function replace_effect_nodes(node_spell, node_spellset, number_spell_level, string_name_spell, node_reference_spell)
+	if not node_spell and node_spellset then return; end
+
 	local node_actions_npc_spell = node_spell.createChild('actions')
 	if node_reference_spell then
 		local node_actions_reference_spell = node_reference_spell.createChild('actions')
