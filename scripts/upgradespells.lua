@@ -40,37 +40,14 @@ local function trim_spell_name(string_spell_name)
 end
 
 local function replace_effect_nodes(node_spell, node_spellset, number_spell_level, string_name_spell, node_reference_spell)
-	if not node_spell and node_spellset then return; end
-
-	local node_actions_npc_spell = node_spell.createChild('actions')
-	if SpellManager.addTags then
-		for _, v in pairs(node_actions_npc_spell.getChildren()) do
-			if DB.getValue(v, "type") == "cast" then
-				SpellManager.addTags(node_spell, v);
-			end
-		end
-	end
-
 	if node_reference_spell then
-		local node_actions_reference_spell = node_reference_spell.createChild('actions')
-		if node_actions_reference_spell and node_actions_npc_spell then
-			for _,nodeAction in pairs(node_actions_npc_spell.getChildren()) do
-				local sType = string.lower(DB.getValue(nodeAction, 'type', ''))
-				if sType ~= 'cast' then
-					DB.deleteNode(nodeAction)
-				end
-			end
-			for _,node_action in pairs(node_actions_reference_spell.getChildren()) do
-				local sType = string.lower(DB.getValue(node_action, 'type', ''))
-				if sType ~= 'cast' then
-					DB.copyNode(node_action, node_actions_npc_spell.createChild())
-				end
-			end
-		elseif node_actions_reference_spell then
-			local prepared_count = DB.getValue(node_spell, 'prepared', 0)
+		local node_actions_npc_spell = node_spell.getChild('actions')
+		if node_actions_reference_spell then
+			local number_prepared = DB.getValue(node_spell, 'prepared', 0)
+			local name_spell = DB.getValue(node_spell, 'name', '')
 			DB.deleteNode(node_spell)
-			local node_spell_new = SpellManager.addSpell(node_actions_reference_spell.getParent(), node_spellset, number_spell_level)
-			DB.setValue(node_spell_new, 'prepared', 'number', prepared_count)
+			local node_spell_new = SpellManager.addSpell(node_reference_spell, node_spellset, number_spell_level)
+			DB.setValue(node_spell_new, 'prepared', 'number', number_prepared)
 			DB.setValue(node_spell_new, 'name', 'string', name_spell)
 
 			return node_spell_new
