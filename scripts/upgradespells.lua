@@ -62,7 +62,7 @@ local function replace_effect_nodes(node_spell, node_spellset, number_spell_leve
 			local node_spell_new = SpellManager.addSpell(node_actions_reference_spell.getParent(), node_spellset, number_spell_level)
 			DB.setValue(node_spell_new, 'prepared', 'number', prepared_count)
 			DB.setValue(node_spell_new, 'name', 'string', name_spell)
-			
+
 			return node_spell_new
 		end
 	end
@@ -105,10 +105,12 @@ local function replace_spell_effects(nodeEntry)
 						for _,nodeSpell in pairs(nodeSpellLevel.getChild('spells').getChildren()) do
 							local string_name_spell = trim_spell_name(DB.getValue(nodeSpell, 'name')) or ''
 							local node_reference_spell = DB.findNode('spelldesc.' .. string_name_spell .. '@PFRPG - Spellbook')
-							local nodeNewSpell = replace_effect_nodes(nodeSpell, node_spellset, number_spell_level, string_name_spell, node_reference_spell)
-							if nodeNewSpell then nodeSpell = nodeNewSpell end
-							add_spell_description(nodeSpell, string_name_spell, node_reference_spell)
-							add_spell_information(nodeSpell, string_name_spell, node_reference_spell)
+							if number_spell_level, string_name_spell, node_reference_spell then
+								local nodeNewSpell = replace_effect_nodes(nodeSpell, nodeSpellset, number_spell_level, string_name_spell, node_reference_spell)
+								if nodeNewSpell then nodeSpell = nodeNewSpell end
+								add_spell_description(nodeSpell, string_name_spell, node_reference_spell)
+								add_spell_information(nodeSpell, string_name_spell, node_reference_spell)
+							end
 						end
 					end
 				end
