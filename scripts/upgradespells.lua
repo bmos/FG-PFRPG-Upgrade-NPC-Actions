@@ -43,6 +43,14 @@ local function replace_effect_nodes(node_spell, node_spellset, number_spell_leve
 	if not node_spell and node_spellset then return; end
 
 	local node_actions_npc_spell = node_spell.createChild('actions')
+	if SpellManager.addTags then
+		for _, v in pairs(node_actions_npc_spell) do
+			if DB.getValue(v, "type") == "cast" then
+				SpellManager.addTags(node_spell, v);
+			end
+		end
+	end
+
 	if node_reference_spell then
 		local node_actions_reference_spell = node_reference_spell.createChild('actions')
 		if node_actions_reference_spell and node_actions_npc_spell then
