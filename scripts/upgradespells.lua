@@ -381,7 +381,7 @@ local function search_for_abilities(node_npc)
 			['actions'] = {
 				['zeffect-1'] = {
 					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
-					['label'] = { ['type'] = 'string', ['value'] = 'Deadly Aim; ATK: -1 [-QBAB] ,ranged; DMG: 1 [QBAB] ,ranged; DMG: 1 [QBAB] ,ranged' },
+					['label'] = { ['type'] = 'string', ['value'] = 'Deadly Aim; ATK: -1 [-QBAB] ,ranged; DMG: 2 [QBAB][QBAB] ,ranged' },
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 				},
@@ -415,12 +415,12 @@ local function search_for_abilities(node_npc)
 			['level'] = 0,
 			['actions'] = {
 				['zeffect-1'] = {
-					['label'] = { ['type'] = 'string', ['value'] = 'Power Attack 1-H; ATK: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee' },
+					['label'] = { ['type'] = 'string', ['value'] = 'Power Attack 1-H; ATK: -1 [-QBAB] ,melee; DMG: 2 [QBAB][QBAB] ,melee' },
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 				},
 				['zeffect-2'] = {
-					['label'] = { ['type'] = 'string', ['value'] = 'Power Attack 2-H; ATK: -1 [-QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee; DMG: 1 [QBAB] ,melee' },
+					['label'] = { ['type'] = 'string', ['value'] = 'Power Attack 2-H; ATK: -1 [-QBAB] ,melee; DMG: 3 [QBAB][QBAB][QBAB] ,melee' },
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 				},
