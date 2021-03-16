@@ -44,7 +44,7 @@ local function replace_effect_nodes(node_spell, node_spellset, number_spell_leve
 
 	local node_actions_npc_spell = node_spell.createChild('actions')
 	if SpellManager.addTags then
-		for _, v in pairs(node_actions_npc_spell) do
+		for _, v in pairs(node_actions_npc_spell.getChildren()) do
 			if DB.getValue(v, "type") == "cast" then
 				SpellManager.addTags(node_spell, v);
 			end
