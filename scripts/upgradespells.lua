@@ -289,6 +289,7 @@ end
 local function search_for_abilities(node_npc)
 	local array_abilities = {
 		['Ancestral Enmity'] = {
+			['description'] = ' You gain a +2 bonus on melee attack rolls against dwarves and gnomes.  You may select this feat twice. Its effects stack.',
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
 			['actions'] = {
@@ -305,6 +306,7 @@ local function search_for_abilities(node_npc)
 			},
 		},
 		['Arcane Strike'] = {
+			['description'] = 'As a swift action, you can imbue your weapons with a fraction of your power. For 1 round, your weapons deal +1 damage and are treated as magic for the purpose of overcoming damage reduction. For every five caster levels you possess, this bonus increases by +1, to a maximum of +5 at 20th level.',
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
 			['actions'] = {
@@ -321,6 +323,7 @@ local function search_for_abilities(node_npc)
 			},
 		},
 		['Breath Weapon'] = {
+			['description'] = 'Some creatures can exhale a cloud, cone, or line of magical effects. A breath weapon usually deals damage and is often based on some type of energy. Breath weapons allow a Reflex save for half damage (DC = 10 + 1/2 breathing creature’s racial HD + breathing creature’s Constitution modifier; the exact DC is given in the creature’s descriptive text). A creature is immune to its own breath weapon unless otherwise noted. Some breath weapons allow a Fortitude save or a Will save instead of a Reflex save. Each breath weapon also includes notes on how often it can be used.',
 			['string_ability_type'] = 'Special Abilities',
 			['level'] = 0,
 			['actions'] = {
@@ -351,6 +354,7 @@ local function search_for_abilities(node_npc)
 			},
 		},
 		['Bleed'] = {
+			['description'] = 'A creature with this ability causes wounds that continue to bleed, dealing additional damage each round at the start of the affected creature’s turn. This bleeding can be stopped with a successful DC 15 Heal skill check or through the application of any magical healing. The amount of damage each round is specified in the creature’s entry.',
 			['string_ability_type'] = 'Special Abilities',
 			['level'] = 0,
 			['search_dice'] = true,
@@ -364,6 +368,7 @@ local function search_for_abilities(node_npc)
 			},
 		},
 		['Combat Expertise'] = {
+			['description'] = 'You can choose to take a –1 penalty on melee attack rolls and combat maneuver checks to gain a +1 dodge bonus to your Armor Class. When your base attack bonus reaches +4, and every +4 thereafter, the penalty increases by –1 and the dodge bonus increases by +1. You can only choose to use this feat when you declare that you are making an attack or a full-attack action with a melee weapon. The effects of this feat last until your next turn.',
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
 			['actions'] = {
@@ -376,6 +381,7 @@ local function search_for_abilities(node_npc)
 			},
 		},
 		['Deadly Aim'] = {
+			['description'] = 'You can choose to take a –1 penalty on all ranged attack rolls to gain a +2 bonus on all ranged damage rolls. When your base attack bonus reaches +4, and every +4 thereafter, the penalty increases by –1 and the bonus to damage increases by +2. You must choose to use this feat before making an attack roll and its effects last until your next turn. The bonus damage does not apply to touch attacks or effects that do not deal hit point damage.',
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
 			['actions'] = {
@@ -388,6 +394,7 @@ local function search_for_abilities(node_npc)
 			},
 		},
 		['Furious Focus'] = {
+			['description'] = 'When you are wielding a two-handed weapon or a one-handed weapon with two hands, and using the Power Attack feat, you do not suffer Power Attack’s penalty on melee attack rolls on the first attack you make each turn. You still suffer the penalty on any additional attacks, including attacks of opportunity.',
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
 			['actions'] = {
@@ -400,6 +407,7 @@ local function search_for_abilities(node_npc)
 			},
 		},
 		['Mobility'] = {
+			['description'] = 'You get a +4 dodge bonus to Armor Class against attacks of opportunity caused when you move out of or within a threatened area. A condition that makes you lose your Dexterity bonus to Armor Class (if any) also makes you lose dodge bonuses. Dodge bonuses stack with each other, unlike most types of bonuses.',
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
 			['actions'] = {
@@ -411,6 +419,7 @@ local function search_for_abilities(node_npc)
 			},
 		},
 		['Power Attack'] = {
+			['description'] = 'You can choose to take a –1 penalty on all melee attack rolls and combat maneuver checks to gain a +2 bonus on all melee damage rolls. This bonus to damage is increased by half (+50%) if you are making an attack with a two-handed weapon, a one handed weapon using two hands, or a primary natural weapon that adds 1-1/2 times your Strength modifier on damage rolls. This bonus to damage is halved (–50%) if you are making an attack with an off-hand weapon or secondary natural weapon. When your base attack bonus reaches +4, and every 4 points thereafter, the penalty increases by –1 and the bonus to damage increases by +2. You must choose to use this feat before making an attack roll, and its effects last until your next turn. The bonus damage does not apply to touch attacks or effects that do not deal hit point damage.',
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
 			['actions'] = {
