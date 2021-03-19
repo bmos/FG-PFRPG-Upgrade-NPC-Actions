@@ -380,6 +380,19 @@ local function search_for_abilities(node_npc)
 				},
 			},
 		},
+		['Critical Focus'] = {
+			['description'] = 'You receive a +4 circumstance bonus on attack rolls made to confirm critical hits.',
+			['string_ability_type'] = 'Feats',
+			['level'] = 0,
+			['actions'] = {
+				['zeffect-1'] = {
+					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+					['label'] = { ['type'] = 'string', ['value'] = 'Critical Focus; CC: +4 circumstance' },
+					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+				},
+			},
+		},
 		['Deadly Aim'] = {
 			['description'] = 'You can choose to take a –1 penalty on all ranged attack rolls to gain a +2 bonus on all ranged damage rolls. When your base attack bonus reaches +4, and every +4 thereafter, the penalty increases by –1 and the bonus to damage increases by +2. You must choose to use this feat before making an attack roll and its effects last until your next turn. The bonus damage does not apply to touch attacks or effects that do not deal hit point damage.',
 			['string_ability_type'] = 'Feats',
