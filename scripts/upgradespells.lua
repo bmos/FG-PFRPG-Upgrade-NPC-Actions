@@ -197,9 +197,11 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 	DB.setValue(node_spellclass, 'cl', 'number', 0)
 	DB.setValue(node_spelllevel, 'level', 'number', table_ability_information['level'])
 
-	-- create actions
+	-- set name and description
 	DB.setValue(node_ability, 'name', 'string', string_ability_name)
-	DB.setValue(node_ability, 'description', 'string', string_parenthetical)
+	DB.setValue(node_ability, 'description', 'string', (table_ability_information['description'] or '') .. (string_parenthetical or ''))
+
+	-- create actions
 	local node_actions = node_ability.createChild('actions')
 	for string_name_action,table_action_information in pairs(table_ability_information['actions']) do
 		local node_action = node_actions.createChild(string_name_action)
@@ -260,6 +262,7 @@ local function hasSpecialAbility(nodeActor, sSearchString, bFeat, bTrait, bSpeci
 end
 
 local function parse_breath_weapon(string_parenthetical, table_ability_information)
+	if not string_parenthetical then return; end
 	local string_parenthetical = string.lower(', ' .. string_parenthetical .. ',')
 	local dice_damage, string_damage_type = string_parenthetical:match(',%s(%d%d*d*d%d+)%s*(%l+)[.+]?')
 	-- Debug.chat(string_parenthetical, dice_damage, string_damage_type)
@@ -289,7 +292,7 @@ end
 local function search_for_abilities(node_npc)
 	local array_abilities = {
 		['Ancestral Enmity'] = {
-			['description'] = ' You gain a +2 bonus on melee attack rolls against dwarves and gnomes.  You may select this feat twice. Its effects stack.',
+			['description'] = 'You gain a +2 bonus on melee attack rolls against dwarves and gnomes.  You may select this feat twice. Its effects stack.',
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
 			['actions'] = {
@@ -431,6 +434,19 @@ local function search_for_abilities(node_npc)
 				},
 			},
 		},
+		-- ['Mythic Power'] = {
+			-- ['description'] = 'Every mythic PC gains a number of base abilities common to all mythic characters, in addition to the special abilities granted by each mythic path. These abilities are gained based on the character’s mythic tier.',
+			-- ['string_ability_type'] = 'Special Abilities',
+			-- ['level'] = 0,
+			-- ['actions'] = {
+				-- ['surge'] = {
+					-- ['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+					-- ['label'] = { ['type'] = 'string', ['value'] = 'Critical Focus; CC: +4 circumstance' },
+					-- ['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+					-- ['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+				-- },
+			-- },
+		-- },
 		['Power Attack'] = {
 			['description'] = 'You can choose to take a –1 penalty on all melee attack rolls and combat maneuver checks to gain a +2 bonus on all melee damage rolls. This bonus to damage is increased by half (+50%) if you are making an attack with a two-handed weapon, a one handed weapon using two hands, or a primary natural weapon that adds 1-1/2 times your Strength modifier on damage rolls. This bonus to damage is halved (–50%) if you are making an attack with an off-hand weapon or secondary natural weapon. When your base attack bonus reaches +4, and every 4 points thereafter, the penalty increases by –1 and the bonus to damage increases by +2. You must choose to use this feat before making an attack roll, and its effects last until your next turn. The bonus damage does not apply to touch attacks or effects that do not deal hit point damage.',
 			['string_ability_type'] = 'Feats',
