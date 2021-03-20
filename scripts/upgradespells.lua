@@ -201,7 +201,7 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 	DB.setValue(node_ability, 'name', 'string', string_ability_name)
 	DB.setValue(node_ability, 'description', 'string', (table_ability_information['description'] or '') .. (string_parenthetical or ''))
 	if table_ability_information['perday'] then
-		DB.setValue(node_ability, 'prepared', 'string', table_ability_information['perday'])
+		DB.setValue(node_ability, 'prepared', 'number', table_ability_information['perday'])
 	end
 
 	-- create actions
