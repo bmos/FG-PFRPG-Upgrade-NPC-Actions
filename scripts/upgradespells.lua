@@ -412,6 +412,32 @@ local function search_for_abilities(node_npc)
 				},
 			},
 		},
+		['Defended Movement'] = {
+			['description'] = 'You gain a +2 bonus to your AC against attacks of opportunity.',
+			['string_ability_type'] = 'Feats',
+			['level'] = 0,
+			['actions'] = {
+				['zeffect-1'] = {
+					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+					['label'] = { ['type'] = 'string', ['value'] = 'Defended Movement; AC: 4 ,,opportunity' },
+					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+				},
+			},
+		},
+		['Defensive Combat Training'] = {
+			['description'] = 'You treat your total Hit Dice as your base attack bonus when calculating your Combat Maneuver Defense (see Combat).',
+			['string_ability_type'] = 'Feats',
+			['level'] = 0,
+			['actions'] = {
+				['zeffect-1'] = {
+					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+					['label'] = { ['type'] = 'string', ['value'] = 'Defensive Combat Training; CMD: [LVL]; CMD: [-BAB]' },
+					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+				},
+			},
+		},
 		['Furious Focus'] = {
 			['description'] = 'When you are wielding a two-handed weapon or a one-handed weapon with two hands, and using the Power Attack feat, you do not suffer Power Attack’s penalty on melee attack rolls on the first attack you make each turn. You still suffer the penalty on any additional attacks, including attacks of opportunity.',
 			['string_ability_type'] = 'Feats',
