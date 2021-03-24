@@ -33,3 +33,6 @@ Feats:
 
 Abilities
 * Breath Weapon (max 1/NPC -- please pass any along that are not detected correctly).
+
+It also adds tooltips to the conditions in the effects window.
+Hovering over these conditions will show you what it does in the PFRPG/3.5E rulesets and the description/definition of that condition.
