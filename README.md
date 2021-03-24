@@ -1,4 +1,10 @@
 # FG-PFRPG-Upgrade-NPC-Actions
+This extension improves automation of NPC abilities and spells.
+
+# Compatibility and Instructions
+This extension has been tested with [FantasyGrounds Unity](https://www.fantasygrounds.com/home/FantasyGroundsUnity.php) 4.0.10 (2021-02-04).
+
+# Features
 This extension replaces NPC spell actions with those from [PFRPG - Spellbook](https://www.fantasygrounds.com/forums/showthread.php?58962-PFRPG-Spellbook).
 Spell actions replacement occurs automatically when the NPC is added to the combat tracker.
 
