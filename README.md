@@ -35,4 +35,4 @@ Feats:
 * Power Attack
 
 Abilities
-* Breath Weapon (max 1/NPC -- please pass any along that are not detected correctly).
+* Breath Weapon (max 1/NPC -- save and damage only).
