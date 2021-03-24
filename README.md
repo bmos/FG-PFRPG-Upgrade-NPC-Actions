@@ -16,6 +16,9 @@ This extension allows easier creation of NPCs, as spells can be entered on Spell
 
 For users of my [Malady Tracker extension](https://www.fantasygrounds.com/forums/showthread.php?60290-PFRPG-Disease-Tracker-Extension), the NPC name will also be checked against the maladies and a link will be added to the Notes tab for any poisons it has.
 
+It also adds tooltips to the conditions in the effects window.
+Hovering over these conditions will show you what it does in the PFRPG/3.5E rulesets and the description/definition of that condition.
+
 Some additional NPC actions will also be created when eligible NPCs are added to the combat tracker.
 
 Feats:
@@ -33,6 +36,3 @@ Feats:
 
 Abilities
 * Breath Weapon (max 1/NPC -- please pass any along that are not detected correctly).
-
-It also adds tooltips to the conditions in the effects window.
-Hovering over these conditions will show you what it does in the PFRPG/3.5E rulesets and the description/definition of that condition.
