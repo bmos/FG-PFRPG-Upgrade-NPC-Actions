@@ -18,5 +18,8 @@
 		<script name='EffectLibraryDescriptions' file='scripts/effectdescriptions.lua' />
 		<!-- Utility -->
 		<includefile source="utility/utility_effects.xml" />
+		<!-- Campaign XMLs -->
+		<includefile source="campaign/record_spell_entry.xml" />
+		<includefile source="campaign/record_spell_mini.xml" />
 	</base>
 </root>

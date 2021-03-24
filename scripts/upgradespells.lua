@@ -39,10 +39,9 @@ local function trim_spell_name(string_spell_name)
 	return string_spell_name
 end
 
-local function replace_effect_nodes(node_spell, node_spellset, number_spell_level, string_name_spell, node_reference_spell)
+local function replace_action_nodes(node_spell, node_spellset, number_spell_level, string_name_spell, node_reference_spell)
 	if node_reference_spell then
-		local node_actions_npc_spell = node_spell.getChild('actions')
-		if node_actions_reference_spell then
+		if node_reference_spell.getChild('actions') then
 			local number_prepared = DB.getValue(node_spell, 'prepared', 0)
 			local name_spell = DB.getValue(node_spell, 'name', '')
 			DB.deleteNode(node_spell)
@@ -82,19 +81,25 @@ local function add_spell_information(node_spell, string_name_spell, node_referen
 	end
 end
 
-local function replace_spell_effects(nodeEntry)
+local function replace_spell_actions(nodeSpell)
+	local string_name_spell = trim_spell_name(DB.getValue(nodeSpell, 'name')) or ''
+	local node_reference_spell = DB.findNode('spelldesc.' .. string_name_spell .. '@PFRPG - Spellbook')
+	local number_spell_level = tonumber(nodeSpell.getChild('...').getName():gsub('level', '') or 0)
+	if number_spell_level and string_name_spell and node_reference_spell then
+		local nodeNewSpell = replace_action_nodes(nodeSpell, nodeSpell.getChild('.....'), number_spell_level, string_name_spell, node_reference_spell)
+		if nodeNewSpell then nodeSpell = nodeNewSpell end
+		add_spell_description(nodeSpell, string_name_spell, node_reference_spell)
+		add_spell_information(nodeSpell, string_name_spell, node_reference_spell)
+	end
+	
+	return true;
+end
+
+local function find_spell_nodes(nodeEntry)
 	for _,nodeSpellset in pairs(nodeEntry.createChild('spellset').getChildren()) do
 		for _,nodeSpellLevel in pairs(nodeSpellset.createChild('levels').getChildren()) do
-			local number_spell_level = tonumber(nodeSpellLevel.getName():gsub('level', '') or 0)
 			for _,nodeSpell in pairs(nodeSpellLevel.createChild('spells').getChildren()) do
-				local string_name_spell = trim_spell_name(DB.getValue(nodeSpell, 'name')) or ''
-				local node_reference_spell = DB.findNode('spelldesc.' .. string_name_spell .. '@PFRPG - Spellbook')
-				if number_spell_level and string_name_spell and node_reference_spell then
-					local nodeNewSpell = replace_effect_nodes(nodeSpell, nodeSpellset, number_spell_level, string_name_spell, node_reference_spell)
-					if nodeNewSpell then nodeSpell = nodeNewSpell end
-					add_spell_description(nodeSpell, string_name_spell, node_reference_spell)
-					add_spell_information(nodeSpell, string_name_spell, node_reference_spell)
-				end
+				replace_spell_actions(nodeSpell)
 			end
 		end
 	end
@@ -528,7 +533,7 @@ local addNPC_old = nil -- placeholder for original addNPC function
 local function addNPC_new(sClass, nodeNPC, sName)
 	local nodeEntry = addNPC_old(sClass, nodeNPC, sName)
 	if nodeEntry then
-		replace_spell_effects(nodeEntry)
+		find_spell_nodes(nodeEntry)
 		search_for_maladies(nodeEntry)
 		search_for_abilities(nodeEntry)
 	end
@@ -536,12 +541,29 @@ local function addNPC_new(sClass, nodeNPC, sName)
 	return nodeEntry
 end
 
+---	This function is called when adding an NPC to the combat tracker.
+--	It passes the call to the original parseSpell function.
+--	Once it receives the node, it performs replacement of actions.
+local parseSpell_old = nil -- placeholder for original parseSpell function
+local function parseSpell_new(nodeSpell)
+	local bFoundActions
+	if nodeSpell then
+		bFoundActions = replace_spell_actions(nodeSpell)
+	end
+
+	-- if spellbook actions not found, run original parsing script
+	--if not bFoundActions then parseSpell_old(nodeSpell); end
+end
+
 -- Function Overrides
 function onInit()
 	addNPC_old = CombatManager2.addNPC
 	CombatManager.addNPC = addNPC_new
+	parseSpell_old = SpellManager.parseSpell
+	SpellManager.parseSpell = parseSpell_new
 end
 
 function onClose()
 	CombatManager.addNPC = addNPC_old
+	SpellManager.parseSpell = parseSpell_old
 end
