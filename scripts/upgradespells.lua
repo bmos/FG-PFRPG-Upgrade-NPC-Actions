@@ -92,7 +92,7 @@ local function replace_spell_actions(nodeSpell)
 		add_spell_information(nodeSpell, string_name_spell, node_reference_spell)
 	end
 	
-	return true;
+	return node_reference_spell;
 end
 
 local function find_spell_nodes(nodeEntry)
@@ -546,13 +546,11 @@ end
 --	Once it receives the node, it performs replacement of actions.
 local parseSpell_old = nil -- placeholder for original parseSpell function
 local function parseSpell_new(nodeSpell)
-	local bFoundActions
 	if nodeSpell then
-		bFoundActions = replace_spell_actions(nodeSpell)
+		local node_reference_spell = replace_spell_actions(nodeSpell)
+		-- if spellbook actions not found, run original parsing script
+		if not node_reference_spell then parseSpell_old(nodeSpell); end
 	end
-
-	-- if spellbook actions not found, run original parsing script
-	--if not bFoundActions then parseSpell_old(nodeSpell); end
 end
 
 -- Function Overrides
