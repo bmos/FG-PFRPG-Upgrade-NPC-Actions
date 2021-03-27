@@ -300,6 +300,7 @@ end
 local function search_for_abilities(node_npc)
 	local array_abilities = {
 		['Ancestral Enmity'] = {
+			['auto_add'] = true,
 			['description'] = 'You gain a +2 bonus on melee attack rolls against dwarves and gnomes.  You may select this feat twice. Its effects stack.',
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
@@ -392,6 +393,7 @@ local function search_for_abilities(node_npc)
 			},
 		},
 		['Critical Focus'] = {
+			['auto_add'] = true,
 			['description'] = 'You receive a +4 circumstance bonus on attack rolls made to confirm critical hits.',
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
@@ -418,6 +420,7 @@ local function search_for_abilities(node_npc)
 			},
 		},
 		['Defended Movement'] = {
+			['auto_add'] = true,
 			['description'] = 'You gain a +2 bonus to your AC against attacks of opportunity.',
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
@@ -431,6 +434,7 @@ local function search_for_abilities(node_npc)
 			},
 		},
 		['Evasion'] = {
+			['auto_add'] = true,
 			['description'] = 'If you are subjected to an attack that normally allows a Reflex save for half damage, it takes no damage if it makes a successful saving throw.',
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
@@ -444,6 +448,7 @@ local function search_for_abilities(node_npc)
 			},
 		},
 		['Furious Focus'] = {
+			['auto_add'] = true,
 			['description'] = 'When you are wielding a two-handed weapon or a one-handed weapon with two hands, and using the Power Attack feat, you do not suffer Power Attack’s penalty on melee attack rolls on the first attack you make each turn. You still suffer the penalty on any additional attacks, including attacks of opportunity.',
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
@@ -457,6 +462,7 @@ local function search_for_abilities(node_npc)
 			},
 		},
 		['Improved Evasion'] = {
+			['auto_add'] = true,
 			['description'] = 'When subjected to an attack that allows a Reflex saving throw for half damage, you take no damage if you make a successful saving throw and only half damage if the saving throw fails.',
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
@@ -470,6 +476,7 @@ local function search_for_abilities(node_npc)
 			},
 		},
 		['Mobility'] = {
+			['auto_add'] = true,
 			['description'] = 'You get a +4 dodge bonus to Armor Class against attacks of opportunity caused when you move out of or within a threatened area. A condition that makes you lose your Dexterity bonus to Armor Class (if any) also makes you lose dodge bonuses. Dodge bonuses stack with each other, unlike most types of bonuses.',
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
