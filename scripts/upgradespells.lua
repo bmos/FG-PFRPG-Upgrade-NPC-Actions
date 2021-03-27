@@ -430,6 +430,19 @@ local function search_for_abilities(node_npc)
 				},
 			},
 		},
+		['Evasion'] = {
+			['description'] = 'If you are subjected to an attack that normally allows a Reflex save for half damage, it takes no damage if it makes a successful saving throw.',
+			['string_ability_type'] = 'Feats',
+			['level'] = 0,
+			['actions'] = {
+				['zeffect-1'] = {
+					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+					['label'] = { ['type'] = 'string', ['value'] = 'Evasion' },
+					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+				},
+			},
+		},
 		['Furious Focus'] = {
 			['description'] = 'When you are wielding a two-handed weapon or a one-handed weapon with two hands, and using the Power Attack feat, you do not suffer Power Attack’s penalty on melee attack rolls on the first attack you make each turn. You still suffer the penalty on any additional attacks, including attacks of opportunity.',
 			['string_ability_type'] = 'Feats',
@@ -438,6 +451,19 @@ local function search_for_abilities(node_npc)
 				['zeffect-1'] = {
 					['apply'] = { ['type'] = 'string', ['value'] = 'roll' },
 					['label'] = { ['type'] = 'string', ['value'] = 'Furious Focus; IF: CUSTOM(Power Attack 2-H); ATK: 1 [QBAB] ,melee' },
+					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+				},
+			},
+		},
+		['Improved Evasion'] = {
+			['description'] = 'When subjected to an attack that allows a Reflex saving throw for half damage, you take no damage if you make a successful saving throw and only half damage if the saving throw fails.',
+			['string_ability_type'] = 'Feats',
+			['level'] = 0,
+			['actions'] = {
+				['zeffect-1'] = {
+					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+					['label'] = { ['type'] = 'string', ['value'] = 'Improved Evasion' },
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 				},
