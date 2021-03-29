@@ -11,16 +11,16 @@ function onMenuSelection(selection, subselection)
 		-- activatedetail.setValue(1);
 	elseif selection == 3 then
 		if subselection == 2 then
-			super.createAction("cast");
+			createAction("cast");
 			activatedetail.setValue(1);
 		elseif subselection == 3 then
-			super.createAction("damage");
+			createAction("damage");
 			activatedetail.setValue(1);
 		elseif subselection == 4 then
-			super.createAction("heal");
+			createAction("heal");
 			activatedetail.setValue(1);
 		elseif subselection == 5 then
-			super.createAction("effect");
+			createAction("effect");
 			activatedetail.setValue(1);
 		end
 	end
