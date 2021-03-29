@@ -36,6 +36,11 @@ local function trim_spell_name(string_spell_name)
 		string_spell_name = string_spell_name:gsub('greater', '') .. 'greater'
 	end
 
+	-- move "lesser" to the end in case it's at the beginning
+	if string.find(string_spell_name, 'lesser') then
+		string_spell_name = string_spell_name:gsub('lesser', '') .. 'greater'
+	end
+
 	return string_spell_name
 end
 
