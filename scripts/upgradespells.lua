@@ -44,24 +44,23 @@ local function trim_spell_name(string_spell_name)
 	return string_spell_name, is_maximized, is_empowered
 end
 
-local function replace_action_nodes(node_spell, node_spellset, number_spell_level, string_name_spell, node_reference_spell)
+local function replace_action_nodes(node_spell, node_spellset, number_spell_level, string_spell_name, node_reference_spell)
 	if node_reference_spell then
 		if node_reference_spell.getChild('actions') then
 			local number_cast = DB.getValue(node_spell, 'cast', 0)
 			local number_prepared = DB.getValue(node_spell, 'prepared', 0)
-			local name_spell = DB.getValue(node_spell, 'name', '')
 			DB.deleteNode(node_spell)
 			local node_spell_new = SpellManager.addSpell(node_reference_spell, node_spellset, number_spell_level)
 			DB.setValue(node_spell_new, 'cast', 'number', number_cast)
 			DB.setValue(node_spell_new, 'prepared', 'number', number_prepared)
-			DB.setValue(node_spell_new, 'name', 'string', name_spell)
+			DB.setValue(node_spell_new, 'name', 'string', string_spell_name)
 
 			return node_spell_new
 		end
 	end
 end
 
-local function add_spell_description(node_spell, string_name_spell, node_reference_spell)
+local function add_spell_description(node_spell, string_spell_name, node_reference_spell)
 	if node_reference_spell and node_spell then
 		if DB.getValue(node_spell, 'description', '') == '' or DB.getValue(node_spell, 'description', '') == '<p></p>' then
 			DB.deleteNode(node_spell.createChild('description'))
@@ -73,7 +72,7 @@ local function add_spell_description(node_spell, string_name_spell, node_referen
 	end
 end
 
-local function add_spell_information(node_spell, string_name_spell, node_reference_spell)
+local function add_spell_information(node_spell, string_spell_name, node_reference_spell)
 	if node_reference_spell and node_spell then
 		for _,node_reference_spell_subnode in pairs(node_reference_spell.getChildren()) do
 			local string_node_name = node_reference_spell_subnode.getName()
@@ -89,14 +88,14 @@ local function add_spell_information(node_spell, string_name_spell, node_referen
 end
 
 local function replace_spell_actions(nodeSpell)
-	local string_name_spell = trim_spell_name(DB.getValue(nodeSpell, 'name')) or ''
-	local node_reference_spell = DB.findNode('spelldesc.' .. string_name_spell .. '@PFRPG - Spellbook')
+	local string_spell_name = trim_spell_name(DB.getValue(nodeSpell, 'name')) or ''
+	local node_reference_spell = DB.findNode('spelldesc.' .. string_spell_name .. '@PFRPG - Spellbook')
 	local number_spell_level = tonumber(nodeSpell.getChild('...').getName():gsub('level', '') or 0)
-	if number_spell_level and string_name_spell and node_reference_spell then
-		local nodeNewSpell = replace_action_nodes(nodeSpell, nodeSpell.getChild('.....'), number_spell_level, string_name_spell, node_reference_spell)
+	if number_spell_level and string_spell_name and node_reference_spell then
+		local nodeNewSpell = replace_action_nodes(nodeSpell, nodeSpell.getChild('.....'), number_spell_level, string_spell_name, node_reference_spell)
 		if nodeNewSpell then nodeSpell = nodeNewSpell end
-		add_spell_description(nodeSpell, string_name_spell, node_reference_spell)
-		add_spell_information(nodeSpell, string_name_spell, node_reference_spell)
+		add_spell_description(nodeSpell, string_spell_name, node_reference_spell)
+		add_spell_information(nodeSpell, string_spell_name, node_reference_spell)
 	end
 	
 	return node_reference_spell;
