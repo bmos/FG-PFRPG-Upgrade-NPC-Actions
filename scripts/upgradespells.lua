@@ -34,10 +34,12 @@ local function trim_spell_name(string_spell_name)
 	string_spell_name = string_spell_name:lower()
 
 	if is_greater then
+		string_spell_name = string_spell_name:gsub('greater', '')
 		string_spell_name = string_spell_name .. 'greater'
 	end
 
 	if is_lesser then
+		string_spell_name = string_spell_name:gsub('lesser', '')
 		string_spell_name = string_spell_name .. 'lesser'
 	end
 
