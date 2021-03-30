@@ -47,10 +47,12 @@ end
 local function replace_action_nodes(node_spell, node_spellset, number_spell_level, string_name_spell, node_reference_spell)
 	if node_reference_spell then
 		if node_reference_spell.getChild('actions') then
+			local number_cast = DB.getValue(node_spell, 'cast', 0)
 			local number_prepared = DB.getValue(node_spell, 'prepared', 0)
 			local name_spell = DB.getValue(node_spell, 'name', '')
 			DB.deleteNode(node_spell)
 			local node_spell_new = SpellManager.addSpell(node_reference_spell, node_spellset, number_spell_level)
+			DB.setValue(node_spell_new, 'cast', 'number', number_cast)
 			DB.setValue(node_spell_new, 'prepared', 'number', number_prepared)
 			DB.setValue(node_spell_new, 'name', 'string', name_spell)
 
