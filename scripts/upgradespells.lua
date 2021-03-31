@@ -7,10 +7,10 @@
 --
 
 local function trim_spell_name(string_spell_name)
-	local is_greater = string.find(string_spell_name, 'greater')
-	local is_lesser = string.find(string_spell_name, 'lesser')
-	local is_maximized = string.find(string_spell_name, 'maximized')
-	local is_empowered = string.find(string_spell_name, 'empowered')
+	local is_greater = string.find(string_spell_name:lower(), 'greater')
+	local is_lesser = string.find(string_spell_name:lower(), 'lesser')
+	local is_maximized = string.find(string_spell_name:lower(), 'maximized')
+	local is_empowered = string.find(string_spell_name:lower(), 'empowered')
 	
 	-- remove anything after open parentheses
 	local number_name_end = string.find(string_spell_name, '%(')
