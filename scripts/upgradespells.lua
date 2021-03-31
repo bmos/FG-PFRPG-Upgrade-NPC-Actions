@@ -7,11 +7,39 @@
 --
 
 local function trim_spell_name(string_spell_name)
-	local is_greater = string.find(string_spell_name:lower(), 'greater')
-	local is_lesser = string.find(string_spell_name:lower(), 'lesser')
+	local is_greater = string.find(string_spell_name:lower(), ', greater')
+	local is_lesser = string.find(string_spell_name:lower(), ', lesser')
+	local is_communal = string.find(string_spell_name:lower(), ', communal')
+	local is_mass = string.find(string_spell_name:lower(), ', mass')
 	local is_maximized = string.find(string_spell_name:lower(), 'maximized')
 	local is_empowered = string.find(string_spell_name:lower(), 'empowered')
-	
+
+	-- remove tags from spell name
+	if is_greater then
+		string_spell_name = string_spell_name:gsub(', greater', '')
+		string_spell_name = string_spell_name:gsub(', Greater', '')
+	end
+	if is_lesser then
+		string_spell_name = string_spell_name:gsub(', lesser', '')
+		string_spell_name = string_spell_name:gsub(', Lesser', '')
+	end
+	if is_communal then
+		string_spell_name = string_spell_name:gsub(', communal', '')
+		string_spell_name = string_spell_name:gsub(', Communal', '')
+	end
+	if is_mass then
+		string_spell_name = string_spell_name:gsub(', mass', '')
+		string_spell_name = string_spell_name:gsub(', Mass', '')
+	end
+	if is_maximized then
+		string_spell_name = string_spell_name:gsub('maximized', '')
+		string_spell_name = string_spell_name:gsub('Maximized', '')
+	end
+	if is_empowered then
+		string_spell_name = string_spell_name:gsub('empowered', '')
+		string_spell_name = string_spell_name:gsub('Empowered', '')
+	end
+
 	-- remove anything after open parentheses
 	local number_name_end = string.find(string_spell_name, '%(')
 	string_spell_name = string_spell_name:sub(1, number_name_end)
@@ -33,22 +61,18 @@ local function trim_spell_name(string_spell_name)
 	-- convert to lower-case
 	string_spell_name = string_spell_name:lower()
 
+	-- append relevant tags to end of spell name
 	if is_greater then
-		string_spell_name = string_spell_name:gsub('greater', '')
 		string_spell_name = string_spell_name .. 'greater'
 	end
-
 	if is_lesser then
-		string_spell_name = string_spell_name:gsub('lesser', '')
 		string_spell_name = string_spell_name .. 'lesser'
 	end
-
-	if is_maximized then
-		string_spell_name = string_spell_name:gsub('maximized', '')
+	if is_communal then
+		string_spell_name = string_spell_name .. 'communal'
 	end
-
-	if is_empowered then
-		string_spell_name = string_spell_name:gsub('empowered', '')
+	if is_mass then
+		string_spell_name = string_spell_name .. 'mass'
 	end
 
 	return string_spell_name, is_maximized, is_empowered
