@@ -8,6 +8,7 @@ function onMenuSelection(selection, subselection)
 		getDatabaseNode().delete();
 	elseif selection == 4 then
 		SpellManager.parseSpell(getDatabaseNode());
+		-- bmos removing this line to keep script error away
 		-- activatedetail.setValue(1);
 	elseif selection == 3 then
 		if subselection == 2 then
