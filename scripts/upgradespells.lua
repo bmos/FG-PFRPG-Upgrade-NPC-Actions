@@ -556,7 +556,17 @@ local function search_for_abilities(node_npc)
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 				},
 				['zeffect-2'] = {
+					['label'] = { ['type'] = 'string', ['value'] = 'REMOVE: Power Attack 1-H; ATK: -1 [-QBAB] ,melee; DMG: 2 [QBAB] [QBAB] ,melee' },
+					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+				},
+				['zeffect-3'] = {
 					['label'] = { ['type'] = 'string', ['value'] = 'Power Attack 2-H; ATK: -1 [-QBAB] ,melee; DMG: 3 [QBAB] [QBAB] [QBAB] ,melee' },
+					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+				},
+				['zeffect-4'] = {
+					['label'] = { ['type'] = 'string', ['value'] = 'REMOVE: Power Attack 2-H; ATK: -1 [-QBAB] ,melee; DMG: 3 [QBAB] [QBAB] [QBAB] ,melee' },
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 				},
