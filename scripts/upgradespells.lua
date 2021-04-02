@@ -7,12 +7,12 @@
 --
 
 local function trim_spell_name(string_spell_name)
-	local is_greater = string.find(string_spell_name:lower(), ', greater')
-	local is_lesser = string.find(string_spell_name:lower(), ', lesser')
-	local is_communal = string.find(string_spell_name:lower(), ', communal')
-	local is_mass = string.find(string_spell_name:lower(), ', mass')
-	local is_maximized = string.find(string_spell_name:lower(), 'maximized')
-	local is_empowered = string.find(string_spell_name:lower(), 'empowered')
+	local is_greater = (string.find(string_spell_name:lower(), ', greater') ~= nil)
+	local is_lesser = (string.find(string_spell_name:lower(), ', lesser') ~= nil)
+	local is_communal = (string.find(string_spell_name:lower(), ', communal') ~= nil)
+	local is_mass = (string.find(string_spell_name:lower(), ', mass') ~= nil)
+	local is_maximized = (string.find(string_spell_name:lower(), 'maximized') ~= nil)
+	local is_empowered = (string.find(string_spell_name:lower(), 'empowered') ~= nil)
 
 	-- remove tags from spell name
 	if is_greater then
@@ -622,7 +622,9 @@ local function parseSpell_new(nodeSpell)
 	if nodeSpell then
 		local node_reference_spell = replace_spell_actions(nodeSpell)
 		-- if spellbook actions not found, run original parsing script
-		if not node_reference_spell then parseSpell_old(nodeSpell); end
+		if not node_reference_spell then
+			parseSpell_old(nodeSpell)
+		end
 	end
 end
 
@@ -630,11 +632,13 @@ end
 function onInit()
 	addNPC_old = CombatManager2.addNPC
 	CombatManager.addNPC = addNPC_new
+	
 	parseSpell_old = SpellManager.parseSpell
 	SpellManager.parseSpell = parseSpell_new
 end
 
 function onClose()
 	CombatManager.addNPC = addNPC_old
+	
 	SpellManager.parseSpell = parseSpell_old
 end
