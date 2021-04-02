@@ -630,7 +630,7 @@ end
 
 -- Function Overrides
 function onInit()
-	addNPC_old = CombatManager2.addNPC
+	addNPC_old = CombatManager.addNPC
 	CombatManager.addNPC = addNPC_new
 	
 	parseSpell_old = SpellManager.parseSpell
