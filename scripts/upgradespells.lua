@@ -586,9 +586,9 @@ local function addNPC_new(sClass, nodeNPC, sName)
 	return nodeEntry
 end
 
----	This function is called when adding an NPC to the combat tracker.
---	It passes the call to the original parseSpell function.
---	Once it receives the node, it performs replacement of actions.
+---	This function is called when clicking re-parse spell on the radial menu.
+--	It re-imports the spell details from the PFRPG - Spellbook module.
+--	If not Spellbook spell is found, it passes the call to the original addNPC function.
 local parseSpell_old = nil -- placeholder for original parseSpell function
 local function parseSpell_new(nodeSpell)
 	if nodeSpell then
