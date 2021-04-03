@@ -84,13 +84,19 @@ local function replace_action_nodes(node_spell, node_spellset, number_spell_leve
 			local string_spell_name = DB.getValue(node_spell, 'name', 0)
 			local number_cast = DB.getValue(node_spell, 'cast', 0)
 			local number_prepared = DB.getValue(node_spell, 'prepared', 0)
+
 			DB.deleteNode(node_spell)
 			local node_spell_new = SpellManager.addSpell(node_reference_spell, node_spellset, number_spell_level)
 			DB.setValue(node_spell_new, 'cast', 'number', number_cast)
 			DB.setValue(node_spell_new, 'prepared', 'number', number_prepared)
 			DB.setValue(node_spell_new, 'name', 'string', string_spell_name)
-			if is_empowered then DB.setValue(node_spell_new, 'meta', 'string', 'empower') end
-			if is_maximized then DB.setValue(node_spell_new, 'meta', 'string', 'maximize') end
+			
+			-- set up metamagic if applicable
+			local node_spell_new_damage = node_spell_new.getChild('actions').getChild('damage')
+			if node_spell_new_damage then
+				if is_empowered then DB.setValue(node_spell_new_damage, 'meta', 'string', 'empower') end
+				if is_maximized then DB.setValue(node_spell_new_damage, 'meta', 'string', 'maximize') end
+			end
 
 			return node_spell_new
 		end
@@ -125,7 +131,7 @@ local function add_spell_information(node_spell, node_reference_spell)
 end
 
 local function replace_spell_actions(nodeSpell)
-	local string_spell_name, is_maximized, is_empowered = trim_spell_name(DB.getValue(nodeSpell, 'name')) or ''
+	local string_spell_name, is_maximized, is_empowered = trim_spell_name(DB.getValue(nodeSpell, 'name'))
 	local node_reference_spell = DB.findNode('spelldesc.' .. string_spell_name .. '@PFRPG - Spellbook')
 	local number_spell_level = tonumber(nodeSpell.getChild('...').getName():gsub('level', '') or 0)
 	if number_spell_level and string_spell_name and node_reference_spell then
