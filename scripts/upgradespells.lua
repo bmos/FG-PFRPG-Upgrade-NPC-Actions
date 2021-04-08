@@ -13,6 +13,7 @@ local function trim_spell_name(string_spell_name)
 	local is_mass = (string.find(string_spell_name:lower(), ', mass') ~= nil)
 	local is_maximized = (string.find(string_spell_name:lower(), 'maximized') ~= nil)
 	local is_empowered = (string.find(string_spell_name:lower(), 'empowered') ~= nil)
+	local is_quickened = (string.find(string_spell_name:lower(), 'quickened') ~= nil)
 
 	-- remove tags from spell name
 	if is_greater then
@@ -38,6 +39,10 @@ local function trim_spell_name(string_spell_name)
 	if is_empowered then
 		string_spell_name = string_spell_name:gsub('empowered', '')
 		string_spell_name = string_spell_name:gsub('Empowered', '')
+	end
+	if is_quickened then
+		string_spell_name = string_spell_name:gsub('quickened', '')
+		string_spell_name = string_spell_name:gsub('Quickened', '')
 	end
 
 	-- remove anything after open parentheses
