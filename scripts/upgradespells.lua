@@ -194,6 +194,7 @@ local function add_malady_link(node_malady, node_npc)
 			string_malady_linked_npc = string_malady_linked_npc:gsub(' %(DC %d+%)', '')
 			string_malady_linked_npc = string.lower(string_malady_linked_npc:gsub('%A', ''))
 			local string_npc_name = DB.getValue(node_npc, 'name')
+			string_npc_name = string.lower(string_npc_name:gsub('%A', '')
 			if string_malady_linked_npc == string_npc_name then
 				local string_description = DB.getValue(node_npc, 'text', '')
 				local string_malady_name = DB.getValue(node_malady, 'name', '')
@@ -209,9 +210,7 @@ end
 --	It does nothing if the DiseaseTracker script isn't found.
 local function search_for_maladies(node_npc)
 	if DiseaseTracker then
-		local string_npc_name = DB.getValue(node_npc, 'name')
-		if string_npc_name then
-			string_npc_name = string.lower(string_npc_name:gsub('%A+', ''))
+		if DB.getValue(node_npc, 'name') then
 			if DB.findNode('reference.diseases@*') then
 				for _,node_malady in pairs(DB.findNode('reference.diseases@*').getChildren()) do
 					add_malady_link(node_malady, node_npc)
