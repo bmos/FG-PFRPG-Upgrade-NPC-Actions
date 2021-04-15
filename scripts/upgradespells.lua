@@ -194,7 +194,7 @@ local function add_malady_link(node_malady, node_npc)
 			string_malady_linked_npc = string_malady_linked_npc:gsub(' %(DC %d+%)', '')
 			string_malady_linked_npc = string.lower(string_malady_linked_npc:gsub('%A', ''))
 			local string_npc_name = DB.getValue(node_npc, 'name')
-			string_npc_name = string.lower(string_npc_name:gsub('%A', '')
+			string_npc_name = string.lower(string_npc_name:gsub('%A', ''))
 			if string_malady_linked_npc == string_npc_name then
 				local string_description = DB.getValue(node_npc, 'text', '')
 				local string_malady_name = DB.getValue(node_malady, 'name', '')
