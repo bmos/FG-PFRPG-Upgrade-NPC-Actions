@@ -7,13 +7,14 @@
 --
 
 local function trim_spell_name(string_spell_name)
-	local is_greater = (string.find(string_spell_name:lower(), ', greater') ~= nil)
-	local is_lesser = (string.find(string_spell_name:lower(), ', lesser') ~= nil)
-	local is_communal = (string.find(string_spell_name:lower(), ', communal') ~= nil)
-	local is_mass = (string.find(string_spell_name:lower(), ', mass') ~= nil)
-	local is_maximized = (string.find(string_spell_name:lower(), 'maximized') ~= nil)
-	local is_empowered = (string.find(string_spell_name:lower(), 'empowered') ~= nil)
-	local is_quickened = (string.find(string_spell_name:lower(), 'quickened') ~= nil)
+	local string_spell_name_lower = string_spell_name:lower()
+	local is_greater = (string.find(string_spell_name_lower, ', greater') ~= nil)
+	local is_lesser = (string.find(string_spell_name_lower, ', lesser') ~= nil)
+	local is_communal = (string.find(string_spell_name_lower, ', communal') ~= nil)
+	local is_mass = (string.find(string_spell_name_lower, ', mass') ~= nil)
+	local is_maximized = (string.find(string_spell_name_lower, 'maximized') ~= nil)
+	local is_empowered = (string.find(string_spell_name_lower, 'empowered') ~= nil)
+	local is_quickened = (string.find(string_spell_name_lower, 'quickened') ~= nil)
 
 	-- remove tags from spell name
 	if is_greater then
