@@ -18,7 +18,7 @@ For users of my [Malady Tracker extension](https://www.fantasygrounds.com/forums
 
 It also adds tooltips to the conditions in the effects window.
 Hovering over these conditions will show you what it does in the PFRPG/3.5E rulesets and the description/definition of that condition:
-![Example of tooltips](https://user-images.githubusercontent.com/1916835/116630111-a9ef1e00-a920-11eb-8096-3e0e33c22ebe.png)
+![Example of tooltips](https://user-images.githubusercontent.com/1916835/116630247-f0dd1380-a920-11eb-84ea-55c0687f17aa.png)
 
 Some additional NPC actions will also be created when eligible NPCs are added to the combat tracker.
 
