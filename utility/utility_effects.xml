@@ -9,8 +9,9 @@
 				if super and super.setEffect then
 					super.setEffect(rEffect);
 				end
-				local sCondition = rEffect["sName"]:lower()
-				if sCondition and sCondition ~= "" then
+				local sCondition = (rEffect["sName"] or ""):lower()
+				sCondition = sCondition:gsub("%L", "")
+				if sCondition ~= "" then
 					local sTooltipText = EffectLibraryDescriptions.conditionshelp[sCondition];
 					button.setTooltipText(sTooltipText);
 				end
