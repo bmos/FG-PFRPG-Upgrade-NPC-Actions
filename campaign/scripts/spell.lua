@@ -26,21 +26,3 @@ function onMenuSelection(selection, subselection)
 		end
 	end
 end
-
-function onDisplayChanged()
-	if minisheet then
-		return;
-	end
-	
-	if DB then
-		sDisplayMode = DB.getValue(getDatabaseNode(), ".......spelldisplaymode", "");
-	end
-
-	if sDisplayMode == "action" then
-		header.subwindow.shortdescription.setVisible(false);
-		header.subwindow.actionsmini.setVisible(true);
-	else
-		header.subwindow.shortdescription.setVisible(true);
-		header.subwindow.actionsmini.setVisible(false);
-	end
-end
