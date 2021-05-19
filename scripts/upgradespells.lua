@@ -138,7 +138,17 @@ end
 
 local function replace_spell_actions(nodeSpell)
 	local string_spell_name, is_maximized, is_empowered = trim_spell_name(DB.getValue(nodeSpell, 'name'))
-	local node_reference_spell = DB.findNode('spelldesc.' .. string_spell_name .. '@PFRPG - Spellbook')
+
+	local aModules = {
+			['SpellbookExtended'] = { ['name'] = '@PFRPG - Spellbook Extended', ['prefix'] = 'spelldesc.' },
+			['Spellbook'] = { ['name'] = '@PFRPG - Spellbook', ['prefix'] = 'spelldesc.' }
+			}
+			
+	local node_reference_spell
+	for _,tModule in pairs(aModules) do
+		node_reference_spell = DB.findNode(tModule['prefix'] .. string_spell_name .. tModule['name'])
+		if node_reference_spell then break; end
+	end
 	local number_spell_level = tonumber(nodeSpell.getChild('...').getName():gsub('level', '') or 0)
 	if number_spell_level and string_spell_name and node_reference_spell then
 		local nodeNewSpell = replace_action_nodes(nodeSpell, nodeSpell.getChild('.....'), number_spell_level, node_reference_spell, is_maximized, is_empowered)
