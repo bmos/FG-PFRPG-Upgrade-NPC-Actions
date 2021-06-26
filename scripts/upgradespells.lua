@@ -429,20 +429,20 @@ local function search_for_abilities(node_npc)
 				},
 			},
 		},
-		['Bleed'] = {
-			['description'] = 'A creature with this ability causes wounds that continue to bleed, dealing additional damage each round at the start of the affected creature’s turn. This bleeding can be stopped with a successful DC 15 Heal skill check or through the application of any magical healing. The amount of damage each round is specified in the creature’s entry.',
-			['string_ability_type'] = 'Special Abilities',
-			['level'] = 0,
-			['search_dice'] = true,
-			['number_substitution'] = true,
-			['actions'] = {
-				['zeffect-1'] = {
-					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
-					['label'] = { ['type'] = 'string', ['value'] = 'Bleed; DMGO: %n bleed' },
-					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-				},
-			},
-		},
+		-- ['Bleed'] = {
+			-- ['description'] = 'A creature with this ability causes wounds that continue to bleed, dealing additional damage each round at the start of the affected creature’s turn. This bleeding can be stopped with a successful DC 15 Heal skill check or through the application of any magical healing. The amount of damage each round is specified in the creature’s entry.',
+			-- ['string_ability_type'] = 'Special Abilities',
+			-- ['level'] = 0,
+			-- ['search_dice'] = true,
+			-- ['number_substitution'] = true,
+			-- ['actions'] = {
+				-- ['zeffect-1'] = {
+					-- ['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+					-- ['label'] = { ['type'] = 'string', ['value'] = 'Bleed; DMGO: %n bleed' },
+					-- ['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+				-- },
+			-- },
+		-- },
 		['Combat Expertise'] = {
 			['description'] = 'You can choose to take a –1 penalty on melee attack rolls and combat maneuver checks to gain a +1 dodge bonus to your Armor Class. When your base attack bonus reaches +4, and every +4 thereafter, the penalty increases by –1 and the dodge bonus increases by +1. You can only choose to use this feat when you declare that you are making an attack or a full-attack action with a melee weapon. The effects of this feat last until your next turn.',
 			['string_ability_type'] = 'Feats',
