@@ -2,7 +2,7 @@
 <root version='3.3' release='3'>
 	<!-- Please see the LICENSE.md file included with this distribution for attribution and copyright information. -->
 	<properties>
-		<name>Upgrade NPC Actions</name>
+		<name>Feature: Upgrade NPC Actions</name>
 		<version>1.18</version>
 		<author>bmos (Wil Thieme)</author>
 		<description>This extension replaces NPC spell effects and descriptions with those from the 'PFRPG - Spellbook' module, links maladies from PFRPG - Maladies Library, and adds tooltips to the built-in conditions.</description>
