@@ -38,3 +38,6 @@ Feats:
 
 Abilities
 * Breath Weapon (max 1/NPC -- save and damage only).
+
+# Video Demonstration (click for video)
+[<img src="https://i.ytimg.com/vi_webp/13GcMh8nL3Y/hqdefault.webp">](https://www.youtube.com/watch?v=13GcMh8nL3Y)
