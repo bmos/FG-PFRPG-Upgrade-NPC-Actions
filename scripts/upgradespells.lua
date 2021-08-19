@@ -596,8 +596,8 @@ end
 --	It passes the call to the original addNPC function.
 --	Once it receives the node, it performs replacement of actions.
 local addNPC_old = nil -- placeholder for original addNPC function
-local function addNPC_new(sClass, nodeNPC, sName)
-	local nodeEntry = addNPC_old(sClass, nodeNPC, sName)
+local function addNPC_new(sClass, nodeNPC, sName, ...)
+	local nodeEntry = addNPC_old(sClass, nodeNPC, sName, ...)
 	if nodeEntry then
 		find_spell_nodes(nodeEntry)
 		search_for_maladies(nodeEntry)
@@ -611,12 +611,12 @@ end
 --	It re-imports the spell details from the PFRPG - Spellbook module.
 --	If not Spellbook spell is found, it passes the call to the original addNPC function.
 local parseSpell_old = nil -- placeholder for original parseSpell function
-local function parseSpell_new(nodeSpell)
+local function parseSpell_new(nodeSpell, ...)
 	if nodeSpell then
 		local node_reference_spell = replace_spell_actions(nodeSpell)
 		-- if spellbook actions not found, run original parsing script
 		if not node_reference_spell then
-			parseSpell_old(nodeSpell)
+			parseSpell_old(nodeSpell, ...)
 		end
 	end
 end
