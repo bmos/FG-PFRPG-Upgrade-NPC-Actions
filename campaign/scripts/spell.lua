@@ -65,8 +65,18 @@ function onDisplayChanged()
 	if header and sDisplayMode == "action" then
 		header.subwindow.shortdescription.setVisible(false);
 		header.subwindow.actionsmini.setVisible(true);
+		-- add compatibility with Zarestia's  Spell casting time labels extension
+		-- adds display change so casting time not shown in summary display
+		if header.subwindow.action_text_label then
+			header.subwindow.action_text_label.setVisible(true);
+		end
 	elseif header then
 		header.subwindow.shortdescription.setVisible(true);
 		header.subwindow.actionsmini.setVisible(false);
+		-- add compatibility with Zarestia's  Spell casting time labels extension
+		-- adds display change so casting time not shown in summary display
+		if header.subwindow.action_text_label then
+			header.subwindow.action_text_label.setVisible(false);
+		end
 	end
 end
