@@ -67,16 +67,22 @@ function onDisplayChanged()
 		header.subwindow.actionsmini.setVisible(true);
 		-- add compatibility with Zarestia's  Spell casting time labels extension
 		-- adds display change so casting time not shown in summary display
-		if header.subwindow.action_text_label then
+		if header.subwindow.action_text_label and header.subwindow.components_text_label then
 			header.subwindow.action_text_label.setVisible(true);
+			if OptionsManager.isOption("SAIC", "on") then
+				header.subwindow.components_text_label.setVisible(true);
+			end
 		end
 	elseif header then
 		header.subwindow.shortdescription.setVisible(true);
 		header.subwindow.actionsmini.setVisible(false);
 		-- add compatibility with Zarestia's  Spell casting time labels extension
 		-- adds display change so casting time not shown in summary display
-		if header.subwindow.action_text_label then
+		if header.subwindow.action_text_label and header.subwindow.components_text_label then
 			header.subwindow.action_text_label.setVisible(false);
+			if OptionsManager.isOption("SAIC", "on") then
+				header.subwindow.components_text_label.setVisible(false);
+			end
 		end
 	end
 end
