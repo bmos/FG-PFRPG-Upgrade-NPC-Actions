@@ -1,3 +1,5 @@
+[![Build FG-Usable File](https://github.com/bmos/FG-PFRPG-Upgrade-NPC-Actions/actions/workflows/create-ext.yml/badge.svg)](https://github.com/bmos/FG-PFRPG-Upgrade-NPC-Actions/actions/workflows/create-ext.yml) [![Luacheck](https://github.com/bmos/FG-PFRPG-Upgrade-NPC-Actions/actions/workflows/luacheck.yml/badge.svg)](https://github.com/bmos/FG-PFRPG-Upgrade-NPC-Actions/actions/workflows/luacheck.yml)
+
 # FG-PFRPG-Upgrade-NPC-Actions
 This extension improves automation of NPC abilities and spells.
 
