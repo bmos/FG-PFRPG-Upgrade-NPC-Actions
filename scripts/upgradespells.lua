@@ -58,7 +58,7 @@ local function trim_spell_name(string_spell_name)
 	string_spell_name = string_spell_name:gsub('%A+', '')
 
 	-- remove uppercase D or M at end of name
-	number_name_end = string.find(string_spell_name, 'D', string.len(string_spell_name)) or string.find(string_spell_name, 'M', string.len(string_spell_name))
+	local number_name_end = string_spell_name:find('D', string.len(string_spell_name)) or string_spell_name:find('M', string.len(string_spell_name))
 	if number_name_end then string_spell_name = string_spell_name:sub(1, number_name_end - 1) end
 
 	-- convert to lower-case
@@ -93,7 +93,7 @@ local function replace_action_nodes(node_spell, node_spellset, number_spell_leve
 			DB.setValue(node_spell_new, 'cast', 'number', number_cast)
 			DB.setValue(node_spell_new, 'prepared', 'number', number_prepared)
 			DB.setValue(node_spell_new, 'name', 'string', string_spell_name)
-			
+
 			-- set up metamagic if applicable
 			local node_spell_new_damage = node_spell_new.getChild('actions').getChild('damage')
 			if node_spell_new_damage then
@@ -140,7 +140,7 @@ local function replace_spell_actions(nodeSpell)
 			['SpellbookExtended'] = { ['name'] = '@PFRPG - Spellbook Extended', ['prefix'] = 'spelldesc.' },
 			['Spellbook'] = { ['name'] = '@PFRPG - Spellbook', ['prefix'] = 'spelldesc.' }
 			}
-			
+
 	local node_reference_spell
 	for _,table_module_data in pairs(array_modules) do
 		node_reference_spell = DB.findNode(table_module_data['prefix'] .. string_spell_name .. table_module_data['name'])
@@ -148,12 +148,13 @@ local function replace_spell_actions(nodeSpell)
 	end
 	local number_spell_level = tonumber(nodeSpell.getChild('...').getName():gsub('level', '') or 0)
 	if number_spell_level and string_spell_name and node_reference_spell then
-		local nodeNewSpell = replace_action_nodes(nodeSpell, nodeSpell.getChild('.....'), number_spell_level, node_reference_spell, is_maximized, is_empowered)
-		if nodeNewSpell then nodeSpell = nodeNewSpell end
+		local node_spellset = node_spell.getChild('.....')
+		local node_new_spell = replace_action_nodes(nodeSpell, node_spellset, number_spell_level, node_reference_spell, is_maximized, is_empowered)
+		if node_new_spell then nodeSpell = node_new_spell end
 		add_spell_description(nodeSpell, node_reference_spell)
 		add_spell_information(nodeSpell, node_reference_spell)
 	end
-	
+
 	return node_reference_spell;
 end
 
@@ -197,7 +198,7 @@ local function add_malady_link(node_malady, node_npc)
 	local table_malady_npcs = string_to_table(DB.getValue(node_malady, 'npc')) or {}
 	if table_malady_npcs ~= {} then
 		for _,string_malady_linked_npc in pairs(table_malady_npcs) do
-			local sDC = (string_malady_linked_npc:match(' %(DC %d+%)')) or ''
+			local string_difficulty_class = (string_malady_linked_npc:match(' %(DC %d+%)')) or ''
 			string_malady_linked_npc = string_malady_linked_npc:gsub(' %(DC %d+%)', '')
 			string_malady_linked_npc = string.lower(string_malady_linked_npc:gsub('%A', ''))
 			local string_npc_name = DB.getValue(node_npc, 'name')
@@ -205,7 +206,12 @@ local function add_malady_link(node_malady, node_npc)
 			if string_malady_linked_npc == string_npc_name then
 				local string_description = DB.getValue(node_npc, 'text', '')
 				local string_malady_name = DB.getValue(node_malady, 'name', '')
-				local string_malady_link = '<linklist><link class="referencedisease" recordname="' .. DB.getPath(node_malady) .. '"><b>Malady: </b>' .. string_malady_name .. sDC .. '</link></linklist>'
+				local string_malady_link = (
+					'<linklist><link class="referencedisease" recordname="' ..
+					DB.getPath(node_malady) .. '"><b>Malady: </b>' ..
+					string_malady_name .. string_difficulty_class ..
+					'</link></linklist>'
+				)
 				DB.setValue(node_npc, 'text', 'formattedtext', string_malady_link .. string_description)
 			end
 		end
@@ -249,7 +255,7 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 		) then
 			return
 	end
-	
+
 	-- create spellset and intermediate subnodes
 	local node_spellset = node_npc.createChild('spellset')
 	local node_spellclass = node_spellset.createChild(table_ability_information['string_ability_type'] or 'Abilities')
@@ -309,7 +315,7 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 end
 
 ---	This function checks NPCs for feats, traits, and/or special abilities.
-local function hasSpecialAbility(nodeActor, sSearchString, bFeat, bTrait, bSpecialAbility, bDice)
+local function hasSpecialAbility(nodeActor, sSearchString, bFeat, bTrait, bSpecialAbility)
 	if not nodeActor or not sSearchString or (not bFeat and not bTrait and not bSpecialAbility) then
 		return false;
 	end
@@ -332,16 +338,18 @@ end
 
 local function parse_breath_weapon(string_parenthetical, table_ability_information)
 	if not string_parenthetical then return; end
-	local string_parenthetical = string.lower(', ' .. string_parenthetical .. ',')
-	local dice_damage, string_damage_type = string_parenthetical:match(',%s(%d%d*d*d%d+)%s*(%l+)[.+]?')
-	-- Debug.chat(string_parenthetical, dice_damage, string_damage_type)
-	local string_save_type, number_save_dc, string_save_half = string_parenthetical:match(',%s(%l*%l*%l*%l*%l*%l*%l*%l*)%s*dc%s*(%d+)%s*f*o*r*%s*(h*a*l*f*)[.+]?')
+	local string_parenthetical_lower = string.lower(', ' .. string_parenthetical .. ',')
+	local dice_damage, string_damage_type = string_parenthetical_lower:match(',%s(%d%d*d*d%d+)%s*(%l+)[.+]?')
+	-- Debug.chat(string_parenthetical_lower, dice_damage, string_damage_type)
+	local string_save_type, number_save_dc, string_save_half = string_parenthetical_lower:match(
+		',%s(%l*%l*%l*%l*%l*%l*%l*%l*)%s*dc%s*(%d+)%s*f*o*r*%s*(h*a*l*f*)[.+]?'
+	)
 	if string_save_type == 'fort' then string_save_type = 'fortitude' end
-	-- Debug.chat(string_parenthetical, string_save_type, number_save_dc, string_save_half)
-	local dice_recharge = string_parenthetical:match(',%susable%severy%s(%d%d*d*d%d+)%srounds[.+]?')
-	-- Debug.chat(string_parenthetical, dice_recharge)
-	
-	
+	-- Debug.chat(string_parenthetical_lower, string_save_type, number_save_dc, string_save_half)
+	local dice_recharge = string_parenthetical_lower:match(',%susable%severy%s(%d%d*d*d%d+)%srounds[.+]?')
+	-- Debug.chat(string_parenthetical_lower, dice_recharge)
+
+
 	table_ability_information['actions']['breathweapondmg']['damagelist']['primarydamage']['dice']['value'] = dice_damage
 	table_ability_information['actions']['breathweapondmg']['damagelist']['primarydamage']['type']['value'] = string_damage_type
 	if string_save_type and string_save_type ~= '' then
@@ -358,6 +366,7 @@ end
 ---	This function breaks down a table of abilities and searches for them in an NPC sheet.
 --	The search result is provided by the hasSpecialAbility function.
 --	If a match is found, it triggers the function hasSpecialAbility.
+--	luacheck: no max line length
 local function search_for_abilities(node_npc)
 	local array_abilities = {
 		['Ancestral Enmity'] = {
@@ -563,7 +572,7 @@ local function search_for_abilities(node_npc)
 			},
 		},
 	}
-	
+
 	for string_ability_name, table_ability_information in pairs(array_abilities) do
 		local is_feat, is_trait, is_special_ability
 		if table_ability_information['string_ability_type'] == 'Feats' then
@@ -573,7 +582,7 @@ local function search_for_abilities(node_npc)
 		elseif table_ability_information['string_ability_type'] == 'Special Abilities' then
 			is_special_ability = true
 		end
-		
+
 		local is_match, number_rank, string_parenthetical = hasSpecialAbility(node_npc, string_ability_name, is_feat, is_trait, is_special_ability)
 		if is_match then
 			if string_parenthetical and string_ability_name == 'Breath Weapon' then
@@ -622,13 +631,13 @@ end
 function onInit()
 	addNPC_old = CombatManager.addNPC
 	CombatManager.addNPC = addNPC_new
-	
+
 	parseSpell_old = SpellManager.parseSpell
 	SpellManager.parseSpell = parseSpell_new
 end
 
 function onClose()
 	CombatManager.addNPC = addNPC_old
-	
+
 	SpellManager.parseSpell = parseSpell_old
 end

@@ -1,4 +1,4 @@
--- 
+--
 -- Please see the LICENSE.md file included with this distribution for attribution and copyright information.
 --
 
@@ -12,7 +12,7 @@ function onInit()
 		registerMenuItem(Interface.getString("menu_addspelldamage"), "radial_damage", 3, 3);
 		registerMenuItem(Interface.getString("menu_addspellheal"), "radial_heal", 3, 4);
 		registerMenuItem(Interface.getString("menu_addspelleffect"), "radial_effect", 3, 5);
-		
+
 		registerMenuItem(Interface.getString("menu_reparsespell"), "textlist", 4);
 	end
 
@@ -23,10 +23,11 @@ function onInit()
 		DB.setValue(nodeSpell, "parse", "number", 0);
 		SpellManager.parseSpell(nodeSpell);
 	end
-	
+
 	onDisplayChanged();
 end
 
+-- luacheck: globals onMenuSelection
 function onMenuSelection(selection, subselection)
 	if selection == 6 and subselection == 7 then
 		getDatabaseNode().delete();
@@ -51,11 +52,12 @@ function onMenuSelection(selection, subselection)
 	end
 end
 
+-- luacheck: globals onDisplayChanged
 function onDisplayChanged()
 	if minisheet then
 		return;
 	end
-	
+
 	local sDisplayMode = ""
 	if DB and getDatabaseNode then
 		sDisplayMode = DB.getValue(getDatabaseNode(), ".......spelldisplaymode", "");
