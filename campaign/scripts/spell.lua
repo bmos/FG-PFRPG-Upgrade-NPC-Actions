@@ -27,7 +27,7 @@ function onInit()
 	onDisplayChanged();
 end
 
--- luacheck: globals onMenuSelection
+--	luacheck: globals onMenuSelection
 function onMenuSelection(selection, subselection)
 	if selection == 6 and subselection == 7 then
 		getDatabaseNode().delete();
@@ -52,7 +52,7 @@ function onMenuSelection(selection, subselection)
 	end
 end
 
--- luacheck: globals onDisplayChanged
+--	luacheck: globals onDisplayChanged
 function onDisplayChanged()
 	if minisheet then
 		return;

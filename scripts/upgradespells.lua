@@ -58,7 +58,11 @@ local function trim_spell_name(string_spell_name)
 	string_spell_name = string_spell_name:gsub('%A+', '')
 
 	-- remove uppercase D or M at end of name
-	local number_name_end = string_spell_name:find('D', string.len(string_spell_name)) or string_spell_name:find('M', string.len(string_spell_name))
+	local number_name_end = (
+		string_spell_name:find('D', string.len(string_spell_name))
+		or
+		string_spell_name:find('M', string.len(string_spell_name))
+	)
 	if number_name_end then string_spell_name = string_spell_name:sub(1, number_name_end - 1) end
 
 	-- convert to lower-case
@@ -288,7 +292,10 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 						if table_damagenode_info['type'] and table_damagenode_info['value'] then
 							if table_damagenode_info['tiermultiplier'] then
 								if table_damagenode_info['type'] == 'string' then
-									local string_result = string.format(table_damagenode_info['value'], (table_damagenode_info['tiermultiplier'] * (number_rank or 1)))
+									local string_result = string.format(
+										table_damagenode_info['value'],
+										(table_damagenode_info['tiermultiplier'] * (number_rank or 1))
+									)
 									DB.setValue(node_damage, string_damagenode_name, table_damagenode_info['type'], string_result)
 								elseif table_damagenode_info['type'] == 'number' then
 									local number_result = table_damagenode_info['value'] * (table_damagenode_info['tiermultiplier'] * (number_rank or 1))

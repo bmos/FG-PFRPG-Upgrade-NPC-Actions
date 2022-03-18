@@ -4,7 +4,8 @@
 
 -- effects summaries for tooltips in effect list
 -- NOTE: From rules, missing dying, staggered and disabled
--- luacheck: ignore
+--	luacheck: no max line length
+--	luacheck: globals conditionshelp
 conditionshelp = {
 	blinded = "Fantasy Grounds Automation: AC:-2; GRANTCA; SKILL:-2 strength dexterity; SKILL:-4 search perception\nThe creature cannot see. It takes a –2 penalty to Armor Class, loses its Dexterity bonus to AC (if any), and takes a –4 penalty on most Strength-based and Dexterity-based skill checks and on opposed Perception skill checks. All checks and activities that rely on vision (such as reading and Perception checks based on sight) automatically fail. All opponents are considered to have total concealment (50% miss chance) against the blinded character. Blind creatures must make a DC 10 Acrobatics skill check to move faster than half speed. Creatures that fail this check fall prone. Characters who remain blinded for a long time grow accustomed to these drawbacks and can overcome some of them.",
 	climbing = "Fantasy Grounds Automation: GRANTCA\nUsing Athletics, you can advance up, down, or across a slope, wall, or other steep incline (or a ceiling if it has handholds). You move at one-quarter your speed, though you can move at half your speed if you take a –5 penalty. If you fail the check by 4 or less, you make no progress. If you fail by 5 or more, you fall. A perfectly smooth vertical (or inverted) surface can’t be climbed.\nYou need both hands free to climb, but can cling with one hand while using the other to cast a spell or take some other action. You can’t use a shield while climbing. You lose your Dexterity bonus to AC while climbing. If you take damage while climbing, you must succeed at an Athletics check against the DC of the surface or fall.",
