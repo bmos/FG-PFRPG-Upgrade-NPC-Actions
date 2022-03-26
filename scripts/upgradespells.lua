@@ -335,7 +335,9 @@ local function parse_breath_weapon(string_parenthetical, table_ability_informati
 		table_ability_information['actions']['breathweaponsave']['savetype']['value'] = string_save_type
 	end
 	table_ability_information['actions']['breathweaponsave']['savedcmod']['value'] = number_save_dc
-	table_ability_information['actions']['breathweaponsave']['onmissdamage']['value'] = string_save_half
+	-- breath weapon special ability says they do half damage on a successful save.
+	-- table_ability_information['actions']['breathweaponsave']['onmissdamage']['value'] = string_save_half
+	table_ability_information['actions']['breathweaponsave']['onmissdamage']['value'] = 'half'
 	if dice_recharge and dice_recharge ~= '' then
 		if dice_recharge:sub(1, 2) == '1d' then dice_recharge = dice_recharge:gsub('1d', 'd') end
 		table_ability_information['actions']['breathweaponrecharge']['durdice']['value'] = dice_recharge
