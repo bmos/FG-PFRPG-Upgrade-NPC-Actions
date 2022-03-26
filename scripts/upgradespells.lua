@@ -344,7 +344,8 @@ end
 ---	This function breaks down a table of abilities and searches for them in an NPC sheet.
 --	The search result is provided by the hasSpecialAbility function.
 --	If a match is found, it triggers the function hasSpecialAbility.
-local function search_for_abilities(node_npc) -- luacheck: no max line length
+-- luacheck: no max line length
+local function search_for_abilities(node_npc)
 	local array_abilities = {
 		['Ancestral Enmity'] = {
 			['auto_add'] = true,
