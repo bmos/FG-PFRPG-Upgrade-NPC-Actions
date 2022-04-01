@@ -125,8 +125,8 @@ local function add_spell_information(node_spell, node_reference_spell)
 	end
 end
 
-local function replace_spell_actions(nodeSpell)
-	local string_spell_name, is_maximized, is_empowered = trim_spell_name(DB.getValue(nodeSpell, 'name'))
+local function replace_spell_actions(node_spell)
+	local string_spell_name, is_maximized, is_empowered = trim_spell_name(DB.getValue(node_spell, 'name'))
 
 	local array_modules = {
 		['SpellbookExtended'] = { ['name'] = '@PFRPG - Spellbook Extended', ['prefix'] = 'spelldesc.' },
@@ -138,15 +138,15 @@ local function replace_spell_actions(nodeSpell)
 		node_reference_spell = DB.findNode(table_module_data['prefix'] .. string_spell_name .. table_module_data['name'])
 		if node_reference_spell then break end
 	end
-	local number_spell_level = tonumber(nodeSpell.getChild('...').getName():gsub('level', '') or 0)
+	local number_spell_level = tonumber(node_spell.getChild('...').getName():gsub('level', '') or 0)
 	if number_spell_level and string_spell_name and node_reference_spell then
 		local node_spellset = node_spell.getChild('.....')
 		local node_new_spell = replace_action_nodes(
-						                       nodeSpell, node_spellset, number_spell_level, node_reference_spell, is_maximized, is_empowered
+			node_spell, node_spellset, number_spell_level, node_reference_spell, is_maximized, is_empowered
 		                       )
-		if node_new_spell then nodeSpell = node_new_spell end
-		add_spell_description(nodeSpell, node_reference_spell)
-		add_spell_information(nodeSpell, node_reference_spell)
+		if node_new_spell then node_spell = node_new_spell end
+		add_spell_description(node_spell, node_reference_spell)
+		add_spell_information(node_spell, node_reference_spell)
 	end
 
 	return node_reference_spell;
