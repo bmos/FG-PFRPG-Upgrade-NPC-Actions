@@ -142,7 +142,8 @@ local function replace_spell_actions(node_spell)
 	if number_spell_level and string_spell_name and node_reference_spell then
 		local node_spellset = node_spell.getChild('.....')
 		local node_new_spell = replace_action_nodes(
-			node_spell, node_spellset, number_spell_level, node_reference_spell, is_maximized, is_empowered
+						                       node_spell, node_spellset, number_spell_level, node_reference_spell, is_maximized,
+						                       is_empowered
 		                       )
 		if node_new_spell then node_spell = node_new_spell end
 		add_spell_description(node_spell, node_reference_spell)
@@ -197,7 +198,8 @@ local function add_malady_link(node_malady, node_npc)
 				local string_description = DB.getValue(node_npc, 'text', '')
 				local string_malady_name = DB.getValue(node_malady, 'name', '')
 				local string_malady_link = ('<linklist><link class="referencedisease" recordname="' .. DB.getPath(node_malady) ..
-								                           '"><b>Malady: </b>' .. string_malady_name .. string_difficulty_class .. '</link></linklist>')
+								                           '"><b>Malady: </b>' .. string_malady_name .. string_difficulty_class ..
+								                           '</link></linklist>')
 				DB.setValue(node_npc, 'text', 'formattedtext', string_malady_link .. string_description)
 			end
 		end
@@ -211,7 +213,9 @@ local function search_for_maladies(node_npc)
 	if DiseaseTracker then
 		if DB.getValue(node_npc, 'name') then
 			if DB.findNode('reference.diseases@*') then
-				for _, node_malady in pairs(DB.findNode('reference.diseases@*').getChildren()) do add_malady_link(node_malady, node_npc) end
+				for _, node_malady in pairs(DB.findNode('reference.diseases@*').getChildren()) do
+					add_malady_link(node_malady, node_npc)
+				end
 			end
 			if DB.findNode('disease') then
 				for _, node_malady in pairs(DB.findNode('disease').getChildren()) do add_malady_link(node_malady, node_npc) end
@@ -224,17 +228,18 @@ end
 --	ACTION AUTOMATION FUNCTIONS
 --
 
-local function add_ability_automation(node_npc, string_ability_name, table_ability_information, number_rank, string_parenthetical)
+local function add_ability_automation(node_npc, string_ability_name, table_ability_information, number_rank,
+                                      string_parenthetical)
 	if (not node_npc or string_ability_name == '' or not table_ability_information or table_ability_information == {} or
 					(table_ability_information['daily_uses'] and table_ability_information['daily_uses'] < 0) or
-					table_ability_information['level'] < 0 or table_ability_information['level'] > 9 or not table_ability_information['actions']) then
-		return
-	end
+					table_ability_information['level'] < 0 or table_ability_information['level'] > 9 or
+					not table_ability_information['actions']) then return end
 
 	-- create spellset and intermediate subnodes
 	local node_spellset = node_npc.createChild('spellset')
 	local node_spellclass = node_spellset.createChild(table_ability_information['string_ability_type'] or 'Abilities')
-	local node_spelllevel = node_spellclass.createChild('levels').createChild('level' .. table_ability_information['level'])
+	local node_spelllevel = node_spellclass.createChild('levels')
+					                        .createChild('level' .. table_ability_information['level'])
 	local node_ability = node_spelllevel.createChild('spells').createChild()
 
 	-- set up spellset and intermediate subnodes
@@ -250,9 +255,12 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 	-- set name and description
 	DB.setValue(node_ability, 'name', 'string', string_ability_name)
 	DB.setValue(
-					node_ability, 'description', 'string', (table_ability_information['description'] or '') .. (string_parenthetical or '')
+					node_ability, 'description', 'string',
+					(table_ability_information['description'] or '') .. (string_parenthetical or '')
 	)
-	if table_ability_information['perday'] then DB.setValue(node_ability, 'prepared', 'number', table_ability_information['perday']) end
+	if table_ability_information['perday'] then
+		DB.setValue(node_ability, 'prepared', 'number', table_ability_information['perday'])
+	end
 	DB.setValue(node_ability, 'sr', 'string', 'no')
 
 	-- create actions
@@ -268,11 +276,13 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 							if table_damagenode_info['tiermultiplier'] then
 								if table_damagenode_info['type'] == 'string' then
 									local string_result = string.format(
-													                      table_damagenode_info['value'], (table_damagenode_info['tiermultiplier'] * (number_rank or 1))
+													                      table_damagenode_info['value'],
+													                      (table_damagenode_info['tiermultiplier'] * (number_rank or 1))
 									                      )
 									DB.setValue(node_damage, string_damagenode_name, table_damagenode_info['type'], string_result)
 								elseif table_damagenode_info['type'] == 'number' then
-									local number_result = table_damagenode_info['value'] * (table_damagenode_info['tiermultiplier'] * (number_rank or 1))
+									local number_result = table_damagenode_info['value'] *
+													                      (table_damagenode_info['tiermultiplier'] * (number_rank or 1))
 									DB.setValue(node_damage, string_damagenode_name, table_damagenode_info['type'], number_result)
 								end
 							else
@@ -306,10 +316,14 @@ local function hasSpecialAbility(nodeActor, sSearchString, bFeat, bTrait, bSpeci
 
 	if bFeat and sFeats:match(sLowerSpecAbil, 1) then
 		local nRank = tonumber(sFeats:match(sLowerSpecAbil .. ' (%d+)', 1))
-		local sParenthetical = sSpecAtks:match(sLowerSpecAbil .. ' %((.-)%)', 1) or sFeats:match(sLowerSpecAbil .. ' %((.-)%)', 1)
+		local sParenthetical = sSpecAtks:match(sLowerSpecAbil .. ' %((.-)%)', 1) or
+						                       sFeats:match(sLowerSpecAbil .. ' %((.-)%)', 1)
 		return true, (nRank or 1), sParenthetical
 	elseif bSpecialAbility and (sSpecAtks:match(sLowerSpecAbil, 1) or sSpecialQualities:match(sLowerSpecAbil, 1)) then
-		local nRank = tonumber(sSpecAtks:match(sLowerSpecAbil .. ' (%d+)', 1) or sSpecialQualities:match(sLowerSpecAbil .. ' (%d+)', 1))
+		local nRank = tonumber(
+						              sSpecAtks:match(sLowerSpecAbil .. ' (%d+)', 1) or
+										              sSpecialQualities:match(sLowerSpecAbil .. ' (%d+)', 1)
+		              )
 		local sParenthetical = sSpecAtks:match(sLowerSpecAbil .. ' %((.-)%)', 1) or
 						                       sSpecialQualities:match(sLowerSpecAbil .. ' %((.-)%)', 1)
 		return true, (nRank or 1), sParenthetical
@@ -320,13 +334,14 @@ local function parse_breath_weapon(string_parenthetical, table_ability_informati
 	local string_parenthetical_lower = string.lower(', ' .. string_parenthetical .. ',')
 	local dice_damage, string_damage_type = string_parenthetical_lower:match(',%s(%d%d*d*d%d+)%s*(%l+)[.+]?')
 	local string_save_type, number_save_dc = string_parenthetical_lower:match(
-					                                                           ',%s(%l*%l*%l*%l*%l*%l*%l*%l*)%s*dc%s*(%d+)[.+]?'
-	                                                           )
+					                                         ',%s(%l*%l*%l*%l*%l*%l*%l*%l*)%s*dc%s*(%d+)[.+]?'
+	                                         )
 	if string_save_type == 'fort' then string_save_type = 'fortitude' end
 	local dice_recharge = string_parenthetical_lower:match(',%susable%severy%s(%d%d*d*d%d+)%srounds[.+]?')
 
 	table_ability_information['actions']['breathweapondmg']['damagelist']['primarydamage']['dice']['value'] = dice_damage
-	table_ability_information['actions']['breathweapondmg']['damagelist']['primarydamage']['type']['value'] = string_damage_type
+	table_ability_information['actions']['breathweapondmg']['damagelist']['primarydamage']['type']['value'] =
+					string_damage_type
 	if string_save_type and string_save_type ~= '' then
 		table_ability_information['actions']['breathweaponsave']['savetype']['value'] = string_save_type
 	end
@@ -340,7 +355,10 @@ end
 
 local function parse_bleed(string_parenthetical, table_ability_information)
 	if string_parenthetical ~= '' then
-		table_ability_information['actions']['zeffect-1']['label']['value'] = string.format(table_ability_information['actions']['zeffect-1']['label']['value'], string_parenthetical)
+		table_ability_information['actions']['zeffect-1']['label']['value'] = string.format(
+						                                                                      table_ability_information['actions']['zeffect-1']['label']['value'],
+						                                                                      string_parenthetical
+		                                                                      )
 	end
 end
 
@@ -357,12 +375,20 @@ local function search_for_abilities(node_npc)
 			['level'] = 0,
 			['actions'] = {
 				['zeffect-1'] = {
-					['label'] = { ['type'] = 'string', ['value'] = ('Ancestral Enmity; IFT: TYPE(gnome); ATK: %d'), ['tiermultiplier'] = 2 },
+					['label'] = {
+						['type'] = 'string',
+						['value'] = ('Ancestral Enmity; IFT: TYPE(gnome); ATK: %d'),
+						['tiermultiplier'] = 2,
+					},
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 				},
 				['zeffect-2'] = {
-					['label'] = { ['type'] = 'string', ['value'] = 'Ancestral Enmity; IFT: TYPE(dwarf); ATK: %d', ['tiermultiplier'] = 2 },
+					['label'] = {
+						['type'] = 'string',
+						['value'] = 'Ancestral Enmity; IFT: TYPE(dwarf); ATK: %d',
+						['tiermultiplier'] = 2,
+					},
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 				},
@@ -399,8 +425,10 @@ local function search_for_abilities(node_npc)
 				},
 				['breathweapondmg'] = {
 					['damagelist'] = {
-						['primarydamage'] = { ['dice'] = { ['type'] = 'dice', ['value'] = nil },
-                            ['type'] = { ['type'] = 'string', ['value'] = nil } },
+						['primarydamage'] = {
+							['dice'] = { ['type'] = 'dice', ['value'] = nil },
+							['type'] = { ['type'] = 'string', ['value'] = nil },
+						},
 					},
 					['dmgnotspell'] = { ['type'] = 'number', ['value'] = 1 },
 					['type'] = { ['type'] = 'string', ['value'] = 'damage' },
@@ -427,7 +455,7 @@ local function search_for_abilities(node_npc)
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 				},
 			},
-		 },
+		},
 		['Combat Expertise'] = {
 			['description'] = 'You can choose to take a -1 penalty on melee attack rolls and combat maneuver checks to gain a +1 dodge bonus to your Armor Class. When your base attack bonus reaches +4, and every +4 thereafter, the penalty increases by -1 and the dodge bonus increases by +1. You can only choose to use this feat when you declare that you are making an attack or a full-attack action with a melee weapon. The effects of this feat last until your next turn.',
 			['string_ability_type'] = 'Feats',
@@ -529,7 +557,10 @@ local function search_for_abilities(node_npc)
 			['level'] = 0,
 			['actions'] = {
 				['zeffect-1'] = {
-					['label'] = { ['type'] = 'string', ['value'] = 'Power Attack 1-H; ATK: -1 [-QBAB] ,melee; DMG: 2 [QBAB] [QBAB] ,melee' },
+					['label'] = {
+						['type'] = 'string',
+						['value'] = 'Power Attack 1-H; ATK: -1 [-QBAB] ,melee; DMG: 2 [QBAB] [QBAB] ,melee',
+					},
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 				},
@@ -542,8 +573,10 @@ local function search_for_abilities(node_npc)
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 				},
 				['zeffect-3'] = {
-					['label'] = { ['type'] = 'string',
-                   ['value'] = 'Power Attack 2-H; ATK: -1 [-QBAB] ,melee; DMG: 3 [QBAB] [QBAB] [QBAB] ,melee' },
+					['label'] = {
+						['type'] = 'string',
+						['value'] = 'Power Attack 2-H; ATK: -1 [-QBAB] ,melee; DMG: 3 [QBAB] [QBAB] [QBAB] ,melee',
+					},
 					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 				},
@@ -570,7 +603,8 @@ local function search_for_abilities(node_npc)
 		end
 
 		local is_match, number_rank, string_parenthetical = hasSpecialAbility(
-						                                                    node_npc, string_ability_name, is_feat, is_trait, is_special_ability
+						                                                    node_npc, string_ability_name, is_feat, is_trait,
+						                                                    is_special_ability
 		                                                    )
 		if is_match then
 			if string_parenthetical and string_ability_name == 'Breath Weapon' then
