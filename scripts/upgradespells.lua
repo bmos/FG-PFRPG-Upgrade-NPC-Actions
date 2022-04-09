@@ -415,6 +415,7 @@ local function search_for_abilities(node_npc)
 			['description'] = 'Some creatures can exhale a cloud, cone, or line of magical effects. A breath weapon usually deals damage and is often based on some type of energy. Breath weapons allow a Reflex save for half damage (DC = 10 + 1/2 breathing creature’s racial HD + breathing creature’s Constitution modifier; the exact DC is given in the creature’s descriptive text). A creature is immune to its own breath weapon unless otherwise noted. Some breath weapons allow a Fortitude save or a Will save instead of a Reflex save. Each breath weapon also includes notes on how often it can be used.',
 			['string_ability_type'] = 'Special Abilities',
 			['level'] = 0,
+			['parser'] = parse_breath_weapon,
 			['actions'] = {
 				['breathweaponsave'] = {
 					['onmissdamage'] = { ['type'] = 'string', ['value'] = nil },
@@ -448,6 +449,7 @@ local function search_for_abilities(node_npc)
 			['level'] = 0,
 			['search_dice'] = true,
 			['number_substitution'] = true,
+			['parser'] = parse_bleed,
 			['actions'] = {
 				['zeffect-1'] = {
 					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
@@ -607,10 +609,8 @@ local function search_for_abilities(node_npc)
 						                                                    is_special_ability
 		                                                    )
 		if is_match then
-			if string_parenthetical and string_ability_name == 'Breath Weapon' then
-				parse_breath_weapon(string_parenthetical, table_ability_information)
-			elseif string_parenthetical and string_ability_name == 'Bleed' then
-				parse_bleed(string_parenthetical, table_ability_information)
+			if string_parenthetical and table_ability_information['parser'] then
+				table_ability_information['parser'](string_parenthetical, table_ability_information)
 			end
 
 			add_ability_automation(node_npc, string_ability_name, table_ability_information, number_rank, string_parenthetical)
