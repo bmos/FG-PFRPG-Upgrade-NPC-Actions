@@ -306,18 +306,17 @@ local function hasSpecialAbility(nodeActor, sSearchString, bFeat, bTrait, bSpeci
 
 	if bFeat and sFeats:match(sLowerSpecAbil, 1) then
 		local nRank = tonumber(sFeats:match(sLowerSpecAbil .. ' (%d+)', 1))
-		local sParenthetical = sSpecAtks:match(sLowerSpecAbil .. ' %((.+)%)', 1) or sFeats:match(sLowerSpecAbil .. ' %((.+)%)', 1)
+		local sParenthetical = sSpecAtks:match(sLowerSpecAbil .. ' %((.-)%)', 1) or sFeats:match(sLowerSpecAbil .. ' %((.-)%)', 1)
 		return true, (nRank or 1), sParenthetical
 	elseif bSpecialAbility and (sSpecAtks:match(sLowerSpecAbil, 1) or sSpecialQualities:match(sLowerSpecAbil, 1)) then
 		local nRank = tonumber(sSpecAtks:match(sLowerSpecAbil .. ' (%d+)', 1) or sSpecialQualities:match(sLowerSpecAbil .. ' (%d+)', 1))
-		local sParenthetical = sSpecAtks:match(sLowerSpecAbil .. ' %((.+)%)', 1) or
-						                       sSpecialQualities:match(sLowerSpecAbil .. ' %((.+)%)', 1)
+		local sParenthetical = sSpecAtks:match(sLowerSpecAbil .. ' %((.-)%)', 1) or
+						                       sSpecialQualities:match(sLowerSpecAbil .. ' %((.-)%)', 1)
 		return true, (nRank or 1), sParenthetical
 	end
 end
 
 local function parse_breath_weapon(string_parenthetical, table_ability_information)
-	if not string_parenthetical then return; end
 	local string_parenthetical_lower = string.lower(', ' .. string_parenthetical .. ',')
 	local dice_damage, string_damage_type = string_parenthetical_lower:match(',%s(%d%d*d*d%d+)%s*(%l+)[.+]?')
 	-- Debug.chat(string_parenthetical_lower, dice_damage, string_damage_type)
@@ -341,6 +340,12 @@ local function parse_breath_weapon(string_parenthetical, table_ability_informati
 	if dice_recharge and dice_recharge ~= '' then
 		if dice_recharge:sub(1, 2) == '1d' then dice_recharge = dice_recharge:gsub('1d', 'd') end
 		table_ability_information['actions']['breathweaponrecharge']['durdice']['value'] = dice_recharge
+	end
+end
+
+local function parse_bleed(string_parenthetical, table_ability_information)
+	if string_parenthetical ~= '' then
+		table_ability_information['actions']['zeffect-1']['label']['value'] = string.format(table_ability_information['actions']['zeffect-1']['label']['value'], string_parenthetical)
 	end
 end
 
@@ -414,22 +419,22 @@ local function search_for_abilities(node_npc)
 				},
 			},
 		},
-		-- ['Bleed'] = {
-		-- ['description'] = 'A creature with this ability causes wounds that continue to bleed, dealing additional damage each round at the start of the affected creature’s turn. This bleeding can be stopped with a successful DC 15 Heal skill check or through the application of any magical healing. The amount of damage each round is specified in the creature’s entry.',
-		-- ['string_ability_type'] = 'Special Abilities',
-		-- ['level'] = 0,
-		-- ['search_dice'] = true,
-		-- ['number_substitution'] = true,
-		-- ['actions'] = {
-		-- ['zeffect-1'] = {
-		-- ['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
-		-- ['label'] = { ['type'] = 'string', ['value'] = 'Bleed; DMGO: %n bleed' },
-		-- ['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-		-- },
-		-- },
-		-- },
+		['Bleed'] = {
+			['description'] = 'A creature with this ability causes wounds that continue to bleed, dealing additional damage each round at the start of the affected creature’s turn. This bleeding can be stopped with a successful DC 15 Heal skill check or through the application of any magical healing. The amount of damage each round is specified in the creature’s entry.',
+			['string_ability_type'] = 'Special Abilities',
+			['level'] = 0,
+			['search_dice'] = true,
+			['number_substitution'] = true,
+			['actions'] = {
+				['zeffect-1'] = {
+					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+					['label'] = { ['type'] = 'string', ['value'] = 'Bleed; DMGO: %s bleed' },
+					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+				},
+			},
+		 },
 		['Combat Expertise'] = {
-			['description'] = 'You can choose to take a –1 penalty on melee attack rolls and combat maneuver checks to gain a +1 dodge bonus to your Armor Class. When your base attack bonus reaches +4, and every +4 thereafter, the penalty increases by –1 and the dodge bonus increases by +1. You can only choose to use this feat when you declare that you are making an attack or a full-attack action with a melee weapon. The effects of this feat last until your next turn.',
+			['description'] = 'You can choose to take a -1 penalty on melee attack rolls and combat maneuver checks to gain a +1 dodge bonus to your Armor Class. When your base attack bonus reaches +4, and every +4 thereafter, the penalty increases by -1 and the dodge bonus increases by +1. You can only choose to use this feat when you declare that you are making an attack or a full-attack action with a melee weapon. The effects of this feat last until your next turn.',
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
 			['actions'] = {
@@ -456,7 +461,7 @@ local function search_for_abilities(node_npc)
 			},
 		},
 		['Deadly Aim'] = {
-			['description'] = 'You can choose to take a –1 penalty on all ranged attack rolls to gain a +2 bonus on all ranged damage rolls. When your base attack bonus reaches +4, and every +4 thereafter, the penalty increases by –1 and the bonus to damage increases by +2. You must choose to use this feat before making an attack roll and its effects last until your next turn. The bonus damage does not apply to touch attacks or effects that do not deal hit point damage.',
+			['description'] = 'You can choose to take a -1 penalty on all ranged attack rolls to gain a +2 bonus on all ranged damage rolls. When your base attack bonus reaches +4, and every +4 thereafter, the penalty increases by -1 and the bonus to damage increases by +2. You must choose to use this feat before making an attack roll and its effects last until your next turn. The bonus damage does not apply to touch attacks or effects that do not deal hit point damage.',
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
 			['actions'] = {
@@ -524,7 +529,7 @@ local function search_for_abilities(node_npc)
 		-- },
 		-- },
 		['Power Attack'] = {
-			['description'] = 'You can choose to take a –1 penalty on all melee attack rolls and combat maneuver checks to gain a +2 bonus on all melee damage rolls. This bonus to damage is increased by half (+50%) if you are making an attack with a two-handed weapon, a one handed weapon using two hands, or a primary natural weapon that adds 1-1/2 times your Strength modifier on damage rolls. This bonus to damage is halved (–50%) if you are making an attack with an off-hand weapon or secondary natural weapon. When your base attack bonus reaches +4, and every 4 points thereafter, the penalty increases by –1 and the bonus to damage increases by +2. You must choose to use this feat before making an attack roll, and its effects last until your next turn. The bonus damage does not apply to touch attacks or effects that do not deal hit point damage.',
+			['description'] = 'You can choose to take a -1 penalty on all melee attack rolls and combat maneuver checks to gain a +2 bonus on all melee damage rolls. This bonus to damage is increased by half (+50%) if you are making an attack with a two-handed weapon, a one handed weapon using two hands, or a primary natural weapon that adds 1-1/2 times your Strength modifier on damage rolls. This bonus to damage is halved (-50%) if you are making an attack with an off-hand weapon or secondary natural weapon. When your base attack bonus reaches +4, and every 4 points thereafter, the penalty increases by -1 and the bonus to damage increases by +2. You must choose to use this feat before making an attack roll, and its effects last until your next turn. The bonus damage does not apply to touch attacks or effects that do not deal hit point damage.',
 			['string_ability_type'] = 'Feats',
 			['level'] = 0,
 			['actions'] = {
@@ -575,6 +580,8 @@ local function search_for_abilities(node_npc)
 		if is_match then
 			if string_parenthetical and string_ability_name == 'Breath Weapon' then
 				parse_breath_weapon(string_parenthetical, table_ability_information)
+			elseif string_parenthetical and string_ability_name == 'Bleed' then
+				parse_bleed(string_parenthetical, table_ability_information)
 			end
 
 			add_ability_automation(node_npc, string_ability_name, table_ability_information, number_rank, string_parenthetical)
@@ -620,10 +627,4 @@ function onInit()
 
 	parseSpell_old = SpellManager.parseSpell
 	SpellManager.parseSpell = parseSpell_new
-end
-
-function onClose()
-	CombatManager.addNPC = addNPC_old
-
-	SpellManager.parseSpell = parseSpell_old
 end
