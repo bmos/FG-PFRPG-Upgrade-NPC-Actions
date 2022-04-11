@@ -305,32 +305,6 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 	end
 end
 
----	This function checks NPCs for feats, traits, and/or special abilities.
-local function hasSpecialAbility(nodeActor, sSearchString, sAbilType)
-	if not nodeActor or not sSearchString or not sAbilType then return false; end
-
-	local sLowerSpecAbil = sSearchString:lower()
-	local sSpecialQualities = DB.getValue(nodeActor, '.specialqualities', ''):lower()
-	local sSpecAtks = DB.getValue(nodeActor, '.specialattacks', ''):lower()
-	local sFeats = DB.getValue(nodeActor, '.feats', ''):lower()
-
-	local function matchInTable(table, search)
-		for _, string in ipairs(table) do
-			local match = string:match(search, 1)
-			if match then
-				return match
-			end
-		end
-	end
-
-	if sAbilType == "Feats" and sFeats:match(sLowerSpecAbil, 1) then
-		return true, (matchInTable({ sFeats }, sLowerSpecAbil .. ' (%d+)') or 1), matchInTable({ sSpecAtks, sFeats }, sLowerSpecAbil .. ' %((.-)%)')
-	elseif sAbilType == "Special Abilities" and (sSpecAtks:match(sLowerSpecAbil, 1) or sSpecialQualities:match(sLowerSpecAbil, 1)) then
-		local tScope = { sSpecAtks, sSpecialQualities }
-		return true, (matchInTable(tScope, sLowerSpecAbil .. ' (%d+)') or 1), matchInTable(tScope, sLowerSpecAbil .. ' %((.-)%)')
-	end
-end
-
 local function parse_breath_weapon(string_parenthetical, table_ability_information)
 	local string_parenthetical_lower = string.lower(', ' .. string_parenthetical .. ',')
 	local dice_damage, string_damage_type = string_parenthetical_lower:match(',%s(%d%d*d*d%d+)%s*(%l+)[.+]?')
@@ -595,16 +569,44 @@ local array_abilities = {
 --	If a match is found, it triggers the function hasSpecialAbility.
 -- luacheck: no max line length
 local function search_for_abilities(node_npc)
+
+	---	This function checks NPCs for feats, traits, and/or special abilities.
+	local function hasSpecialAbility(nodeActor, sSearchString, sAbilType)
+		if not nodeActor or not sSearchString then return false; end
+
+		local function matchInTable(table, search)
+			for _, string in ipairs(table) do
+				string = string:lower()
+
+				local match = string:match(search:lower(), 1)
+				if match then return match; end
+			end
+		end
+
+		local tScope = {}
+		if sAbilType == "Feats" then
+			tScope = { DB.getValue(nodeActor, '.specialattacks', ''), DB.getValue(nodeActor, '.feats', '') }
+		elseif sAbilType == "Special Abilities" then
+			tScope = { DB.getValue(nodeActor, '.specialattacks', ''), DB.getValue(nodeActor, '.specialqualities', '') }
+		end
+
+		return matchInTable(tScope, sSearchString) ~= nil,
+					matchInTable(tScope, sSearchString .. ' (%d+)') or 1,
+					matchInTable(tScope, sSearchString .. ' %((.-)%)')
+	end
+
 	for string_ability_name, table_ability_information in pairs(array_abilities) do
 		local is_match, number_rank, string_parenthetical = hasSpecialAbility(
 						                                                    node_npc, string_ability_name, table_ability_information['string_ability_type']
 		                                                    )
 
 		if is_match then
+			-- call ability parser function if supplied
 			if string_parenthetical and table_ability_information['parser'] then
 				table_ability_information['parser'](string_parenthetical, table_ability_information)
 			end
 
+			-- add ability
 			add_ability_automation(node_npc, string_ability_name, table_ability_information, number_rank, string_parenthetical)
 		end
 	end
