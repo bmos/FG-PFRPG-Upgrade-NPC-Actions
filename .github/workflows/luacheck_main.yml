@@ -49,10 +49,10 @@ jobs:
     outputs:
       repos: ${{ steps.generate-matrix.outputs.repos }}
 
-  generateconfig:
-    name: Clone FG-Unofficial-Developers-Guild/2E
-    runs-on: ubuntu-latest
-    needs: inherit
+#  generateconfig:
+#    name: Clone FG-Unofficial-Developers-Guild/2E
+#    runs-on: ubuntu-latest
+#    needs: inherit
 #    strategy:
 #      matrix:
 #          package: ${{ fromJson(needs.inherit.outputs.repos) }}
