@@ -51,9 +51,9 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - inherit
-    strategy:
-      matrix:
-        repos: [${{ needs.inherit.outputs.repos }}]
+   # strategy:
+   #   matrix:
+   #     repos: [${{ needs.inherit.outputs.repos }}]
     steps:
       - uses: actions/checkout@v3
         with:
