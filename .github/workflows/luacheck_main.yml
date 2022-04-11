@@ -18,7 +18,7 @@ jobs:
   inherit:
     runs-on: ubuntu-latest
     outputs:
-      repos: ${{ steps.innerquotes.outputs.value }}
+      repos: ${{ steps.generate-matrix.outputs.repos }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -45,11 +45,11 @@ jobs:
           value: ${{ steps.outerquotes.outputs.value }}
           regex: ','
           replacement: '","'
-      - name: print
-        id: print
+
+      - id: generate-matrix
         run: |
-          echo ${{ steps.innerquotes.outputs.value }}
-          
+          REPOS='${{ toJSON(${{ steps.innerquotes.outputs.value }}) }}'
+          echo ::set-output name=repos::${REPOS}
 #  generateconfig:
 #    name: Clone FG-Unofficial-Developers-Guild/2E
 #    runs-on: ubuntu-latest
