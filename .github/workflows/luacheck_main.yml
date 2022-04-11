@@ -48,7 +48,7 @@ jobs:
       - name: print
         id: print
         run: |
-          echo ${{ steps.innerquotes.outputs.value }}
+          echo ${{ steps.inheritrepos.outputs.value }}
           
 #  generateconfig:
 #    name: Clone FG-Unofficial-Developers-Guild/2E
