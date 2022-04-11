@@ -14,6 +14,21 @@ on:
 name: Run Luacheck on Default Branch
 
 jobs:
+  inherit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Inherit other repos
+        id: inheritrepos
+        uses: mavrosxristoforos/get-xml-info@1.1.0
+        with:
+          xml-file: 'extension.xml'
+          xpath: '//properties//luacheck//repo'
+
   luacheck:
     runs-on: ubuntu-latest
     steps:
