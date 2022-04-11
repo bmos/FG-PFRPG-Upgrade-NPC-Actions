@@ -48,8 +48,9 @@ jobs:
 
       - id: generate-matrix
         run: |
-          REPOS='${{ toJSON(${{ steps.innerquotes.outputs.value }}) }}'
+          REPOS='${{ toJSON(steps.innerquotes.outputs.value) }}'
           echo ::set-output name=repos::${REPOS}
+
 #  generateconfig:
 #    name: Clone FG-Unofficial-Developers-Guild/2E
 #    runs-on: ubuntu-latest
