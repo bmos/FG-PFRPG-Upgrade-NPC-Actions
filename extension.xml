@@ -13,6 +13,12 @@
 			<name>PFRPG</name>
 		</ruleset>
 		<loadorder>51</loadorder>
+		<luacheck>
+			<repo>FG-Unofficial-Developers-Guild/CoreRPG</repo>
+			<repo>FG-Unofficial-Developers-Guild/PFRPG</repo>
+			<repo>FG-Unofficial-Developers-Guild/3.5E</repo>
+			<repo>bmos/FG-PFRPG-Malady-Tracker</repo>
+		</luacheck>
 	</properties>
 
 	<announcement text="https://www.fantasygrounds.com/forums/showthread.php?63620-PFRPG-Upgrade-NPC-Actions-Extension\nUpgrade NPC Actions v1.19:\nThis extension replaces NPC spell effects and descriptions with those from the 'PFRPG - Spellbook' module, links maladies from PFRPG - Maladies Library, and adds tooltips to the built-in conditions." font="emotefont" />
