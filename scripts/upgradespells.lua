@@ -338,7 +338,8 @@ local function parse_bleed(string_parenthetical, table_ability_information)
 end
 
 local array_abilities = {
-	['Ancestral Enmity'] = {
+-- luacheck: no max line length
+['Ancestral Enmity'] = {
 		['auto_add'] = true,
 		['description'] = 'You gain a +2 bonus on melee attack rolls against dwarves and gnomes.  You may select this feat twice. Its effects stack.',
 		['string_ability_type'] = 'Feats',
@@ -567,7 +568,6 @@ local array_abilities = {
 ---	This function breaks down a table of abilities and searches for them in an NPC sheet.
 --	The search result is provided by the hasSpecialAbility function.
 --	If a match is found, it triggers the function hasSpecialAbility.
--- luacheck: no max line length
 local function search_for_abilities(node_npc)
 
 	---	This function checks NPCs for feats, traits, and/or special abilities.
