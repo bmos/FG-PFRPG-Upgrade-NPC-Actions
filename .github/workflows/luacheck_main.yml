@@ -55,11 +55,15 @@ jobs:
    #   matrix:
    #     repos: [${{ needs.inherit.outputs.repos }}]
     steps:
-      - uses: actions/checkout@v3
-        with:
-          repository: FG-Unofficial-Developers-Guild/2E
-          path: .fg/rulesets/DND2E
-          token: ${{ secrets.ACTIONS }}
+      - name: print
+        id: print
+        run: |
+          echo ${{ needs.inherit.outputs.repos }}
+      #- uses: actions/checkout@v3
+      #  with:
+      #    repository: FG-Unofficial-Developers-Guild/2E
+      #    path: .fg/rulesets/DND2E
+      #    token: ${{ secrets.ACTIONS }}
 
   luacheck:
     runs-on: ubuntu-latest
