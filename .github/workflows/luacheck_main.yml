@@ -35,7 +35,7 @@ jobs:
       - id: outerquotes
         uses: ashley-taylor/regex-property-action@1.2
         with:
-          value: ${{ steps.inheritrepos.outputs.value }}
+          value: ${{ steps.inheritrepos.outputs.info }}
           regex: '(.+)'
           replacement: '"$1"'
 
@@ -48,7 +48,7 @@ jobs:
       - name: print
         id: print
         run: |
-          echo "${{ steps.inheritrepos.outputs.value }}"
+          echo ${{ steps.inheritrepos.outputs.info }}
           
 #  generateconfig:
 #    name: Clone FG-Unofficial-Developers-Guild/2E
