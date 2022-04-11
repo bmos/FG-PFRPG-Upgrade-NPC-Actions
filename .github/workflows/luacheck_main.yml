@@ -44,7 +44,7 @@ jobs:
           regex: ','
           replacement: '","'
       - id: generate-matrix
-        run: echo "::set-output name=repos::${{ steps.innerquotes.outputs.value }}
+        run: echo "::set-output name=repos::${{ steps.innerquotes.outputs.value }}"
 
     outputs:
       repos: ${{ steps.generate-matrix.outputs.repos }}
