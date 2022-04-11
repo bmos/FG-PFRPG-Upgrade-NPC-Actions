@@ -1,13 +1,12 @@
 on:
   push:
     paths:
-      - '**.lua' # Run if pushed commits include a change to a Lua (.lua) file.
-      - 'extension.xml' # Run if pushed commits include a change to extension definition file.
+      - '**.lua' # Only run if pushed commits include a change to a Lua (.lua) file.
+      - 'extension.xml'
   pull_request:
     # Only run if pull request includes a change to a Lua (.lua) file.
     paths:
-      - '**.lua' # Run if pushed commits include a change to a Lua (.lua) file.
-      - 'extension.xml' # Run if pushed commits include a change to extension definition file.
+      - '**.lua'
   schedule:
     - cron: 0 0 * * *
   workflow_dispatch:
@@ -15,7 +14,7 @@ on:
 name: Run Luacheck on Default Branch
 
 jobs:
-  inherit:
+  luacheck:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -23,67 +22,102 @@ jobs:
         with:
           ref: ${{ github.event.repository.default_branch }}
 
-      - name: Inherit other repos from extension.xml
-        id: inheritrepos
+      - name: Install Lua/LuaJIT
+        uses: leafo/gh-actions-lua@v9
+        with:
+          luaVersion: 5.1
+
+        # Determine extension name
+
+      - name: Get Extension Name from XML
+        id: getnamefromxml
         uses: mavrosxristoforos/get-xml-info@1.1.0
         with:
           xml-file: 'extension.xml'
-          xpath: '//properties//luacheck//repo'
+          xpath: '//properties//name'
 
-      - id: outerquotes
+      - name: Format Extension Name
+        id: removenameprefix
         uses: ashley-taylor/regex-property-action@1.2
         with:
-          value: ${{ steps.inheritrepos.outputs.info }}
-          regex: '(.+)'
-          replacement: '["$1"]'
+          value: ${{ steps.getnamefromxml.outputs.info }}
+          regex: '.*:\s'
+          replacement: ''
 
-      - id: innerquotes
+      - id: shortenextname
         uses: ashley-taylor/regex-property-action@1.2
         with:
-          value: ${{ steps.outerquotes.outputs.value }}
-          regex: ','
-          replacement: '","'
-      - id: generate-matrix
-        run: echo "::set-output name=repos::${{ steps.innerquotes.outputs.value }}"
+          value: ${{ steps.removenameprefix.outputs.value }}
+          regex: ',.*'
+          replacement: ''
 
-    outputs:
-      repos: ${{ steps.generate-matrix.outputs.repos }}
+      - id: removenameparenthetical
+        uses: ashley-taylor/regex-property-action@1.2
+        with:
+          value: ${{ steps.shortenextname.outputs.value }}
+          regex: '\(.*\)'
+          replacement: ''
 
-  generateconfig:
-    name: Clone FG-Unofficial-Developers-Guild/2E
-    runs-on: ubuntu-latest
-    needs: inherit
-#    strategy:
-#      matrix:
-#          package: ${{ fromJson(needs.inherit.outputs.repos) }}
-    steps:
-      - id: generate-matrix
-        run: echo ${{ needs.inherit.outputs.repos }}
-#      - uses: actions/checkout@v3
-#        with:
-#          repository: FG-Unofficial-Developers-Guild/2E
-#          path: .fg/rulesets/DND2E
-#          token: ${{ secrets.ACTIONS }}
-#
-#  luacheck:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout repo
-#        uses: actions/checkout@v3
-#        with:
-#          ref: ${{ github.event.repository.default_branch }}
-#
-#      - name: Install Lua/LuaJIT
-#        uses: leafo/gh-actions-lua@v9
-#        with:
-#          luaVersion: 5.1
-#
-#      # Process extension code
-#      - name: Running luacheck
-#        uses: nebularg/actions-luacheck@v1
-#        with:
-#          files: '.'
-#          config: https://raw.githubusercontent.com/bmos/FG-luacheck/main/.luacheckrc
-#          args: '--no-color --exclude-files .install/*'
-#          annotate: 'warning'
-#
+      - id: removenamepunctuation
+        uses: ashley-taylor/regex-property-action@1.2
+        with:
+          value: ${{ steps.removenameparenthetical.outputs.value }}
+          regex: '[^A-Za-z0-9]+'
+          replacement: ''
+
+      - id: namelowercase
+        uses: ASzc/change-string-case-action@v2
+        with:
+          string: ${{ steps.removenamepunctuation.outputs.value }}
+
+      # Determine extension author
+
+      - name: Get Extension Name from XML
+        id: getauthorfromxml
+        uses: mavrosxristoforos/get-xml-info@1.1.0
+        with:
+          xml-file: 'extension.xml'
+          xpath: '//properties//author'
+
+      - name: Format author name
+        id: removeauthorprefix
+        uses: ashley-taylor/regex-property-action@1.2
+        with:
+          value: ${{ steps.getauthorfromxml.outputs.info }}
+          regex: '.*:\s'
+          replacement: ''
+
+      - id: shortenauthorname
+        uses: ashley-taylor/regex-property-action@1.2
+        with:
+          value: ${{ steps.removeauthorprefix.outputs.value }}
+          regex: ',.*'
+          replacement: ''
+
+      - id: removeauthorparenthetical
+        uses: ashley-taylor/regex-property-action@1.2
+        with:
+          value: ${{ steps.shortenauthorname.outputs.value }}
+          regex: '\(.*\)'
+          replacement: ''
+
+      - id: removeauthorpunctuation
+        uses: ashley-taylor/regex-property-action@1.2
+        with:
+          value: ${{ steps.removeauthorparenthetical.outputs.value }}
+          regex: '[^A-Za-z0-9]+'
+          replacement: ''
+
+      - id: authorlowercase
+        uses: ASzc/change-string-case-action@v2
+        with:
+          string: ${{ steps.removeauthorpunctuation.outputs.value }}
+
+      # Process extension code
+      - name: Running luacheck
+        uses: nebularg/actions-luacheck@v1
+        with:
+          files: '.'
+          config: https://raw.githubusercontent.com/bmos/FG-luacheck/main/.luacheckrc
+          args: '--no-color --std +${{ steps.namelowercase.outputs.lowercase }}${{ steps.authorlowercase.outputs.lowercase }} --exclude-files .install/*'
+          annotate: 'warning'
