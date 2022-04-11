@@ -17,8 +17,6 @@ name: Run Luacheck on Default Branch
 jobs:
   inherit:
     runs-on: ubuntu-latest
-    outputs:
-      repos: ${{ steps.generate-matrix.outputs.repos }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -37,7 +35,7 @@ jobs:
         with:
           value: ${{ steps.inheritrepos.outputs.info }}
           regex: '(.+)'
-          replacement: '"$1"'
+          replacement: '["$1"]'
 
       - id: innerquotes
         uses: ashley-taylor/regex-property-action@1.2
@@ -45,20 +43,19 @@ jobs:
           value: ${{ steps.outerquotes.outputs.value }}
           regex: ','
           replacement: '","'
-
       - id: generate-matrix
-        run: |
-          REPOS='${{ toJSON(steps.innerquotes.outputs.value) }}'
-          echo ::set-output name=repos::${REPOS}
+        run: echo "::set-output name=repos::${{ steps.innerquotes.outputs.value }}
 
-#  generateconfig:
-#    name: Clone FG-Unofficial-Developers-Guild/2E
-#    runs-on: ubuntu-latest
-#    needs:
-#      - inherit
+    outputs:
+      repos: ${{ steps.generate-matrix.outputs.repos }}
+
+  generateconfig:
+    name: Clone FG-Unofficial-Developers-Guild/2E
+    runs-on: ubuntu-latest
+    needs: inherit
 #    strategy:
 #      matrix:
-#        repos: [${{ needs.inherit.outputs.repos }}]
+#          package: ${{ fromJson(needs.inherit.outputs.repos) }}
 #    steps:
 #      - uses: actions/checkout@v3
 #        with:
