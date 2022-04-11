@@ -306,27 +306,28 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 end
 
 ---	This function checks NPCs for feats, traits, and/or special abilities.
-local function hasSpecialAbility(nodeActor, sSearchString, bFeat, bTrait, bSpecialAbility)
-	if not nodeActor or not sSearchString or (not bFeat and not bTrait and not bSpecialAbility) then return false; end
+local function hasSpecialAbility(nodeActor, sSearchString, sAbilType)
+	if not nodeActor or not sSearchString or not sAbilType then return false; end
 
-	local sLowerSpecAbil = string.lower(sSearchString);
-	local sSpecialQualities = string.lower(DB.getValue(nodeActor, '.specialqualities', ''));
-	local sSpecAtks = string.lower(DB.getValue(nodeActor, '.specialattacks', ''));
-	local sFeats = string.lower(DB.getValue(nodeActor, '.feats', ''));
+	local sLowerSpecAbil = sSearchString:lower()
+	local sSpecialQualities = DB.getValue(nodeActor, '.specialqualities', ''):lower()
+	local sSpecAtks = DB.getValue(nodeActor, '.specialattacks', ''):lower()
+	local sFeats = DB.getValue(nodeActor, '.feats', ''):lower()
 
-	if bFeat and sFeats:match(sLowerSpecAbil, 1) then
-		local nRank = tonumber(sFeats:match(sLowerSpecAbil .. ' (%d+)', 1))
-		local sParenthetical = sSpecAtks:match(sLowerSpecAbil .. ' %((.-)%)', 1) or
-						                       sFeats:match(sLowerSpecAbil .. ' %((.-)%)', 1)
-		return true, (nRank or 1), sParenthetical
-	elseif bSpecialAbility and (sSpecAtks:match(sLowerSpecAbil, 1) or sSpecialQualities:match(sLowerSpecAbil, 1)) then
-		local nRank = tonumber(
-						              sSpecAtks:match(sLowerSpecAbil .. ' (%d+)', 1) or
-										              sSpecialQualities:match(sLowerSpecAbil .. ' (%d+)', 1)
-		              )
-		local sParenthetical = sSpecAtks:match(sLowerSpecAbil .. ' %((.-)%)', 1) or
-						                       sSpecialQualities:match(sLowerSpecAbil .. ' %((.-)%)', 1)
-		return true, (nRank or 1), sParenthetical
+	local function matchInTable(table, search)
+		for _, string in ipairs(table) do
+			local match = string:match(search, 1)
+			if match then
+				return match
+			end
+		end
+	end
+
+	if sAbilType == "Feats" and sFeats:match(sLowerSpecAbil, 1) then
+		return true, (matchInTable({ sFeats }, sLowerSpecAbil .. ' (%d+)') or 1), matchInTable({ sSpecAtks, sFeats }, sLowerSpecAbil .. ' %((.-)%)')
+	elseif sAbilType == "Special Abilities" and (sSpecAtks:match(sLowerSpecAbil, 1) or sSpecialQualities:match(sLowerSpecAbil, 1)) then
+		local tScope = { sSpecAtks, sSpecialQualities }
+		return true, (matchInTable(tScope, sLowerSpecAbil .. ' (%d+)') or 1), matchInTable(tScope, sLowerSpecAbil .. ' %((.-)%)')
 	end
 end
 
@@ -362,252 +363,243 @@ local function parse_bleed(string_parenthetical, table_ability_information)
 	end
 end
 
+local array_abilities = {
+	['Ancestral Enmity'] = {
+		['auto_add'] = true,
+		['description'] = 'You gain a +2 bonus on melee attack rolls against dwarves and gnomes.  You may select this feat twice. Its effects stack.',
+		['string_ability_type'] = 'Feats',
+		['level'] = 0,
+		['actions'] = {
+			['zeffect-1'] = {
+				['label'] = {
+					['type'] = 'string',
+					['value'] = ('Ancestral Enmity; IFT: TYPE(gnome); ATK: %d'),
+					['tiermultiplier'] = 2,
+				},
+				['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+				['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+			},
+			['zeffect-2'] = {
+				['label'] = {
+					['type'] = 'string',
+					['value'] = 'Ancestral Enmity; IFT: TYPE(dwarf); ATK: %d',
+					['tiermultiplier'] = 2,
+				},
+				['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+				['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+			},
+		},
+	},
+	['Arcane Strike'] = {
+		['description'] = 'As a swift action, you can imbue your weapons with a fraction of your power. For 1 round, your weapons deal +1 damage and are treated as magic for the purpose of overcoming damage reduction. For every five caster levels you possess, this bonus increases by +1, to a maximum of +5 at 20th level.',
+		['string_ability_type'] = 'Feats',
+		['level'] = 0,
+		['actions'] = {
+			['zeffect-1'] = {
+				['dmaxstat'] = { ['type'] = 'number', ['value'] = 4 },
+				['durmod'] = { ['type'] = 'number', ['value'] = 1 },
+				['durmult'] = { ['type'] = 'number', ['value'] = .25 },
+				['durstat'] = { ['type'] = 'string', ['value'] = 'cl' },
+				['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+				['label'] = { ['type'] = 'string', ['value'] = ('Arcane Strike; DMG: 1; DMGTYPE: magic') },
+				['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+				['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+			},
+		},
+	},
+	['Breath Weapon'] = {
+		['description'] = 'Some creatures can exhale a cloud, cone, or line of magical effects. A breath weapon usually deals damage and is often based on some type of energy. Breath weapons allow a Reflex save for half damage (DC = 10 + 1/2 breathing creature’s racial HD + breathing creature’s Constitution modifier; the exact DC is given in the creature’s descriptive text). A creature is immune to its own breath weapon unless otherwise noted. Some breath weapons allow a Fortitude save or a Will save instead of a Reflex save. Each breath weapon also includes notes on how often it can be used.',
+		['string_ability_type'] = 'Special Abilities',
+		['level'] = 0,
+		['parser'] = parse_breath_weapon,
+		['actions'] = {
+			['breathweaponsave'] = {
+				['onmissdamage'] = { ['type'] = 'string', ['value'] = nil },
+				['savedcmod'] = { ['type'] = 'number', ['value'] = nil },
+				['savedctype'] = { ['type'] = 'string', ['value'] = 'fixed' },
+				['savetype'] = { ['type'] = 'string', ['value'] = 'reflex' },
+				['type'] = { ['type'] = 'string', ['value'] = 'cast' },
+			},
+			['breathweapondmg'] = {
+				['damagelist'] = {
+					['primarydamage'] = {
+						['dice'] = { ['type'] = 'dice', ['value'] = nil },
+						['type'] = { ['type'] = 'string', ['value'] = nil },
+					},
+				},
+				['dmgnotspell'] = { ['type'] = 'number', ['value'] = 1 },
+				['type'] = { ['type'] = 'string', ['value'] = 'damage' },
+			},
+			['breathweaponrecharge'] = {
+				['durdice'] = { ['type'] = 'dice', ['value'] = 'd4' },
+				['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+				['label'] = { ['type'] = 'string', ['value'] = ('Breath Weapon Recharge') },
+				['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+				['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+			},
+		},
+	},
+	['Bleed'] = {
+		['description'] = 'A creature with this ability causes wounds that continue to bleed, dealing additional damage each round at the start of the affected creature’s turn. This bleeding can be stopped with a successful DC 15 Heal skill check or through the application of any magical healing. The amount of damage each round is specified in the creature’s entry.',
+		['string_ability_type'] = 'Special Abilities',
+		['level'] = 0,
+		['search_dice'] = true,
+		['number_substitution'] = true,
+		['parser'] = parse_bleed,
+		['actions'] = {
+			['zeffect-1'] = {
+				['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+				['label'] = { ['type'] = 'string', ['value'] = 'Bleed; DMGO: %s bleed' },
+				['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+			},
+		},
+	},
+	['Combat Expertise'] = {
+		['description'] = 'You can choose to take a -1 penalty on melee attack rolls and combat maneuver checks to gain a +1 dodge bonus to your Armor Class. When your base attack bonus reaches +4, and every +4 thereafter, the penalty increases by -1 and the dodge bonus increases by +1. You can only choose to use this feat when you declare that you are making an attack or a full-attack action with a melee weapon. The effects of this feat last until your next turn.',
+		['string_ability_type'] = 'Feats',
+		['level'] = 0,
+		['actions'] = {
+			['zeffect-1'] = {
+				['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+				['label'] = { ['type'] = 'string', ['value'] = 'Combat Expertise; ATK: -1 [-QBAB] ,melee; AC: 1 [QBAB] dodge' },
+				['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+				['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+			},
+		},
+	},
+	['Critical Focus'] = {
+		['auto_add'] = true,
+		['description'] = 'You receive a +4 circumstance bonus on attack rolls made to confirm critical hits.',
+		['string_ability_type'] = 'Feats',
+		['level'] = 0,
+		['actions'] = {
+			['zeffect-1'] = {
+				['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+				['label'] = { ['type'] = 'string', ['value'] = 'Critical Focus; CC: +4 circumstance' },
+				['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+				['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+			},
+		},
+	},
+	['Deadly Aim'] = {
+		['description'] = 'You can choose to take a -1 penalty on all ranged attack rolls to gain a +2 bonus on all ranged damage rolls. When your base attack bonus reaches +4, and every +4 thereafter, the penalty increases by -1 and the bonus to damage increases by +2. You must choose to use this feat before making an attack roll and its effects last until your next turn. The bonus damage does not apply to touch attacks or effects that do not deal hit point damage.',
+		['string_ability_type'] = 'Feats',
+		['level'] = 0,
+		['actions'] = {
+			['zeffect-1'] = {
+				['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+				['label'] = { ['type'] = 'string', ['value'] = 'Deadly Aim; ATK: -1 [-QBAB] ,ranged; DMG: 2 [QBAB] [QBAB] ,ranged' },
+				['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+				['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+			},
+		},
+	},
+	['Defended Movement'] = {
+		['auto_add'] = true,
+		['description'] = 'You gain a +2 bonus to your AC against attacks of opportunity.',
+		['string_ability_type'] = 'Feats',
+		['level'] = 0,
+		['actions'] = {
+			['zeffect-1'] = {
+				['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+				['label'] = { ['type'] = 'string', ['value'] = 'Defended Movement; AC: 4 ,,opportunity' },
+				['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+				['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+			},
+		},
+	},
+	['Furious Focus'] = {
+		['auto_add'] = true,
+		['description'] = 'When you are wielding a two-handed weapon or a one-handed weapon with two hands, and using the Power Attack feat, you do not suffer Power Attack’s penalty on melee attack rolls on the first attack you make each turn. You still suffer the penalty on any additional attacks, including attacks of opportunity.',
+		['string_ability_type'] = 'Feats',
+		['level'] = 0,
+		['actions'] = {
+			['zeffect-1'] = {
+				['apply'] = { ['type'] = 'string', ['value'] = 'roll' },
+				['label'] = { ['type'] = 'string', ['value'] = 'Furious Focus; IF: CUSTOM(Power Attack 2-H); ATK: 1 [QBAB] ,melee' },
+				['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+				['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+			},
+		},
+	},
+	['Mobility'] = {
+		['auto_add'] = true,
+		['description'] = 'You get a +4 dodge bonus to Armor Class against attacks of opportunity caused when you move out of or within a threatened area. A condition that makes you lose your Dexterity bonus to Armor Class (if any) also makes you lose dodge bonuses. Dodge bonuses stack with each other, unlike most types of bonuses.',
+		['string_ability_type'] = 'Feats',
+		['level'] = 0,
+		['actions'] = {
+			['zeffect-1'] = {
+				['label'] = { ['type'] = 'string', ['value'] = 'Mobility; AC: 4 dodge,opportunity' },
+				['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+				['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+			},
+		},
+	},
+	-- ['Mythic Power'] = {
+	-- ['description'] = 'Every mythic PC gains a number of base abilities common to all mythic characters, in addition to the special abilities granted by each mythic path. These abilities are gained based on the character’s mythic tier.',
+	-- ['string_ability_type'] = 'Special Abilities',
+	-- ['level'] = 0,
+	-- ['perday'] = nil,
+	-- ['actions'] = {
+	-- ['surge'] = {
+	-- ['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
+	-- ['label'] = { ['type'] = 'string', ['value'] = 'Critical Focus; CC: +4 circumstance' },
+	-- ['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+	-- ['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+	-- },
+	-- },
+	-- },
+	['Power Attack'] = {
+		['description'] = 'You can choose to take a -1 penalty on all melee attack rolls and combat maneuver checks to gain a +2 bonus on all melee damage rolls. This bonus to damage is increased by half (+50%) if you are making an attack with a two-handed weapon, a one handed weapon using two hands, or a primary natural weapon that adds 1-1/2 times your Strength modifier on damage rolls. This bonus to damage is halved (-50%) if you are making an attack with an off-hand weapon or secondary natural weapon. When your base attack bonus reaches +4, and every 4 points thereafter, the penalty increases by -1 and the bonus to damage increases by +2. You must choose to use this feat before making an attack roll, and its effects last until your next turn. The bonus damage does not apply to touch attacks or effects that do not deal hit point damage.',
+		['string_ability_type'] = 'Feats',
+		['level'] = 0,
+		['actions'] = {
+			['zeffect-1'] = {
+				['label'] = {
+					['type'] = 'string',
+					['value'] = 'Power Attack 1-H; ATK: -1 [-QBAB] ,melee; DMG: 2 [QBAB] [QBAB] ,melee',
+				},
+				['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+				['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+			},
+			['zeffect-2'] = {
+				['label'] = {
+					['type'] = 'string',
+					['value'] = 'REMOVE: Power Attack 1-H; ATK: -1 [-QBAB] ,melee; DMG: 2 [QBAB] [QBAB] ,melee',
+				},
+				['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+				['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+			},
+			['zeffect-3'] = {
+				['label'] = {
+					['type'] = 'string',
+					['value'] = 'Power Attack 2-H; ATK: -1 [-QBAB] ,melee; DMG: 3 [QBAB] [QBAB] [QBAB] ,melee',
+				},
+				['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+				['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+			},
+			['zeffect-4'] = {
+				['label'] = {
+					['type'] = 'string',
+					['value'] = 'REMOVE: Power Attack 2-H; ATK: -1 [-QBAB] ,melee; DMG: 3 [QBAB] [QBAB] [QBAB] ,melee',
+				},
+				['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
+				['type'] = { ['type'] = 'string', ['value'] = 'effect' },
+			},
+		},
+	},
+}
+
 ---	This function breaks down a table of abilities and searches for them in an NPC sheet.
 --	The search result is provided by the hasSpecialAbility function.
 --	If a match is found, it triggers the function hasSpecialAbility.
 -- luacheck: no max line length
 local function search_for_abilities(node_npc)
-	local array_abilities = {
-		['Ancestral Enmity'] = {
-			['auto_add'] = true,
-			['description'] = 'You gain a +2 bonus on melee attack rolls against dwarves and gnomes.  You may select this feat twice. Its effects stack.',
-			['string_ability_type'] = 'Feats',
-			['level'] = 0,
-			['actions'] = {
-				['zeffect-1'] = {
-					['label'] = {
-						['type'] = 'string',
-						['value'] = ('Ancestral Enmity; IFT: TYPE(gnome); ATK: %d'),
-						['tiermultiplier'] = 2,
-					},
-					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
-					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-				},
-				['zeffect-2'] = {
-					['label'] = {
-						['type'] = 'string',
-						['value'] = 'Ancestral Enmity; IFT: TYPE(dwarf); ATK: %d',
-						['tiermultiplier'] = 2,
-					},
-					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
-					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-				},
-			},
-		},
-		['Arcane Strike'] = {
-			['description'] = 'As a swift action, you can imbue your weapons with a fraction of your power. For 1 round, your weapons deal +1 damage and are treated as magic for the purpose of overcoming damage reduction. For every five caster levels you possess, this bonus increases by +1, to a maximum of +5 at 20th level.',
-			['string_ability_type'] = 'Feats',
-			['level'] = 0,
-			['actions'] = {
-				['zeffect-1'] = {
-					['dmaxstat'] = { ['type'] = 'number', ['value'] = 4 },
-					['durmod'] = { ['type'] = 'number', ['value'] = 1 },
-					['durmult'] = { ['type'] = 'number', ['value'] = .25 },
-					['durstat'] = { ['type'] = 'string', ['value'] = 'cl' },
-					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
-					['label'] = { ['type'] = 'string', ['value'] = ('Arcane Strike; DMG: 1; DMGTYPE: magic') },
-					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
-					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-				},
-			},
-		},
-		['Breath Weapon'] = {
-			['description'] = 'Some creatures can exhale a cloud, cone, or line of magical effects. A breath weapon usually deals damage and is often based on some type of energy. Breath weapons allow a Reflex save for half damage (DC = 10 + 1/2 breathing creature’s racial HD + breathing creature’s Constitution modifier; the exact DC is given in the creature’s descriptive text). A creature is immune to its own breath weapon unless otherwise noted. Some breath weapons allow a Fortitude save or a Will save instead of a Reflex save. Each breath weapon also includes notes on how often it can be used.',
-			['string_ability_type'] = 'Special Abilities',
-			['level'] = 0,
-			['parser'] = parse_breath_weapon,
-			['actions'] = {
-				['breathweaponsave'] = {
-					['onmissdamage'] = { ['type'] = 'string', ['value'] = nil },
-					['savedcmod'] = { ['type'] = 'number', ['value'] = nil },
-					['savedctype'] = { ['type'] = 'string', ['value'] = 'fixed' },
-					['savetype'] = { ['type'] = 'string', ['value'] = 'reflex' },
-					['type'] = { ['type'] = 'string', ['value'] = 'cast' },
-				},
-				['breathweapondmg'] = {
-					['damagelist'] = {
-						['primarydamage'] = {
-							['dice'] = { ['type'] = 'dice', ['value'] = nil },
-							['type'] = { ['type'] = 'string', ['value'] = nil },
-						},
-					},
-					['dmgnotspell'] = { ['type'] = 'number', ['value'] = 1 },
-					['type'] = { ['type'] = 'string', ['value'] = 'damage' },
-				},
-				['breathweaponrecharge'] = {
-					['durdice'] = { ['type'] = 'dice', ['value'] = 'd4' },
-					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
-					['label'] = { ['type'] = 'string', ['value'] = ('Breath Weapon Recharge') },
-					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
-					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-				},
-			},
-		},
-		['Bleed'] = {
-			['description'] = 'A creature with this ability causes wounds that continue to bleed, dealing additional damage each round at the start of the affected creature’s turn. This bleeding can be stopped with a successful DC 15 Heal skill check or through the application of any magical healing. The amount of damage each round is specified in the creature’s entry.',
-			['string_ability_type'] = 'Special Abilities',
-			['level'] = 0,
-			['search_dice'] = true,
-			['number_substitution'] = true,
-			['parser'] = parse_bleed,
-			['actions'] = {
-				['zeffect-1'] = {
-					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
-					['label'] = { ['type'] = 'string', ['value'] = 'Bleed; DMGO: %s bleed' },
-					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-				},
-			},
-		},
-		['Combat Expertise'] = {
-			['description'] = 'You can choose to take a -1 penalty on melee attack rolls and combat maneuver checks to gain a +1 dodge bonus to your Armor Class. When your base attack bonus reaches +4, and every +4 thereafter, the penalty increases by -1 and the dodge bonus increases by +1. You can only choose to use this feat when you declare that you are making an attack or a full-attack action with a melee weapon. The effects of this feat last until your next turn.',
-			['string_ability_type'] = 'Feats',
-			['level'] = 0,
-			['actions'] = {
-				['zeffect-1'] = {
-					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
-					['label'] = { ['type'] = 'string', ['value'] = 'Combat Expertise; ATK: -1 [-QBAB] ,melee; AC: 1 [QBAB] dodge' },
-					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
-					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-				},
-			},
-		},
-		['Critical Focus'] = {
-			['auto_add'] = true,
-			['description'] = 'You receive a +4 circumstance bonus on attack rolls made to confirm critical hits.',
-			['string_ability_type'] = 'Feats',
-			['level'] = 0,
-			['actions'] = {
-				['zeffect-1'] = {
-					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
-					['label'] = { ['type'] = 'string', ['value'] = 'Critical Focus; CC: +4 circumstance' },
-					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
-					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-				},
-			},
-		},
-		['Deadly Aim'] = {
-			['description'] = 'You can choose to take a -1 penalty on all ranged attack rolls to gain a +2 bonus on all ranged damage rolls. When your base attack bonus reaches +4, and every +4 thereafter, the penalty increases by -1 and the bonus to damage increases by +2. You must choose to use this feat before making an attack roll and its effects last until your next turn. The bonus damage does not apply to touch attacks or effects that do not deal hit point damage.',
-			['string_ability_type'] = 'Feats',
-			['level'] = 0,
-			['actions'] = {
-				['zeffect-1'] = {
-					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
-					['label'] = { ['type'] = 'string', ['value'] = 'Deadly Aim; ATK: -1 [-QBAB] ,ranged; DMG: 2 [QBAB] [QBAB] ,ranged' },
-					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
-					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-				},
-			},
-		},
-		['Defended Movement'] = {
-			['auto_add'] = true,
-			['description'] = 'You gain a +2 bonus to your AC against attacks of opportunity.',
-			['string_ability_type'] = 'Feats',
-			['level'] = 0,
-			['actions'] = {
-				['zeffect-1'] = {
-					['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
-					['label'] = { ['type'] = 'string', ['value'] = 'Defended Movement; AC: 4 ,,opportunity' },
-					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
-					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-				},
-			},
-		},
-		['Furious Focus'] = {
-			['auto_add'] = true,
-			['description'] = 'When you are wielding a two-handed weapon or a one-handed weapon with two hands, and using the Power Attack feat, you do not suffer Power Attack’s penalty on melee attack rolls on the first attack you make each turn. You still suffer the penalty on any additional attacks, including attacks of opportunity.',
-			['string_ability_type'] = 'Feats',
-			['level'] = 0,
-			['actions'] = {
-				['zeffect-1'] = {
-					['apply'] = { ['type'] = 'string', ['value'] = 'roll' },
-					['label'] = { ['type'] = 'string', ['value'] = 'Furious Focus; IF: CUSTOM(Power Attack 2-H); ATK: 1 [QBAB] ,melee' },
-					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
-					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-				},
-			},
-		},
-		['Mobility'] = {
-			['auto_add'] = true,
-			['description'] = 'You get a +4 dodge bonus to Armor Class against attacks of opportunity caused when you move out of or within a threatened area. A condition that makes you lose your Dexterity bonus to Armor Class (if any) also makes you lose dodge bonuses. Dodge bonuses stack with each other, unlike most types of bonuses.',
-			['string_ability_type'] = 'Feats',
-			['level'] = 0,
-			['actions'] = {
-				['zeffect-1'] = {
-					['label'] = { ['type'] = 'string', ['value'] = 'Mobility; AC: 4 dodge,opportunity' },
-					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
-					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-				},
-			},
-		},
-		-- ['Mythic Power'] = {
-		-- ['description'] = 'Every mythic PC gains a number of base abilities common to all mythic characters, in addition to the special abilities granted by each mythic path. These abilities are gained based on the character’s mythic tier.',
-		-- ['string_ability_type'] = 'Special Abilities',
-		-- ['level'] = 0,
-		-- ['perday'] = nil,
-		-- ['actions'] = {
-		-- ['surge'] = {
-		-- ['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
-		-- ['label'] = { ['type'] = 'string', ['value'] = 'Critical Focus; CC: +4 circumstance' },
-		-- ['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
-		-- ['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-		-- },
-		-- },
-		-- },
-		['Power Attack'] = {
-			['description'] = 'You can choose to take a -1 penalty on all melee attack rolls and combat maneuver checks to gain a +2 bonus on all melee damage rolls. This bonus to damage is increased by half (+50%) if you are making an attack with a two-handed weapon, a one handed weapon using two hands, or a primary natural weapon that adds 1-1/2 times your Strength modifier on damage rolls. This bonus to damage is halved (-50%) if you are making an attack with an off-hand weapon or secondary natural weapon. When your base attack bonus reaches +4, and every 4 points thereafter, the penalty increases by -1 and the bonus to damage increases by +2. You must choose to use this feat before making an attack roll, and its effects last until your next turn. The bonus damage does not apply to touch attacks or effects that do not deal hit point damage.',
-			['string_ability_type'] = 'Feats',
-			['level'] = 0,
-			['actions'] = {
-				['zeffect-1'] = {
-					['label'] = {
-						['type'] = 'string',
-						['value'] = 'Power Attack 1-H; ATK: -1 [-QBAB] ,melee; DMG: 2 [QBAB] [QBAB] ,melee',
-					},
-					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
-					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-				},
-				['zeffect-2'] = {
-					['label'] = {
-						['type'] = 'string',
-						['value'] = 'REMOVE: Power Attack 1-H; ATK: -1 [-QBAB] ,melee; DMG: 2 [QBAB] [QBAB] ,melee',
-					},
-					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
-					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-				},
-				['zeffect-3'] = {
-					['label'] = {
-						['type'] = 'string',
-						['value'] = 'Power Attack 2-H; ATK: -1 [-QBAB] ,melee; DMG: 3 [QBAB] [QBAB] [QBAB] ,melee',
-					},
-					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
-					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-				},
-				['zeffect-4'] = {
-					['label'] = {
-						['type'] = 'string',
-						['value'] = 'REMOVE: Power Attack 2-H; ATK: -1 [-QBAB] ,melee; DMG: 3 [QBAB] [QBAB] [QBAB] ,melee',
-					},
-					['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
-					['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-				},
-			},
-		},
-	}
-
 	for string_ability_name, table_ability_information in pairs(array_abilities) do
-		local is_feat, is_trait, is_special_ability
-		if table_ability_information['string_ability_type'] == 'Feats' then
-			is_feat = true
-		elseif table_ability_information['string_ability_type'] == 'Traits' then
-			is_trait = true
-		elseif table_ability_information['string_ability_type'] == 'Special Abilities' then
-			is_special_ability = true
-		end
-
 		local is_match, number_rank, string_parenthetical = hasSpecialAbility(
-						                                                    node_npc, string_ability_name, is_feat, is_trait,
-						                                                    is_special_ability
+						                                                    node_npc, string_ability_name, table_ability_information['string_ability_type']
 		                                                    )
+
 		if is_match then
 			if string_parenthetical and table_ability_information['parser'] then
 				table_ability_information['parser'](string_parenthetical, table_ability_information)
@@ -618,41 +610,38 @@ local function search_for_abilities(node_npc)
 	end
 end
 
---
---	UTILITY FUNCTIONS
---
-
----	This function is called when adding an NPC to the combat tracker.
---	It passes the call to the original addNPC function.
---	Once it receives the node, it performs replacement of actions.
-local addNPC_old = nil -- placeholder for original addNPC function
-local function addNPC_new(sClass, nodeNPC, sName, ...)
-	local nodeEntry = addNPC_old(sClass, nodeNPC, sName, ...)
-	if nodeEntry then
-		find_spell_nodes(nodeEntry)
-		search_for_maladies(nodeEntry)
-		search_for_abilities(nodeEntry)
-	end
-
-	return nodeEntry
-end
-
----	This function is called when clicking re-parse spell on the radial menu.
---	It re-imports the spell details from the PFRPG - Spellbook module.
---	If not Spellbook spell is found, it passes the call to the original addNPC function.
-local parseSpell_old = nil -- placeholder for original parseSpell function
-local function parseSpell_new(nodeSpell, ...)
-	if nodeSpell then
-		local node_reference_spell = replace_spell_actions(nodeSpell)
-		-- if spellbook actions not found, run original parsing script
-		if not node_reference_spell then parseSpell_old(nodeSpell, ...) end
-	end
-end
-
 -- Function Overrides
 function onInit()
+
+	---	This function is called when adding an NPC to the combat tracker.
+	--	It passes the call to the original addNPC function.
+	--	Once it receives the node, it performs replacement of actions.
+	local addNPC_old -- placeholder for original addNPC function
+	local function addNPC_new(sClass, nodeNPC, sName, ...)
+		local nodeEntry = addNPC_old(sClass, nodeNPC, sName, ...)
+		if nodeEntry then
+			find_spell_nodes(nodeEntry)
+			search_for_maladies(nodeEntry)
+			search_for_abilities(nodeEntry)
+		end
+
+		return nodeEntry
+	end
+
 	addNPC_old = CombatManager.addNPC
 	CombatManager.addNPC = addNPC_new
+
+	---	This function is called when clicking re-parse spell on the radial menu.
+	--	It re-imports the spell details from the PFRPG - Spellbook module.
+	--	If not Spellbook spell is found, it passes the call to the original addNPC function.
+	local parseSpell_old -- placeholder for original parseSpell function
+	local function parseSpell_new(nodeSpell, ...)
+		if nodeSpell then
+			local node_reference_spell = replace_spell_actions(nodeSpell)
+			-- if spellbook actions not found, run original parsing script
+			if not node_reference_spell then parseSpell_old(nodeSpell, ...) end
+		end
+	end
 
 	parseSpell_old = SpellManager.parseSpell
 	SpellManager.parseSpell = parseSpell_new
