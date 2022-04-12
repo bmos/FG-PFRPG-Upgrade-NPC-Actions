@@ -1,7 +1,6 @@
 --
 -- Please see the LICENSE.md file included with this distribution for attribution and copyright information.
 --
-
 --	luacheck: globals onMenuSelection
 function onMenuSelection(selection, subselection)
 	if selection == 6 and subselection == 7 then
