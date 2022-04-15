@@ -3,9 +3,9 @@
 --
 --	luacheck: globals onMenuSelection
 function onMenuSelection(selection, subselection)
-	if selection == 6 and subselection == 7 then
+	if getDatabaseNode and selection == 6 and subselection == 7 then
 		getDatabaseNode().delete();
-	elseif selection == 4 then
+	elseif getDatabaseNode and selection == 4 then
 		SpellManager.parseSpell(getDatabaseNode());
 		-- bmos removing this line to keep script error away
 		-- activatedetail.setValue(1);
