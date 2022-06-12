@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
-<root version='3.3' release='3'>
+<root version='4.2'>
 	<!-- Please see the LICENSE.md file included with this distribution for attribution and copyright information. -->
 	<properties>
 		<name>Feature: Upgrade NPC Actions</name>
-		<version>1.19</version>
+		<version>1.20</version>
 		<author>bmos (Wil Thieme)</author>
 		<description>This extension replaces NPC spell effects and descriptions with those from the 'PFRPG - Spellbook' module, links maladies from PFRPG - Maladies Library, and adds tooltips to the built-in conditions.</description>
 		<ruleset>
@@ -21,7 +21,7 @@
 		</luacheck>
 	</properties>
 
-	<announcement text="https://www.fantasygrounds.com/forums/showthread.php?63620-PFRPG-Upgrade-NPC-Actions-Extension\nUpgrade NPC Actions v1.19:\nThis extension replaces NPC spell effects and descriptions with those from the 'PFRPG - Spellbook' module, links maladies from PFRPG - Maladies Library, and adds tooltips to the built-in conditions." font="emotefont" />
+	<announcement text="https://www.fantasygrounds.com/forums/showthread.php?63620-PFRPG-Upgrade-NPC-Actions-Extension\nUpgrade NPC Actions v1.20-hotfix.2:\nThis extension replaces NPC spell effects and descriptions with those from the 'PFRPG - Spellbook' module, links maladies from PFRPG - Maladies Library, and adds tooltips to the built-in conditions." font="emotefont" />
 
 	<base>
 		<!-- Scripts -->
