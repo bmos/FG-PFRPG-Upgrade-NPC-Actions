@@ -359,6 +359,7 @@ local array_abilities = {
 		['actions'] = {
 			['breathweaponsave'] = {
 				['onmissdamage'] = { ['type'] = 'string', ['value'] = nil },
+				['srnotallowed'] = { ['type'] = 'number', ['value'] = 1 },
 				['savedcmod'] = { ['type'] = 'number', ['value'] = nil },
 				['savedctype'] = { ['type'] = 'string', ['value'] = 'fixed' },
 				['savetype'] = { ['type'] = 'string', ['value'] = 'reflex' },
