@@ -2,28 +2,12 @@
 -- Please see the LICENSE.md file included with this distribution for attribution and copyright information.
 --
 --	luacheck: globals onMenuSelection
-function onMenuSelection(selection, subselection)
-	if getDatabaseNode and selection == 6 and subselection == 7 then
-		getDatabaseNode().delete();
-	elseif getDatabaseNode and selection == 4 then
+function onMenuSelection(selection, subselection, ...)
+	if super and super.onMenuSelection and selection ~= 4 then
+		super.onMenuSelection(selection, subselection, ...)
+	elseif getDatabaseNode then
 		SpellManager.parseSpell(getDatabaseNode());
-		-- bmos removing this line to keep script error away
-		-- activatedetail.setValue(1);
-	elseif selection == 3 then
-		-- luacheck: globals createAction
-		if subselection == 2 then
-			createAction('cast');
-			activatedetail.setValue(1);
-		elseif subselection == 3 then
-			createAction('damage');
-			activatedetail.setValue(1);
-		elseif subselection == 4 then
-			createAction('heal');
-			activatedetail.setValue(1);
-		elseif subselection == 5 then
-			createAction('effect');
-			activatedetail.setValue(1);
-		end
+		-- activatedetail.setValue(1); -- remove line to keep script error away
 	end
 end
 
@@ -58,27 +42,6 @@ end
 
 function onInit()
 	if super and super.onInit then super.onInit() end
-	if not windowlist.isReadOnly() then
-		-- luacheck: globals registerMenuItem
-		registerMenuItem(Interface.getString('menu_deletespell'), 'delete', 6);
-		registerMenuItem(Interface.getString('list_menu_deleteconfirm'), 'delete', 6, 7);
-
-		registerMenuItem(Interface.getString('menu_addspellaction'), 'pointer', 3);
-		registerMenuItem(Interface.getString('menu_addspellcast'), 'radial_sword', 3, 2);
-		registerMenuItem(Interface.getString('menu_addspelldamage'), 'radial_damage', 3, 3);
-		registerMenuItem(Interface.getString('menu_addspellheal'), 'radial_heal', 3, 4);
-		registerMenuItem(Interface.getString('menu_addspelleffect'), 'radial_effect', 3, 5);
-
-		registerMenuItem(Interface.getString('menu_reparsespell'), 'textlist', 4);
-	end
-
-	-- Check to see if we should automatically parse spell description
-	local nodeSpell = getDatabaseNode();
-	local nParse = DB.getValue(nodeSpell, 'parse', 0);
-	if nParse ~= 0 then
-		DB.setValue(nodeSpell, 'parse', 'number', 0);
-		SpellManager.parseSpell(nodeSpell);
-	end
 
 	onDisplayChanged();
 end
