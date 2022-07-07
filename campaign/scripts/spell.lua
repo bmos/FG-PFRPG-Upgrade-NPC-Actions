@@ -57,6 +57,7 @@ function onDisplayChanged()
 end
 
 function onInit()
+	if super and super.onInit then super.onInit() end
 	if not windowlist.isReadOnly() then
 		-- luacheck: globals registerMenuItem
 		registerMenuItem(Interface.getString('menu_deletespell'), 'delete', 6);
