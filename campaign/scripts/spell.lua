@@ -5,7 +5,7 @@
 function onMenuSelection(selection, subselection, ...)
 	if super and super.onMenuSelection and selection ~= 4 then
 		super.onMenuSelection(selection, subselection, ...)
-	elseif getDatabaseNode then
+	elseif getDatabaseNode and selection == 4 then
 		SpellManager.parseSpell(getDatabaseNode());
 		-- activatedetail.setValue(1); -- remove line to keep script error away
 	end
