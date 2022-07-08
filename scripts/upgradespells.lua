@@ -570,9 +570,9 @@ end
 function onInit()
 
 	---	This function is called when adding an NPC to the combat tracker.
-	local addNPCHelper_old -- placeholder for original addNPC function
-	local function addNPCHelper_new(tCustom, ...)
-		addNPCHelper_old(tCustom, ...) -- call original function
+	local addNPC_old -- placeholder for original addNPC function
+	local function addNPC_new(tCustom, ...)
+		addNPC_old(tCustom, ...) -- call original function
 
 		local bAutomatedModule, tSourceModule = nil, Module.getModuleInfo(tCustom['nodeRecord'].getPath():gsub('.+%@', ''))
 		if tSourceModule then
@@ -584,8 +584,8 @@ function onInit()
 		if not bAutomatedModule then search_for_abilities(tCustom['nodeCT']) end
 	end
 
-	addNPCHelper_old = CombatRecordManager.addNPCHelper
-	CombatRecordManager.addNPCHelper = addNPCHelper_new
+	addNPC_old = CombatRecordManager.addNPC
+	CombatRecordManager.addNPC = addNPC_new
 
 	---	This function is called when clicking re-parse spell on the radial menu.
 	--	It re-imports the spell details from the PFRPG - Spellbook module.
