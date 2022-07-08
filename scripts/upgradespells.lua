@@ -574,11 +574,17 @@ function onInit()
 	--	Once it receives the node, it performs replacement of actions.
 	local addNPC_old -- placeholder for original addNPC function
 	local function addNPC_new(sClass, nodeNPC, sName, ...)
+		local tSourceModule = Module.getModuleInfo(nodeNPC.getPath():gsub('.+%@', ''))
+		local bAutomatedModule
+		if tSourceModule then
+			bAutomatedModule = tSourceModule['author'] == 'Tanor'
+		end
 		local nodeEntry = addNPC_old(sClass, nodeNPC, sName, ...)
 		if nodeEntry then
 			find_spell_nodes(nodeEntry)
 			search_for_maladies(nodeEntry)
-			search_for_abilities(nodeEntry)
+			Debug.chat(bAutomatedModule)
+			if not bAutomatedModule then search_for_abilities(nodeEntry) end
 		end
 
 		return nodeEntry
