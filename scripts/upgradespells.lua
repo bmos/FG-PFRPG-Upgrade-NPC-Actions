@@ -570,28 +570,22 @@ end
 function onInit()
 
 	---	This function is called when adding an NPC to the combat tracker.
-	--	It passes the call to the original addNPC function.
-	--	Once it receives the node, it performs replacement of actions.
 	local addNPC_old -- placeholder for original addNPC function
-	local function addNPC_new(sClass, nodeNPC, sName, ...)
-		local tSourceModule = Module.getModuleInfo(nodeNPC.getPath():gsub('.+%@', ''))
-		local bAutomatedModule
+	local function addNPC_new(tCustom, ...)
+		addNPC_old(tCustom, ...) -- call original function
+
+		local bAutomatedModule, tSourceModule = nil, Module.getModuleInfo(tCustom['nodeRecord'].getPath():gsub('.+%@', ''))
 		if tSourceModule then
 			bAutomatedModule = tSourceModule['author'] == 'Tanor'
 		end
-		local nodeEntry = addNPC_old(sClass, nodeNPC, sName, ...)
-		if nodeEntry then
-			find_spell_nodes(nodeEntry)
-			search_for_maladies(nodeEntry)
-			Debug.chat(bAutomatedModule)
-			if not bAutomatedModule then search_for_abilities(nodeEntry) end
-		end
 
-		return nodeEntry
+		find_spell_nodes(tCustom['nodeCT'])
+		search_for_maladies(tCustom['nodeCT'])
+		if not bAutomatedModule then search_for_abilities(tCustom['nodeCT']) end
 	end
 
-	addNPC_old = CombatManager.addNPC
-	CombatManager.addNPC = addNPC_new
+	addNPC_old = CombatRecordManager.addNPC
+	CombatRecordManager.addNPC = addNPC_new
 
 	---	This function is called when clicking re-parse spell on the radial menu.
 	--	It re-imports the spell details from the PFRPG - Spellbook module.
