@@ -5,12 +5,11 @@
 <root>
 	<windowclass name="effect_preset_item" merge="join">
 		<script>
-			function setEffect(rEffect)
+			function setEffect(rEffect, ...)
 				if super and super.setEffect then
-					super.setEffect(rEffect);
+					super.setEffect(rEffect, ...);
 				end
-				local sCondition = (rEffect["sName"] or ""):lower()
-				sCondition = sCondition:gsub("%L", "")
+				local sCondition = (rEffect["sName"] or ""):lower():gsub("%L", "")
 				if sCondition ~= "" then
 					local sTooltipText = EffectLibraryDescriptions.conditionshelp[sCondition];
 					button.setTooltipText(sTooltipText);
