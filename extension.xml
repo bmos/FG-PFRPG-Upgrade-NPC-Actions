@@ -25,8 +25,9 @@
 
 	<base>
 		<!-- Scripts -->
-		<script name='UpgradeSpells' file='scripts/upgradespells.lua' />
-		<script name='EffectLibraryDescriptions' file='scripts/effectdescriptions.lua' />
+		<script name='UNPCAbilities' file='scripts/UNPC_abilities.lua' />
+		<script name='UpgradeSpells' file='scripts/UNPC_upgradespells.lua' />
+		<script name='EffectLibraryDescriptions' file='scripts/UNPC_effectdescriptions.lua' />
 		<!-- Utility -->
 		<includefile source="utility/utility_effects.xml" />
 		<!-- Campaign XMLs -->
