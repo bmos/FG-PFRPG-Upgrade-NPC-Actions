@@ -199,20 +199,6 @@ array_abilities = {
 			},
 		},
 	},
-	-- ['Mythic Power'] = {
-	-- ['description'] = 'Every mythic PC gains a number of base abilities common to all mythic characters, in addition to the special abilities granted by each mythic path. These abilities are gained based on the character’s mythic tier.',
-	-- ['string_ability_type'] = 'Special Abilities',
-	-- ['level'] = 0,
-	-- ['perday'] = nil,
-	-- ['actions'] = {
-	-- ['surge'] = {
-	-- ['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
-	-- ['label'] = { ['type'] = 'string', ['value'] = 'Critical Focus; CC: +4 circumstance' },
-	-- ['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
-	-- ['type'] = { ['type'] = 'string', ['value'] = 'effect' },
-	-- },
-	-- },
-	-- },
 	['Power Attack'] = {
 		['description'] = 'You can choose to take a -1 penalty on all melee attack rolls and combat maneuver checks to gain a +2 bonus on all melee damage rolls. This bonus to damage is increased by half (+50%) if you are making an attack with a two-handed weapon, a one handed weapon using two hands, or a primary natural weapon that adds 1-1/2 times your Strength modifier on damage rolls. This bonus to damage is halved (-50%) if you are making an attack with an off-hand weapon or secondary natural weapon. When your base attack bonus reaches +4, and every 4 points thereafter, the penalty increases by -1 and the bonus to damage increases by +2. You must choose to use this feat before making an attack roll, and its effects last until your next turn. The bonus damage does not apply to touch attacks or effects that do not deal hit point damage.',
 		['string_ability_type'] = 'Feats',
