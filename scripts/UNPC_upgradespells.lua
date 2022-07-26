@@ -226,8 +226,8 @@ end
 --	ACTION AUTOMATION FUNCTIONS
 --
 
-local function add_ability_automation(node_npc, string_ability_name, table_ability_information, number_rank, string_parenthetical)
-	if (not node_npc or string_ability_name == '' or not table_ability_information or table_ability_information == {} or
+local function add_ability_automation(node_npc, table_ability_information, number_rank, string_parenthetical)
+	if (not node_npc or table_ability_information['name'] == '' or not table_ability_information or table_ability_information == {} or
 					(table_ability_information['daily_uses'] and table_ability_information['daily_uses'] < 0) or table_ability_information['level'] < 0 or
 					table_ability_information['level'] > 9 or not table_ability_information['actions']) then return end
 
@@ -245,7 +245,7 @@ local function add_ability_automation(node_npc, string_ability_name, table_abili
 	DB.setValue(node_spelllevel, 'level', 'number', table_ability_information['level'])
 
 	-- set name and description
-	DB.setValue(node_ability, 'name', 'string', string_ability_name)
+	DB.setValue(node_ability, 'name', 'string', table_ability_information['name'])
 	DB.setValue(node_ability, 'description', 'string', (table_ability_information['description'] or '') .. (string_parenthetical or ''))
 	if table_ability_information['perday'] then DB.setValue(node_ability, 'prepared', 'number', table_ability_information['perday']) end
 	DB.setValue(node_ability, 'sr', 'string', 'no')
@@ -329,7 +329,7 @@ local function search_for_abilities(node_npc)
 			end
 
 			-- add ability
-			add_ability_automation(node_npc, string_ability_name, table_ability_information, number_rank, string_parenthetical)
+			add_ability_automation(node_npc, table_ability_information, number_rank, string_parenthetical)
 		end
 	end
 end
