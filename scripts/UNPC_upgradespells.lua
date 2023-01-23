@@ -85,7 +85,7 @@ end
 local function add_spell_description(node_spell, node_reference_spell)
 	if node_reference_spell and node_spell then
 		if DB.getValue(node_spell, 'description', '') == '' or DB.getValue(node_spell, 'description', '') == '<p></p>' then
-			DB.deleteNode(node_spell.createChild('description'))
+			DB.deleteNode(node_spell, 'description')
 			local string_full_description = DB.getValue(node_reference_spell, 'description', '<p></p>')
 			DB.setValue(node_spell, 'description_full', 'formattedtext', string_full_description)
 			DB.setValue(node_spell, 'description', 'formattedtext', string_full_description)
@@ -96,12 +96,12 @@ end
 
 local function add_spell_information(node_spell, node_reference_spell)
 	if node_reference_spell and node_spell then
-		for _, node_reference_spell_subnode in pairs(node_reference_spell.getChildren()) do
+		for _, node_reference_spell_subnode in pairs(DB.getChildren(node_reference_spell)) do
 			local string_node_name = node_reference_spell_subnode.getName()
 			if string_node_name ~= 'description' and string_node_name ~= 'name' then
-				if not node_spell.getChild(string_node_name) then
-					local string_node_type = node_reference_spell_subnode.getType()
-					local node_spell_subnode = node_spell.createChild(string_node_name, string_node_type)
+				if not DB.getChild(node_spell, string_node_name) then
+					local string_node_type = DB.getType(node_reference_spell_subnode)
+					local node_spell_subnode = DB.createChild(node_spell, string_node_name, string_node_type)
 					DB.copyNode(node_reference_spell_subnode, node_spell_subnode)
 				end
 			end
@@ -117,9 +117,9 @@ local function replace_spell_actions(node_spell)
 		node_reference_spell = DB.findNode(table_module_data['prefix'] .. string_spell_name .. table_module_data['name'])
 		if node_reference_spell then break end
 	end
-	local number_spell_level = tonumber(node_spell.getChild('...').getName():gsub('level', '') or 0)
+	local number_spell_level = tonumber(DB.getChild(node_spell, '...').getName():gsub('level', '') or 0)
 	if number_spell_level and string_spell_name and node_reference_spell then
-		local node_spellset = node_spell.getChild('.....')
+		local node_spellset = DB.getChild(node_spell, '.....')
 		local node_new_spell = replace_action_nodes(
 						                       node_spell, node_spellset, number_spell_level, node_reference_spell, is_maximized, is_empowered
 		                       )
@@ -132,9 +132,9 @@ local function replace_spell_actions(node_spell)
 end
 
 local function find_spell_nodes(nodeEntry)
-	for _, nodeSpellset in pairs(nodeEntry.createChild('spellset').getChildren()) do
-		for _, nodeSpellLevel in pairs(nodeSpellset.createChild('levels').getChildren()) do
-			for _, nodeSpell in pairs(nodeSpellLevel.createChild('spells').getChildren()) do replace_spell_actions(nodeSpell) end
+	for _, nodeSpellset in pairs(DB.getChildren(nodeEntry, 'spellset')) do
+		for _, nodeSpellLevel in pairs(DB.getChildren(nodeSpellset, 'levels')) do
+			for _, nodeSpell in pairs(DB.getChildren(nodeSpellLevel, 'spells')) do replace_spell_actions(nodeSpell) end
 		end
 	end
 end
@@ -190,10 +190,10 @@ local function search_for_maladies(node_npc)
 	if DiseaseTracker then
 		if DB.getValue(node_npc, 'name') then
 			if DB.findNode('reference.diseases@*') then
-				for _, node_malady in pairs(DB.findNode('reference.diseases@*').getChildren()) do add_malady_link(node_malady, node_npc) end
+				for _, node_malady in pairs(DB.getChildren('reference.diseases@*')) do add_malady_link(node_malady, node_npc) end
 			end
 			if DB.findNode('disease') then
-				for _, node_malady in pairs(DB.findNode('disease').getChildren()) do add_malady_link(node_malady, node_npc) end
+				for _, node_malady in pairs(DB.getChildren('disease')) do add_malady_link(node_malady, node_npc) end
 			end
 		end
 	end
