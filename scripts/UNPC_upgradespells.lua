@@ -97,7 +97,7 @@ end
 local function add_spell_information(node_spell, node_reference_spell)
 	if node_reference_spell and node_spell then
 		for _, node_reference_spell_subnode in pairs(DB.getChildren(node_reference_spell)) do
-			local string_node_name = node_reference_spell_subnode.getName()
+			local string_node_name = DB.getName(node_reference_spell_subnode)
 			if string_node_name ~= 'description' and string_node_name ~= 'name' then
 				if not DB.getChild(node_spell, string_node_name) then
 					local string_node_type = DB.getType(node_reference_spell_subnode)
@@ -117,7 +117,7 @@ local function replace_spell_actions(node_spell)
 		node_reference_spell = DB.findNode(table_module_data['prefix'] .. string_spell_name .. table_module_data['name'])
 		if node_reference_spell then break end
 	end
-	local number_spell_level = tonumber(DB.getChild(node_spell, '...').getName():gsub('level', '') or 0)
+	local number_spell_level = tonumber(DB.getName(DB.getChild(node_spell, '...')):gsub('level', '') or 0)
 	if number_spell_level and string_spell_name and node_reference_spell then
 		local node_spellset = DB.getChild(node_spell, '.....')
 		local node_new_spell = replace_action_nodes(
@@ -209,10 +209,10 @@ local function add_ability_automation(node_npc, table_ability_information, numbe
 					table_ability_information['level'] > 9 or not table_ability_information['actions']) then return end
 
 	-- create spellset and intermediate subnodes
-	local node_spellset = node_npc.createChild('spellset')
-	local node_spellclass = node_spellset.createChild(table_ability_information['string_ability_type'] or 'Abilities')
-	local node_spelllevel = node_spellclass.createChild('levels').createChild('level' .. table_ability_information['level'])
-	local node_ability = node_spelllevel.createChild('spells').createChild()
+	local node_spellset = DB.createChild(node_npc, 'spellset')
+	local node_spellclass = DB.createChild(node_spellset, table_ability_information['string_ability_type'] or 'Abilities')
+	local node_spelllevel = DB.createChild(DB.createChild(node_spellclass, 'levels'), 'level' .. table_ability_information['level'])
+	local node_ability = DB.createChild(node_spelllevel.createChild('spells'))
 
 	-- set up spellset and intermediate subnodes
 	DB.setValue(node_spellclass, 'label', 'string', table_ability_information['string_ability_type'])
