@@ -90,7 +90,7 @@ end
 
 local function add_spell_information(node_spell, node_reference_spell)
 	if node_reference_spell and node_spell then
-		for _, node_reference_spell_subnode in pairs(DB.getChildren(node_reference_spell)) do
+		for _, node_reference_spell_subnode in ipairs(DB.getChildList(node_reference_spell)) do
 			local string_node_name = DB.getName(node_reference_spell_subnode)
 			if string_node_name ~= 'description' and string_node_name ~= 'name' then
 				if not DB.getChild(node_spell, string_node_name) then
@@ -124,9 +124,9 @@ local function replace_spell_actions(node_spell)
 end
 
 local function find_spell_nodes(nodeEntry)
-	for _, nodeSpellset in pairs(DB.getChildren(nodeEntry, 'spellset')) do
-		for _, nodeSpellLevel in pairs(DB.getChildren(nodeSpellset, 'levels')) do
-			for _, nodeSpell in pairs(DB.getChildren(nodeSpellLevel, 'spells')) do
+	for _, nodeSpellset in ipairs(DB.getChildList(nodeEntry, 'spellset')) do
+		for _, nodeSpellLevel in ipairs(DB.getChildList(nodeSpellset, 'levels')) do
+			for _, nodeSpell in ipairs(DB.getChildList(nodeSpellLevel, 'spells')) do
 				replace_spell_actions(nodeSpell)
 			end
 		end
@@ -190,12 +190,12 @@ local function search_for_maladies(node_npc)
 	if DiseaseTracker then
 		if DB.getValue(node_npc, 'name') then
 			if DB.findNode('reference.diseases@*') then
-				for _, node_malady in pairs(DB.getChildren('reference.diseases@*')) do
+				for _, node_malady in ipairs(DB.getChildList('reference.diseases@*')) do
 					add_malady_link(node_malady, node_npc)
 				end
 			end
 			if DB.findNode('disease') then
-				for _, node_malady in pairs(DB.getChildren('disease')) do
+				for _, node_malady in ipairs(DB.getChildList('disease')) do
 					add_malady_link(node_malady, node_npc)
 				end
 			end
