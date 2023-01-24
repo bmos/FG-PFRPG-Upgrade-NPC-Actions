@@ -26,10 +26,8 @@ end
 
 local function parse_bleed(string_parenthetical, table_ability_information)
 	if string_parenthetical ~= '' then
-		table_ability_information['actions']['zeffect-1']['label']['value'] = string.format(
-						                                                                      table_ability_information['actions']['zeffect-1']['label']['value'],
-						                                                                      string_parenthetical
-		                                                                      )
+		table_ability_information['actions']['zeffect-1']['label']['value'] =
+			string.format(table_ability_information['actions']['zeffect-1']['label']['value'], string_parenthetical)
 	end
 end
 
@@ -46,7 +44,7 @@ array_abilities = {
 		['level'] = 0,
 		['actions'] = {
 			['zeffect-1'] = {
-				['label'] = { ['type'] = 'string', ['value'] = ('Ancestral Enmity; IFT: TYPE(gnome); ATK: %d'), ['tiermultiplier'] = 2 },
+				['label'] = { ['type'] = 'string', ['value'] = 'Ancestral Enmity; IFT: TYPE(gnome); ATK: %d', ['tiermultiplier'] = 2 },
 				['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 				['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 			},
@@ -66,10 +64,10 @@ array_abilities = {
 			['zeffect-1'] = {
 				['dmaxstat'] = { ['type'] = 'number', ['value'] = 4 },
 				['durmod'] = { ['type'] = 'number', ['value'] = 1 },
-				['durmult'] = { ['type'] = 'number', ['value'] = .25 },
+				['durmult'] = { ['type'] = 'number', ['value'] = 0.25 },
 				['durstat'] = { ['type'] = 'string', ['value'] = 'cl' },
 				['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
-				['label'] = { ['type'] = 'string', ['value'] = ('Arcane Strike; DMG: 1; DMGTYPE: magic') },
+				['label'] = { ['type'] = 'string', ['value'] = 'Arcane Strike; DMG: 1; DMGTYPE: magic' },
 				['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 				['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 			},
@@ -100,7 +98,7 @@ array_abilities = {
 			['breathweaponrecharge'] = {
 				['durdice'] = { ['type'] = 'dice', ['value'] = 'd4' },
 				['durunit'] = { ['type'] = 'string', ['value'] = 'round' },
-				['label'] = { ['type'] = 'string', ['value'] = ('Breath Weapon Recharge') },
+				['label'] = { ['type'] = 'string', ['value'] = 'Breath Weapon Recharge' },
 				['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 				['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 			},
@@ -229,7 +227,10 @@ array_abilities = {
 				['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 			},
 			['zeffect-4'] = {
-				['label'] = { ['type'] = 'string', ['value'] = 'REMOVE: Power Attack 2-H; ATK: -1 [-QBAB] ,melee; DMG: 3 [QBAB] [QBAB] [QBAB] ,melee' },
+				['label'] = {
+					['type'] = 'string',
+					['value'] = 'REMOVE: Power Attack 2-H; ATK: -1 [-QBAB] ,melee; DMG: 3 [QBAB] [QBAB] [QBAB] ,melee',
+				},
 				['targeting'] = { ['type'] = 'string', ['value'] = 'self' },
 				['type'] = { ['type'] = 'string', ['value'] = 'effect' },
 			},
