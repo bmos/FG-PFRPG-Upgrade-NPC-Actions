@@ -332,7 +332,7 @@ function onInit()
 	local function addNPC_new(tCustom, ...)
 		addNPC_old(tCustom, ...) -- call original function
 
-		local bAutomatedModule, tSourceModule = nil, Module.getModuleInfo(tCustom['nodeRecord'].getPath():gsub('.+%@', ''))
+		local bAutomatedModule, tSourceModule = nil, Module.getModuleInfo(DB.getPath(tCustom['nodeRecord']):gsub('.+%@', ''))
 		if tSourceModule then bAutomatedModule = tSourceModule['author'] == 'Tanor' end
 
 		find_spell_nodes(tCustom['nodeCT'])
