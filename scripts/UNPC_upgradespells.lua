@@ -90,7 +90,7 @@ end
 
 local function add_spell_information(node_spell, node_reference_spell)
 	if node_reference_spell and node_spell then
-		for _, node_reference_spell_subnode in pairs(DB.getChildren(node_reference_spell)) do
+		for _, node_reference_spell_subnode in ipairs(DB.getChildList(node_reference_spell)) do
 			local string_node_name = DB.getName(node_reference_spell_subnode)
 			if string_node_name ~= 'description' and string_node_name ~= 'name' then
 				if not DB.getChild(node_spell, string_node_name) then
@@ -111,7 +111,7 @@ local function replace_spell_actions(node_spell)
 		node_reference_spell = DB.findNode(table_module_data['prefix'] .. string_spell_name .. table_module_data['name'])
 		if node_reference_spell then break end
 	end
-	local number_spell_level = tonumber(DB.getName(DB.getChild(node_spell, '...')):gsub('level', '') or 0)
+	local number_spell_level = tonumber(DB.getName(node_spell, '...'):gsub('level', '') or 0)
 	if number_spell_level and string_spell_name and node_reference_spell then
 		local node_spellset = DB.getChild(node_spell, '.....')
 		local node_new_spell = replace_action_nodes(node_spell, node_spellset, number_spell_level, node_reference_spell, is_maximized, is_empowered)
@@ -124,9 +124,9 @@ local function replace_spell_actions(node_spell)
 end
 
 local function find_spell_nodes(nodeEntry)
-	for _, nodeSpellset in pairs(DB.getChildren(nodeEntry, 'spellset')) do
-		for _, nodeSpellLevel in pairs(DB.getChildren(nodeSpellset, 'levels')) do
-			for _, nodeSpell in pairs(DB.getChildren(nodeSpellLevel, 'spells')) do
+	for _, nodeSpellset in ipairs(DB.getChildList(nodeEntry, 'spellset')) do
+		for _, nodeSpellLevel in ipairs(DB.getChildList(nodeSpellset, 'levels')) do
+			for _, nodeSpell in ipairs(DB.getChildList(nodeSpellLevel, 'spells')) do
 				replace_spell_actions(nodeSpell)
 			end
 		end
@@ -190,12 +190,12 @@ local function search_for_maladies(node_npc)
 	if DiseaseTracker then
 		if DB.getValue(node_npc, 'name') then
 			if DB.findNode('reference.diseases@*') then
-				for _, node_malady in pairs(DB.getChildren('reference.diseases@*')) do
+				for _, node_malady in ipairs(DB.getChildList('reference.diseases@*')) do
 					add_malady_link(node_malady, node_npc)
 				end
 			end
 			if DB.findNode('disease') then
-				for _, node_malady in pairs(DB.getChildren('disease')) do
+				for _, node_malady in ipairs(DB.getChildList('disease')) do
 					add_malady_link(node_malady, node_npc)
 				end
 			end
@@ -225,7 +225,7 @@ local function add_ability_automation(node_npc, table_ability_information, numbe
 	local node_spellset = DB.createChild(node_npc, 'spellset')
 	local node_spellclass = DB.createChild(node_spellset, table_ability_information['string_ability_type'] or 'Abilities')
 	local node_spelllevel = DB.createChild(DB.createChild(node_spellclass, 'levels'), 'level' .. table_ability_information['level'])
-	local node_ability = DB.createChild(node_spelllevel.createChild('spells'))
+	local node_ability = DB.createChild(DB.createChild(node_spelllevel, 'spells'))
 
 	-- set up spellset and intermediate subnodes
 	DB.setValue(node_spellclass, 'label', 'string', table_ability_information['string_ability_type'])
@@ -241,13 +241,13 @@ local function add_ability_automation(node_npc, table_ability_information, numbe
 	DB.setValue(node_ability, 'sr', 'string', 'no')
 
 	-- create actions
-	local node_actions = node_ability.createChild('actions')
+	local node_actions = DB.createChild(node_ability, 'actions')
 	for string_name_action, table_action_information in pairs(table_ability_information['actions']) do
-		local node_action = node_actions.createChild(string_name_action)
+		local node_action = DB.createChild(node_actions, string_name_action)
 		for string_node_name, table_node_info in pairs(table_action_information) do
 			if string_node_name == 'damagelist' or string_node_name == 'heallist' then
 				for string_damage_name, table_damage_information in pairs(table_node_info) do
-					local node_damage = node_action.createChild(string_node_name).createChild(string_damage_name)
+					local node_damage = DB.createChild(DB.createChild(node_action, string_node_name), string_damage_name)
 					for string_damagenode_name, table_damagenode_info in pairs(table_damage_information) do
 						if table_damagenode_info['type'] and table_damagenode_info['value'] then
 							if table_damagenode_info['tiermultiplier'] then
@@ -332,7 +332,7 @@ function onInit()
 	local function addNPC_new(tCustom, ...)
 		addNPC_old(tCustom, ...) -- call original function
 
-		local bAutomatedModule, tSourceModule = nil, Module.getModuleInfo(tCustom['nodeRecord'].getPath():gsub('.+%@', ''))
+		local bAutomatedModule, tSourceModule = nil, Module.getModuleInfo(DB.getPath(tCustom['nodeRecord']):gsub('.+%@', ''))
 		if tSourceModule then bAutomatedModule = tSourceModule['author'] == 'Tanor' end
 
 		find_spell_nodes(tCustom['nodeCT'])
