@@ -28,10 +28,8 @@
 		<script name='UNPCAbilities' file='scripts/UNPC_abilities.lua' />
 		<script name='UpgradeSpells' file='scripts/UNPC_upgradespells.lua' />
 		<script name='EffectLibraryDescriptions' file='scripts/UNPC_effectdescriptions.lua' />
+		<script name='PowerManagerCoreUNPC' file='scripts/UNPC_manager_power_core.lua' />
 		<!-- Utility -->
 		<includefile source="utility/utility_effects.xml" />
-		<!-- Campaign XMLs -->
-		<includefile source="campaign/record_spell_entry.xml" />
-		<includefile source="campaign/record_spell_mini.xml" />
 	</base>
 </root>
