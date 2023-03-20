@@ -4,7 +4,7 @@
 This extension improves automation of NPC abilities and spells.
 
 # Compatibility and Instructions
-This extension has been tested with [FantasyGrounds Unity](https://www.fantasygrounds.com/home/FantasyGroundsUnity.php) v4.3.5 (2023-03-07).
+This extension has been tested with [FantasyGrounds Unity](https://www.fantasygrounds.com/home/FantasyGroundsUnity.php) v4.3.6 (2023-03-16).
 
 Most features of this extension require the [PFRPG - Spellbook](https://www.fantasygrounds.com/forums/showthread.php?58962-PFRPG-Spellbook) module by [dllewell](https://www.fantasygrounds.com/forums/member.php?276423-dllewell).
 
