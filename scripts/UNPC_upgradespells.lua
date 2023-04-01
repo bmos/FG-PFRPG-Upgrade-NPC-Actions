@@ -104,7 +104,7 @@ local function add_spell_information(node_spell, node_reference_spell)
 end
 
 local function replace_spell_actions(node_spell)
-	local string_spell_name, is_maximized, is_empowered = trim_spell_name(DB.getValue(node_spell, 'name'))
+	local string_spell_name, is_maximized, is_empowered = trim_spell_name(DB.getValue(node_spell, 'name', ''))
 
 	local node_reference_spell
 	for _, table_module_data in pairs(array_modules) do
