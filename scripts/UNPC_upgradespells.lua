@@ -51,27 +51,22 @@ local function trim_spell_name(string_spell_name)
 	return string_spell_name, tTrims['Maximized'], tTrims['Empowered']
 end
 
-local function replace_action_nodes(node_spell, node_spellset, number_spell_level, node_reference_spell, is_maximized, is_empowered)
+local function replace_action_nodes(node_spell, node_reference_spell, is_maximized, is_empowered)
 	if node_reference_spell then
-		if node_reference_spell.getChild('actions') then
-			local string_spell_name = DB.getValue(node_spell, 'name', 0)
-			local number_cast = DB.getValue(node_spell, 'cast', 0)
-			local number_prepared = DB.getValue(node_spell, 'prepared', 0)
-
-			DB.deleteNode(node_spell)
-			local node_spell_new = SpellManager.addSpell(node_reference_spell, node_spellset, number_spell_level)
-			DB.setValue(node_spell_new, 'cast', 'number', number_cast)
-			DB.setValue(node_spell_new, 'prepared', 'number', number_prepared)
-			DB.setValue(node_spell_new, 'name', 'string', string_spell_name)
+		local node_reference_actions = DB.getChild(node_reference_spell, 'actions')
+		if node_reference_actions then
+			local node_actions = DB.getChild(node_spell, 'actions')
+			DB.deleteChildren(node_actions)
+			for _, node_reference_action in ipairs(DB.getChildList(node_reference_actions)) do
+				DB.copyNode(node_reference_action, DB.createChild(node_actions, DB.getName(node_reference_action)))
+			end
 
 			-- set up metamagic if applicable
-			local node_spell_new_damage = node_spell_new.getChild('actions').getChild('damage')
+			local node_spell_new_damage = node_actions.getChild('damage')
 			if node_spell_new_damage then
 				if is_empowered then DB.setValue(node_spell_new_damage, 'meta', 'string', 'empower') end
 				if is_maximized then DB.setValue(node_spell_new_damage, 'meta', 'string', 'maximize') end
 			end
-
-			return node_spell_new
 		end
 	end
 end
@@ -113,9 +108,7 @@ local function replace_spell_actions(node_spell)
 	end
 	local number_spell_level = tonumber(DB.getName(node_spell, '...'):gsub('level', '') or 0)
 	if number_spell_level and string_spell_name and node_reference_spell then
-		local node_spellset = DB.getChild(node_spell, '.....')
-		local node_new_spell = replace_action_nodes(node_spell, node_spellset, number_spell_level, node_reference_spell, is_maximized, is_empowered)
-		if node_new_spell then node_spell = node_new_spell end
+		replace_action_nodes(node_spell, node_reference_spell, is_maximized, is_empowered)
 		add_spell_description(node_spell, node_reference_spell)
 		add_spell_information(node_spell, node_reference_spell)
 	end
