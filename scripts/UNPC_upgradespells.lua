@@ -62,7 +62,7 @@ local function replace_action_nodes(node_spell, node_reference_spell, is_maximiz
 			end
 
 			-- set up metamagic if applicable
-			local node_spell_new_damage = node_actions.getChild('damage')
+			local node_spell_new_damage = DB.getChild(node_actions, 'damage')
 			if node_spell_new_damage then
 				if is_empowered then DB.setValue(node_spell_new_damage, 'meta', 'string', 'empower') end
 				if is_maximized then DB.setValue(node_spell_new_damage, 'meta', 'string', 'maximize') end
