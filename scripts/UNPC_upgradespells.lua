@@ -55,7 +55,7 @@ local function replace_action_nodes(node_spell, node_reference_spell, is_maximiz
 	if node_reference_spell then
 		local node_reference_actions = DB.getChild(node_reference_spell, 'actions')
 		if node_reference_actions then
-			local node_actions = DB.getChild(node_spell, 'actions')
+			local node_actions = DB.createChild(node_spell, 'actions')
 			DB.deleteChildren(node_actions)
 			for _, node_reference_action in ipairs(DB.getChildList(node_reference_actions)) do
 				DB.copyNode(node_reference_action, DB.createChild(node_actions, DB.getName(node_reference_action)))
