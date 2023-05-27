@@ -45,7 +45,7 @@ local function trim_spell_name(string_spell_name)
 
 	-- append relevant tags to end of spell name
 	for s, v in pairs(tFormats) do
-		if tTrims[v] then string_spell_name = string_spell_name .. ', ' .. s end
+		if tTrims[v] then string_spell_name = string.format('%s, %s', string_spell_name, s) end
 	end
 
 	return string_spell_name, tTrims['Maximized'], tTrims['Empowered']
