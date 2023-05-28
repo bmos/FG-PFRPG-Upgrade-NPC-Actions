@@ -120,7 +120,13 @@ local function find_spell_nodes(nodeEntry)
 	for _, nodeSpellset in ipairs(DB.getChildList(nodeEntry, 'spellset')) do
 		for _, nodeSpellLevel in ipairs(DB.getChildList(nodeSpellset, 'levels')) do
 			for _, nodeSpell in ipairs(DB.getChildList(nodeSpellLevel, 'spells')) do
-				replace_spell_actions(nodeSpell)
+				if DB.getType(nodeSpell) == 'databasenode' then
+					replace_spell_actions(nodeSpell)
+				else
+					Debug.console('nodeSpell', nodeSpell)
+					Debug.console('nodeSpell.getType', DB.getType(nodeSpell))
+					Debug.console('nodeSpell.getValue', DB.getValue(nodeSpell))
+				end
 			end
 		end
 	end
