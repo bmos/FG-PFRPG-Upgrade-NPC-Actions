@@ -52,47 +52,47 @@ local function trim_spell_name(string_spell_name)
 end
 
 local function replace_action_nodes(node_spell, node_reference_spell, is_maximized, is_empowered)
-	if node_reference_spell then
-		local node_reference_actions = DB.getChild(node_reference_spell, 'actions')
-		if node_reference_actions then
-			local node_actions = DB.createChild(node_spell, 'actions')
-			DB.deleteChildren(node_actions)
-			for _, node_reference_action in ipairs(DB.getChildList(node_reference_actions)) do
-				DB.copyNode(node_reference_action, DB.createChild(node_actions, DB.getName(node_reference_action)))
-			end
+	if not node_reference_spell then return end
 
-			-- set up metamagic if applicable
-			local node_spell_new_damage = DB.getChild(node_actions, 'damage')
-			if node_spell_new_damage then
-				if is_empowered then DB.setValue(node_spell_new_damage, 'meta', 'string', 'empower') end
-				if is_maximized then DB.setValue(node_spell_new_damage, 'meta', 'string', 'maximize') end
-			end
-		end
+	local node_reference_actions = DB.getChild(node_reference_spell, 'actions')
+	if not node_reference_actions then return end
+
+	local node_actions = DB.createChild(node_spell, 'actions')
+	DB.deleteChildren(node_actions)
+	for _, node_reference_action in ipairs(DB.getChildList(node_reference_actions)) do
+		DB.copyNode(node_reference_action, DB.createChild(node_actions, DB.getName(node_reference_action)))
 	end
+
+	local node_spell_new_damage = DB.getChild(node_actions, 'damage')
+	if not node_spell_new_damage then return end
+
+	-- set up metamagic if applicable
+	if is_empowered then DB.setValue(node_spell_new_damage, 'meta', 'string', 'empower') end
+	if is_maximized then DB.setValue(node_spell_new_damage, 'meta', 'string', 'maximize') end
 end
 
 local function add_spell_description(node_spell, node_reference_spell)
-	if node_reference_spell and node_spell then
-		if DB.getValue(node_spell, 'description', '') == '' or DB.getValue(node_spell, 'description', '') == '<p></p>' then
-			DB.deleteNode(node_spell, 'description')
-			local string_full_description = DB.getValue(node_reference_spell, 'description', '<p></p>')
-			DB.setValue(node_spell, 'description_full', 'formattedtext', string_full_description)
-			DB.setValue(node_spell, 'description', 'formattedtext', string_full_description)
-			SpellManager.convertSpellDescToString(node_spell)
-		end
-	end
+	if not node_reference_spell or not node_spell then return end
+	local sOrigSpellDesc = DB.getValue(node_spell, 'description', '')
+	if sOrigSpellDesc ~= '' and sOrigSpellDesc ~= '<p></p>' then return end
+
+	DB.deleteNode(node_spell, 'description')
+	local string_full_description = DB.getValue(node_reference_spell, 'description', '<p></p>')
+	DB.setValue(node_spell, 'description_full', 'formattedtext', string_full_description)
+	DB.setValue(node_spell, 'description', 'formattedtext', string_full_description)
+	SpellManager.convertSpellDescToString(node_spell)
 end
 
 local function add_spell_information(node_spell, node_reference_spell)
-	if node_reference_spell and node_spell then
-		for _, node_reference_spell_subnode in ipairs(DB.getChildList(node_reference_spell)) do
-			local string_node_name = DB.getName(node_reference_spell_subnode)
-			if string_node_name ~= 'description' and string_node_name ~= 'name' then
-				if not DB.getChild(node_spell, string_node_name) then
-					local string_node_type = DB.getType(node_reference_spell_subnode)
-					local node_spell_subnode = DB.createChild(node_spell, string_node_name, string_node_type)
-					DB.copyNode(node_reference_spell_subnode, node_spell_subnode)
-				end
+	if not node_reference_spell or not node_spell then return end
+
+	for _, node_reference_spell_subnode in ipairs(DB.getChildList(node_reference_spell)) do
+		local string_node_name = DB.getName(node_reference_spell_subnode)
+		if string_node_name ~= 'description' and string_node_name ~= 'name' then
+			if not DB.getChild(node_spell, string_node_name) then
+				local string_node_type = DB.getType(node_reference_spell_subnode)
+				local node_spell_subnode = DB.createChild(node_spell, string_node_name, string_node_type)
+				DB.copyNode(node_reference_spell_subnode, node_spell_subnode)
 			end
 		end
 	end
