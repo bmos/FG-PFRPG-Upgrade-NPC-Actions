@@ -118,7 +118,6 @@ local function replace_spell_actions(node_spell)
 	local string_spell_name, is_maximized, is_empowered = trim_spell_name(DB.getValue(node_spell, 'name', ''))
 
 	local node_reference_spell = find_reference_spell(string_spell_name)
-	Debug.chat(string_spell_name, node_reference_spell)
 	if not node_reference_spell then return end
 
 	replace_action_nodes(node_spell, node_reference_spell, is_maximized, is_empowered)
