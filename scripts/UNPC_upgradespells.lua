@@ -21,14 +21,14 @@ local function trim_spell_name(string_spell_name)
 	for s, _ in pairs(tFormats) do
 		local nS, nE = string_spell_name_lower:find(s:lower())
 		if nS and nE then
-			string_spell_name = string_spell_name:sub(string_spell_name, 0, nS) .. string_spell_name:sub(string_spell_name, nE, string_spell_name:len())
+			string_spell_name = string_spell_name:sub(0, nS) .. string_spell_name:sub(nE, string_spell_name:len())
 			tFormats[s] = true
 		end
 	end
 	for s, _ in pairs(tTrims) do
 		local nS, nE = string_spell_name_lower:find(s:lower())
 		if nS and nE then
-			string_spell_name = string_spell_name:sub(string_spell_name, 0, nS) .. string_spell_name:sub(string_spell_name, nE, string_spell_name:len())
+			string_spell_name = string_spell_name:sub(0, nS) .. string_spell_name:sub(nE, string_spell_name:len())
 			tTrims[s] = true
 		end
 	end
