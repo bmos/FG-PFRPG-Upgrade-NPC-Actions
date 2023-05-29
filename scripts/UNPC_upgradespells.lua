@@ -16,12 +16,21 @@ local function trim_spell_name(string_spell_name)
 	local tFormats = { ['Greater'] = false, ['Lesser'] = false, ['Communal'] = false, ['Mass'] = false }
 	local tTrims = { ['Maximized'] = false, ['Heightened'] = false, ['Empowered'] = false, ['Quickened'] = false }
 
+	local string_spell_name_lower = string_spell_name:lower()
 	-- remove tags from spell name
 	for s, _ in pairs(tFormats) do
-		if string_spell_name:gsub(', ' .. s, '') or string_spell_name:gsub(', ' .. s:lower(), '') then tTrims[s] = true end
+		local nS, nE = string_spell_name_lower:find(s:lower())
+		if nS and nE then
+			string_spell_name = string_spell_name:sub(string_spell_name, 0, nS) .. string_spell_name:sub(string_spell_name, nE, string_spell_name:len())
+			tFormats[s] = true
+		end
 	end
 	for s, _ in pairs(tTrims) do
-		if string_spell_name:gsub(', ' .. s, '') or string_spell_name:gsub(', ' .. s:lower(), '') then tTrims[s] = true end
+		local nS, nE = string_spell_name_lower:find(s:lower())
+		if nS and nE then
+			string_spell_name = string_spell_name:sub(string_spell_name, 0, nS) .. string_spell_name:sub(string_spell_name, nE, string_spell_name:len())
+			tTrims[s] = true
+		end
 	end
 
 	-- remove certain sets of characters
@@ -41,14 +50,14 @@ local function trim_spell_name(string_spell_name)
 	if number_name_end then string_spell_name = string_spell_name:sub(1, number_name_end - 1) end
 
 	-- convert to lower-case
-	string_spell_name = string_spell_name:lower()
+	string_spell_name_lower = string_spell_name:lower()
 
 	-- append relevant tags to end of spell name
 	for s, v in pairs(tFormats) do
-		if tTrims[v] then string_spell_name = string.format('%s, %s', string_spell_name, s) end
+		if v == true then string_spell_name_lower = string.format('%s%s', string_spell_name_lower, s:lower()) end
 	end
 
-	return string_spell_name, tTrims['Maximized'], tTrims['Empowered']
+	return string_spell_name_lower, tTrims['Maximized'], tTrims['Empowered']
 end
 
 local function replace_action_nodes(node_spell, node_reference_spell, is_maximized, is_empowered)
@@ -98,20 +107,23 @@ local function add_spell_information(node_spell, node_reference_spell)
 	end
 end
 
+local function find_reference_spell(string_spell_name)
+	for _, table_module_data in pairs(array_modules) do
+		local node_reference_spell = DB.findNode(table_module_data['prefix'] .. string_spell_name .. table_module_data['name'])
+		if node_reference_spell then return node_reference_spell end
+	end
+end
+
 local function replace_spell_actions(node_spell)
 	local string_spell_name, is_maximized, is_empowered = trim_spell_name(DB.getValue(node_spell, 'name', ''))
 
-	local node_reference_spell
-	for _, table_module_data in pairs(array_modules) do
-		node_reference_spell = DB.findNode(table_module_data['prefix'] .. string_spell_name .. table_module_data['name'])
-		if node_reference_spell then break end
-	end
-	local number_spell_level = tonumber(DB.getName(node_spell, '...'):gsub('level', '') or 0)
-	if number_spell_level and string_spell_name and node_reference_spell then
-		replace_action_nodes(node_spell, node_reference_spell, is_maximized, is_empowered)
-		add_spell_description(node_spell, node_reference_spell)
-		add_spell_information(node_spell, node_reference_spell)
-	end
+	local node_reference_spell = find_reference_spell(string_spell_name)
+	Debug.chat(string_spell_name, node_reference_spell)
+	if not node_reference_spell then return end
+
+	replace_action_nodes(node_spell, node_reference_spell, is_maximized, is_empowered)
+	add_spell_description(node_spell, node_reference_spell)
+	add_spell_information(node_spell, node_reference_spell)
 
 	return node_reference_spell
 end
