@@ -117,7 +117,9 @@ end
 local function replace_spell_actions(node_spell)
 	local string_spell_name, is_maximized, is_empowered = trim_spell_name(DB.getValue(node_spell, 'name', ''))
 
+	Debug.chat(type(node_spell))
 	local node_reference_spell = find_reference_spell(string_spell_name)
+	Debug.chat(node_reference_spell, type(node_reference_spell))
 	if not node_reference_spell then return end
 
 	replace_action_nodes(node_spell, node_reference_spell, is_maximized, is_empowered)
@@ -131,7 +133,8 @@ local function find_spell_nodes(nodeEntry)
 	for _, nodeSpellset in ipairs(DB.getChildList(nodeEntry, 'spellset')) do
 		for _, nodeSpellLevel in ipairs(DB.getChildList(nodeSpellset, 'levels')) do
 			for _, nodeSpell in ipairs(DB.getChildList(nodeSpellLevel, 'spells')) do
-				if DB.getType(nodeSpell) == 'node' then
+				Debug.chat(type(nodeSpell))
+				if DB.getType(nodeSpell) == 'node' and type(nodeSpell) ~= 'error' then
 					replace_spell_actions(nodeSpell)
 				else
 					Debug.console('nodeSpell', nodeSpell)
@@ -345,9 +348,10 @@ function onInit()
 		local bAutomatedModule, tSourceModule = nil, Module.getModuleInfo(DB.getPath(tCustom['nodeRecord']):gsub('.+%@', ''))
 		if tSourceModule then bAutomatedModule = tSourceModule['author'] == 'Tanor' end
 
-		find_spell_nodes(tCustom['nodeCT'])
-		search_for_maladies(tCustom['nodeCT'])
-		if not bAutomatedModule then search_for_abilities(tCustom['nodeCT']) end
+		if not bAutomatedModule then
+			find_spell_nodes(tCustom['nodeCT'])
+			search_for_abilities(tCustom['nodeCT'])
+		end
 	end
 
 	addNPC_old = CombatRecordManager.addNPC
