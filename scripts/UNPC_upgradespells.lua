@@ -117,9 +117,9 @@ end
 local function replace_spell_actions(node_spell)
 	local string_spell_name, is_maximized, is_empowered = trim_spell_name(DB.getValue(node_spell, 'name', ''))
 
-	Debug.chat(type(node_spell))
+	--Debug.chat(type(node_spell))
 	local node_reference_spell = find_reference_spell(string_spell_name)
-	Debug.chat(node_reference_spell, type(node_reference_spell))
+	--Debug.chat(node_reference_spell, type(node_reference_spell))
 	if not node_reference_spell then return end
 
 	replace_action_nodes(node_spell, node_reference_spell, is_maximized, is_empowered)
@@ -133,13 +133,13 @@ local function find_spell_nodes(nodeEntry)
 	for _, nodeSpellset in ipairs(DB.getChildList(nodeEntry, 'spellset')) do
 		for _, nodeSpellLevel in ipairs(DB.getChildList(nodeSpellset, 'levels')) do
 			for _, nodeSpell in ipairs(DB.getChildList(nodeSpellLevel, 'spells')) do
-				Debug.chat(type(nodeSpell))
+				--Debug.chat(type(nodeSpell))
 				if DB.getType(nodeSpell) == 'node' and type(nodeSpell) ~= 'error' then
 					replace_spell_actions(nodeSpell)
-				else
-					Debug.console('nodeSpell', nodeSpell)
-					Debug.console('nodeSpell.getType', DB.getType(nodeSpell))
-					Debug.console('nodeSpell.getValue', DB.getValue(nodeSpell))
+				--else
+					--Debug.console('nodeSpell', nodeSpell)
+					--Debug.console('nodeSpell.getType', DB.getType(nodeSpell))
+					--Debug.console('nodeSpell.getValue', DB.getValue(nodeSpell))
 				end
 			end
 		end
