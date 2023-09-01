@@ -81,7 +81,7 @@ local function replace_action_nodes(node_spell, node_reference_spell, is_maximiz
 end
 
 local function add_spell_description(node_spell, node_reference_spell)
-	if not node_reference_spell or not node_spell then return end
+	if not node_reference_spell or not node_spell or type(node_spell) ~= 'databasenode' then return end
 	local sOrigSpellDesc = DB.getValue(node_spell, 'description', '')
 	if sOrigSpellDesc ~= '' and sOrigSpellDesc ~= '<p></p>' then return end
 
