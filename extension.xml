@@ -15,7 +15,7 @@
 		<loadorder>51</loadorder>
 	</properties>
 
-	<announcement text="https://www.fantasygrounds.com/forums/showthread.php?63620-PFRPG-Upgrade-NPC-Actions-Extension\nUpgrade NPC Actions v1.25-hotfix.6:\nThis extension replaces NPC spell effects and descriptions with those from the 'PFRPG - Spellbook' module, links maladies from PFRPG - Maladies Library, and adds tooltips to the built-in conditions." font="emotefont" icon="module_loaded" />
+	<announcement text="https://www.fantasygrounds.com/forums/showthread.php?63620-PFRPG-Upgrade-NPC-Actions-Extension\nUpgrade NPC Actions v1.25-hotfix.7:\nThis extension replaces NPC spell effects and descriptions with those from the 'PFRPG - Spellbook' module, links maladies from PFRPG - Maladies Library, and adds tooltips to the built-in conditions." font="emotefont" icon="module_loaded" />
 
 	<base>
 		<!-- Scripts -->

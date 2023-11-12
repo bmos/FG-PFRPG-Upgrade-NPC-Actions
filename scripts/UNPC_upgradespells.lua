@@ -85,7 +85,7 @@ local function add_spell_description(node_spell, node_reference_spell)
 	local sOrigSpellDesc = DB.getValue(node_spell, 'description', '')
 	if sOrigSpellDesc ~= '' and sOrigSpellDesc ~= '<p></p>' then return end
 
-	DB.deleteNode(node_spell, 'description')
+	DB.deleteChild(node_spell, 'description')
 	local string_full_description = DB.getValue(node_reference_spell, 'description', '<p></p>')
 	DB.setValue(node_spell, 'description_full', 'formattedtext', string_full_description)
 	DB.setValue(node_spell, 'description', 'formattedtext', string_full_description)
