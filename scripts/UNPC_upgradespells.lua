@@ -355,6 +355,7 @@ function onInit()
 		if not bAutomatedModule then
 			find_spell_nodes(tCustom['nodeCT'])
 			search_for_abilities(tCustom['nodeCT'])
+			search_for_maladies(tCustom['nodeCT'])
 		end
 	end
 
