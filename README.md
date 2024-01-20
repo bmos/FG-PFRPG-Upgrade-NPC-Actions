@@ -11,6 +11,7 @@ Most features of this extension require the [PFRPG - Spellbook](https://www.fant
 # Features
 This extension replaces NPC spell actions with those from [PFRPG - Spellbook](https://www.fantasygrounds.com/forums/showthread.php?58962-PFRPG-Spellbook).
 Spell actions replacement occurs automatically when the NPC is added to the combat tracker.
+Spells whose names include `[LOCK]`, `(Mythic)`, or any parenthetical starting with `Mythic` -- such as `(Mythic Augmented 3rd)` -- will have their spell data left as-is.
 
 To update a spell with the latest improvements from [PFRPG - Spellbook](https://www.fantasygrounds.com/forums/showthread.php?58962-PFRPG-Spellbook), right-click the spell and click "reparse".
 The spell will be deleted and re-added with the latest information.

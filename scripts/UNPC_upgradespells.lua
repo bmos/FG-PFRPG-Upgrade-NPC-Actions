@@ -135,7 +135,11 @@ local function find_spell_nodes(nodeEntry)
 			for _, nodeSpell in ipairs(DB.getChildList(nodeSpellLevel, 'spells')) do
 				--Debug.chat(type(nodeSpell))
 				if DB.getType(nodeSpell) == 'node' and type(nodeSpell) ~= 'error' then
-					replace_spell_actions(nodeSpell)
+					local sSpellName = DB.getValue(nodeSpell, 'name', '')
+					if not string.find(sSpellName, '[LOCK]') and not string.match(sSpellName, '%(Mythic.*%)') then
+						replace_spell_actions(nodeSpell)
+					end
+					--Debug.console('nodeSpell', nodeSpell)
 				--else
 					--Debug.console('nodeSpell', nodeSpell)
 					--Debug.console('nodeSpell.getType', DB.getType(nodeSpell))
