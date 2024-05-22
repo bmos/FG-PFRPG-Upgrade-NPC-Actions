@@ -36,10 +36,10 @@ local function trim_spell_name(string_spell_name)
 	end
 
 	-- remove certain sets of characters
-	string_spell_name = string_spell_name:gsub("%u%u%u%u", "")
-	string_spell_name = string_spell_name:gsub("%u%u%u", "")
+	--string_spell_name = string_spell_name:gsub("%u%u%u%u", "")
+	--string_spell_name = string_spell_name:gsub("%u%u%u", "")
 	string_spell_name = string_spell_name:gsub("AP%d+", "")
-	string_spell_name = string_spell_name:gsub("%u%u", "")
+	--string_spell_name = string_spell_name:gsub("%u%u", "")
 	string_spell_name = string_spell_name:gsub(".+:", "")
 	string_spell_name = string_spell_name:gsub(",.+", "")
 	string_spell_name = string_spell_name:gsub("%[.-%]", "")
